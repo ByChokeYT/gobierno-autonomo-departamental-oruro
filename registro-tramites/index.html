@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gobernación de Oruro - Registro de Trámites</title>
+    <!-- Fuente Outfit de Google Fonts para una tipografía premium -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Vinculamos la hoja de estilos externa -->
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+
+<body>
+
+    <div class="app-container">
+        <!-- Encabezado Institucional -->
+        <header class="header">
+            <div class="logo-area">
+                <span class="logo-icon">🏢</span>
+                <div>
+                    <h1>Gobernación Autónoma Departamental de Oruro</h1>
+                    <p class="subtitle">Secretaría General - Registro de Trámites</p>
+                </div>
+            </div>
+            <!-- Badge de Estado de Trámites -->
+            <div class="stats-badge">
+                <span class="stats-label">Trámites Registrados</span>
+                <span id="contador-tramites" class="stats-value">0</span>
+            </div>
+        </header>
+
+        <div class="grid-layout">
+            <!-- Panel del Formulario (Creación) -->
+            <section class="panel form-panel">
+                <h2>Nuevo Registro</h2>
+                <p class="panel-desc">Ingrese los datos correspondientes para registrar un nuevo trámite ciudadano.</p>
+                
+                <form id="formulario-tramite">
+                    <div class="form-group">
+                        <label for="nombre">Nombre Completo del Ciudadano:</label>
+                        <input type="text" id="nombre" placeholder="Ej. Juan Carlos Flores Pérez" required autocomplete="off">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cedula">Cédula de Identidad (CI):</label>
+                        <input type="text" id="cedula" placeholder="Ej. 1234567 OR" required autocomplete="off">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tipo-tramite">Tipo de Trámite:</label>
+                        <select id="tipo-tramite" required>
+                            <option value="" disabled selected>Seleccione una opción...</option>
+                            <option value="Licencia de Funcionamiento">Licencia de Funcionamiento</option>
+                            <option value="Pago de Impuestos Departamentales">Pago de Impuestos Departamentales</option>
+                            <option value="Certificación Técnica Ambiental">Certificación Técnica Ambiental</option>
+                            <option value="Trámite Administrativo Legal">Trámite Administrativo Legal</option>
+                            <option value="Solicitud de Audiencia Departamental">Solicitud de Audiencia Departamental</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" id="btn-registrar">Registrar Trámite</button>
+                </form>
+            </section>
+
+            <!-- Panel de la Tabla (Listado) -->
+            <section class="panel table-panel">
+                <h2>Bandeja de Trámites Activos</h2>
+                <p class="panel-desc">Lista de trámites cargados en memoria. Se sincronizan automáticamente.</p>
+                
+                <div class="table-container">
+                    <table id="tabla-tramites">
+                        <thead>
+                            <tr>
+                                <th style="width: 8%">Nro</th>
+                                <th style="width: 27%">Ciudadano</th>
+                                <th style="width: 18%">Cédula (CI)</th>
+                                <th style="width: 27%">Trámite</th>
+                                <th style="width: 20%">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-tramites">
+                            <!-- Filas generadas dinámicamente con JavaScript -->
+                        </tbody>
+                    </table>
+                    
+                    <!-- Estado vacío cuando no hay registros -->
+                    <div id="estado-vacio" class="empty-state">
+                        <div class="empty-icon-container">
+                            <svg class="empty-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                                <line x1="16" y1="13" x2="8" y2="13"/>
+                                <line x1="16" y1="17" x2="8" y2="17"/>
+                                <line x1="10" y1="9" x2="8" y2="9"/>
+                            </svg>
+                        </div>
+                        <p class="empty-title">No hay trámites registrados</p>
+                        <p class="empty-subtitle">Todos los trámites han sido completados o no se han cargado datos aún.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Vinculamos la lógica externa -->
+    <script src="src/main.js"></script>
+</body>
+
+</html>

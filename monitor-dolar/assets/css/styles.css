@@ -1,0 +1,28 @@
+
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        /* Tarjeta principal en negro */
+        .tarjeta-dolar {
+            background-color: #000000; 
+            color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            width: 250px;
+        }
+        #precio-dolar {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        #estado {
+            font-size: 0.8rem;
+            color: #aaaaaa;
+        }

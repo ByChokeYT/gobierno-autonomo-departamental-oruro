@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gobernación Oruro - Hojas de Ruta y Correspondencia</title>
+    <!-- Fuentes de Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+
+<body>
+
+    <div class="app-workspace">
+        
+        <!-- Panel de Control Lateral (Sidebar) -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <span class="brand-icon">🏛️</span>
+                <div>
+                    <h2>Gobernación</h2>
+                    <p>Oruro - Bolivia</p>
+                </div>
+            </div>
+
+            <!-- Botones de Navegación del Workspace (Pestañas) -->
+            <nav class="navigation-menu">
+                <button class="nav-item active" data-tab="tab-registro">
+                    <span class="nav-icon">📥</span>
+                    <span class="nav-label">Ventanilla Única</span>
+                </button>
+                <button class="nav-item" data-tab="tab-bandeja">
+                    <span class="nav-icon">💼</span>
+                    <span class="nav-label">Bandeja Interna</span>
+                </button>
+                <button class="nav-item" data-tab="tab-consulta">
+                    <span class="nav-icon">🔍</span>
+                    <span class="nav-label">Rastreo Ciudadano</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="server-status">
+                    <span class="status-indicator online"></span>
+                    <span>Servidor centralizado online</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Contenedor Principal (Main Area) -->
+        <main class="main-content">
+            
+            <!-- Cabecera Superior -->
+            <header class="top-bar">
+                <div class="page-title-area">
+                    <span class="section-indicator">SISCO v2.5</span>
+                    <h1 id="page-current-title">Ventanilla Única de Registro</h1>
+                </div>
+                
+                <div class="top-bar-stats">
+                    <div class="quick-stat">
+                        <span class="stat-num" id="contador-tramites">0</span>
+                        <span class="stat-lbl">Trámites Activos</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Sección de Contenido Dinámico (Pestañas) -->
+            <div class="workspace-body">
+                
+                <!-- PESTAÑA 1: Ventanilla Única (Registro) -->
+                <div id="tab-registro" class="tab-pane active">
+                    <div class="card-focus centered-card">
+                        <div class="card-header">
+                            <h2>Nueva Correspondencia Externa</h2>
+                            <p>Registre solicitudes externas para iniciar la Hoja de Ruta institucional.</p>
+                        </div>
+                        
+                        <form id="form-correspondencia" autocomplete="off">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="input-remitente">Nombre del Remitente</label>
+                                    <input type="text" id="input-remitente" placeholder="Ej. Juan Pérez Ramos" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="input-ci">Cédula de Identidad (CI)</label>
+                                    <input type="text" id="input-ci" placeholder="Ej. 1234567 OR" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="input-asunto">Asunto / Descripción de la Solicitud</label>
+                                <textarea id="input-asunto" placeholder="Detalle brevemente el trámite o los documentos adjuntos..." rows="4" required></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="select-destino-inicial">Oficina de Destino Inicial</label>
+                                <select id="select-destino-inicial" required>
+                                    <option value="">Seleccione dependencia...</option>
+                                    <option value="Secretaría General">Secretaría General</option>
+                                    <option value="Dirección de Obras Públicas">Dirección de Obras Públicas</option>
+                                    <option value="Asesoría Jurídica">Asesoría Jurídica</option>
+                                    <option value="Unidad de Planificación">Unidad de Planificación</option>
+                                    <option value="Dirección Financiera">Dirección Financiera</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" id="btn-registrar" class="btn-glow">Iniciar Flujo Documental</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- PESTAÑA 2: Bandeja Interna (Tabla de Derivaciones) -->
+                <div id="tab-bandeja" class="tab-pane">
+                    <div class="card-focus table-card">
+                        <div class="card-header flex-header">
+                            <div>
+                                <h2>Correspondencia Registrada</h2>
+                                <p>Seleccione un trámite para ver detalles y derivarlo a otra oficina.</p>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table id="tabla-hojas-ruta">
+                                <thead>
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Remitente</th>
+                                        <th>Asunto / Solicitud</th>
+                                        <th>Ubicación Actual</th>
+                                        <th>Estado</th>
+                                        <th>Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-hojas-ruta">
+                                    <!-- Dinámico -->
+                                </tbody>
+                            </table>
+
+                            <div id="tabla-vacía" class="empty-state">
+                                <div class="empty-animation">📁</div>
+                                <h3>Bandeja sin registros</h3>
+                                <p>No existen Hojas de Ruta activas en este momento.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PESTAÑA 3: Consulta y Rastreo Ciudadano -->
+                <div id="tab-consulta" class="tab-pane">
+                    <div class="consulta-layout">
+                        
+                        <div class="card-focus search-box-card">
+                            <h2>Rastreador de Hojas de Ruta</h2>
+                            <p>Escriba el código correlativo para consultar el historial de oficinas por las que pasó el documento.</p>
+                            
+                            <div class="search-field">
+                                <input type="text" id="input-buscar-codigo" placeholder="Ej. HR-OR-2026-0001">
+                                <button type="button" id="btn-buscar">Rastrear</button>
+                            </div>
+                        </div>
+
+                        <!-- Panel de Resultados del Rastreo -->
+                        <div id="resultado-seguimiento" class="resultado-seguimiento-area">
+                            
+                            <!-- Estado inicial sin búsquedas -->
+                            <div id="seguimiento-vacio" class="tracking-empty">
+                                <div class="empty-glow-icon">🔍</div>
+                                <h3>Esperando Código</h3>
+                                <p>Ingrese un código de Hoja de Ruta para mostrar la línea de tiempo.</p>
+                            </div>
+
+                            <!-- Información General del Documento Encontrado -->
+                            <div id="info-tramite-buscado" class="tracking-info-card hidden">
+                                <div class="info-card-header">
+                                    <div>
+                                        <span class="tracking-label">Código Único</span>
+                                        <h3 id="info-codigo">HR-OR-2026-0001</h3>
+                                    </div>
+                                    <div style="display: flex; gap: 10px; align-items: center;">
+                                        <button type="button" id="btn-imprimir-ficha" class="btn-print">🖨️ Imprimir Ficha</button>
+                                        <span id="info-estado" class="badge">Pendiente</span>
+                                    </div>
+                                </div>
+                                <div class="info-card-body">
+                                    <p><strong>Remitente:</strong> <span id="info-remitente">-</span></p>
+                                    <p><strong>Asunto:</strong> <span id="info-asunto">-</span></p>
+                                </div>
+                            </div>
+
+                            <!-- Línea de Tiempo del Historial de Derivaciones -->
+                            <div id="timeline-derivaciones" class="tracking-timeline hidden">
+                                <!-- Elementos dinámicos -->
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Panel Lateral Deslizable (Sliding Drawer) para Derivaciones -->
+    <div id="drawer-derivacion" class="drawer-overlay hidden">
+        <div class="drawer-content">
+            <div class="drawer-header">
+                <div>
+                    <h2>Derivación de Documento</h2>
+                    <p>Mueva el expediente a la oficina correspondiente añadiendo un proveído.</p>
+                </div>
+                <button type="button" id="btn-cerrar-drawer" class="btn-close-drawer">&times;</button>
+            </div>
+
+            <form id="form-derivar" autocomplete="off">
+                <input type="hidden" id="modal-tramite-id">
+                
+                <div class="drawer-meta-box">
+                    <div>
+                        <span class="meta-label">Trámite</span>
+                        <span class="meta-val" id="modal-codigo-tramite">-</span>
+                    </div>
+                    <div>
+                        <span class="meta-label">Ubicación Actual</span>
+                        <span class="meta-val" id="modal-ubicacion-tramite">-</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="select-oficina-destino">Oficina Destinataria (Derivar a):</label>
+                    <select id="select-oficina-destino" required>
+                        <option value="">Seleccione oficina destino...</option>
+                        <option value="Secretaría General">Secretaría General</option>
+                        <option value="Dirección de Obras Públicas">Dirección de Obras Públicas</option>
+                        <option value="Asesoría Jurídica">Asesoría Jurídica</option>
+                        <option value="Unidad de Planificación">Unidad de Planificación</option>
+                        <option value="Dirección Financiera">Dirección Financiera</option>
+                        <option value="Archivo Central (Completado)">Archivo Central (Completado)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="select-nuevo-estado">Nuevo Estado del Trámite:</label>
+                    <select id="select-nuevo-estado" required>
+                        <option value="En Revisión">En Revisión</option>
+                        <option value="Aprobado">Aprobado</option>
+                        <option value="Observado / Pendiente">Observado / Pendiente</option>
+                        <option value="Archivado / Completado">Archivado / Completado</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="textarea-proveido">Proveído / Instrucción Oficial:</label>
+                    <textarea id="textarea-proveido" placeholder="Ej: Remito para su respectiva consideración técnica..." rows="5" required></textarea>
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="checkbox-firma-digital">
+                        <label for="checkbox-firma-digital" class="label-checkbox">🔒 Firmar digitalmente con ADSIB (Bolivia)</label>
+                    </div>
+                </div>
+
+                <div class="drawer-footer">
+                    <button type="button" id="btn-cancelar-drawer" class="btn-secondary">Cancelar</button>
+                    <button type="submit" id="btn-guardar-derivacion" class="btn-primary">Guardar Derivación</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="src/main.js"></script>
+</body>
+
+</html>

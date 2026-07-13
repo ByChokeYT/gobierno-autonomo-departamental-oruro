@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gobernación Oruro - Sistema de Turnos</title>
+    <!-- Vinculamos la hoja de estilos externa -->
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Atención al Ciudadano</h1>
+
+        <div class="panel">
+            <h2>Emitir Turno</h2>
+            <label for="nombre-ciudadano">Nombre del Ciudadano:</label>
+            <input type="text" id="nombre-ciudadano" placeholder="Ej. Juan Pérez">
+            <button id="btn-registrar">Registrar y Dar Turno</button>
+        </div>
+
+        <div class="panel">
+            <h2>Panel del Funcionario</h2>
+            <button id="btn-llamar" class="btn-llamar">Llamar Siguiente Turno</button>
+
+            <p>Atendiendo ahora a:</p>
+            <div id="turno-actual">--</div>
+            <p id="nombre-actual" class="texto-secundario">Nadie en ventanilla</p>
+        </div>
+
+        <div class="panel">
+            <h2>Fila de Espera (<span id="contador-fila">0</span>)</h2>
+            <ul id="lista-espera">
+                <!-- Los turnos aparecerán aquí -->
+            </ul>
+        </div>
+    </div>
+
+    <!-- Vinculamos la lógica externa -->
+    <script src="src/main.js"></script>
+</body>
+
+</html>

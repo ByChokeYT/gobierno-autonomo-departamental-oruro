@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gobernación Oruro - Dashboard Demográfico</title>
+    <!-- Vinculación de fuentes profesionales desde Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Vinculamos la hoja de estilos externa en su ruta correcta -->
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+
+<body>
+
+    <main class="container">
+        <!-- Encabezado del Dashboard -->
+        <header class="header">
+            <h1>Tablero de Control Departamental</h1>
+            <p>Datos Estadísticos - Censo Nacional 2024 (Oruro)</p>
+        </header>
+
+        <!-- Tarjetas de Resumen (KPIs) -->
+        <section class="kpi-grid">
+            <div class="kpi-card">
+                <h3>Población Total</h3>
+                <p id="kpi-poblacion-total" class="kpi-value">Cargando...</p>
+            </div>
+            <div class="kpi-card">
+                <h3>Viviendas Registradas</h3>
+                <p id="kpi-viviendas-total" class="kpi-value">Cargando...</p>
+            </div>
+            <div class="kpi-card">
+                <h3>Tasa de Masculinidad</h3>
+                <p id="kpi-ratio-hombres" class="kpi-value">Cargando...</p>
+            </div>
+        </section>
+
+        <!-- Tabla Analítica -->
+        <section class="panel">
+            <h2>Desglose por Municipios/Regiones (Simulación)</h2>
+            <div class="table-responsive">
+                <table id="tabla-estadisticas">
+                    <thead>
+                        <tr>
+                            <th>Región</th>
+                            <th>Población</th>
+                            <th>Hombres</th>
+                            <th>Mujeres</th>
+                            <th>Viviendas</th>
+                            <th>Estado de Densidad</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpo-tabla-stats">
+                        <!-- Las filas se generarán dinámicamente con JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Botón de Acción -->
+        <footer style="text-align: right; margin-top: 10px;">
+            <button id="btn-recargar" class="btn-accion">Recargar Datos del Servidor</button>
+        </footer>
+    </main>
+
+    <!-- Vinculación de la lógica del sistema -->
+    <script src="src/main.js"></script>
+</body>
+
+</html>

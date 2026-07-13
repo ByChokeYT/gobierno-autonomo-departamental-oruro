@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gobernación Oruro - Liquidación de Regalías Mineras (SISREMIN)</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+
+<body>
+
+    <div class="app-workspace">
+        
+        <!-- Sidebar lateral -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <span class="brand-icon">🪙</span>
+                <div>
+                    <h2>SISREMIN</h2>
+                    <p>Regalías Mineras Oruro</p>
+                </div>
+            </div>
+
+            <div class="sidebar-info-box">
+                <h4>Normativa Aplicada</h4>
+                <p>Ley N° 535 de Minería y Metalurgia del Estado Plurinacional de Bolivia.</p>
+                <div class="distribution-info">
+                    <div class="dist-row"><span>Gobernación Oruro:</span> <strong>85%</strong></div>
+                    <div class="dist-row"><span>Municipios:</span> <strong>15%</strong></div>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="server-status">
+                    <span class="status-indicator online"></span>
+                    <span>Sistema de Control Tributario</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Contenido principal -->
+        <main class="main-content">
+            
+            <header class="top-bar">
+                <div class="page-title-area">
+                    <span class="section-indicator">Fase 5 - Control de Minerales</span>
+                    <h1>Liquidación y Control de Regalías</h1>
+                </div>
+            </header>
+
+            <!-- Panel de Estadísticas (KPIs) -->
+            <section class="kpi-section">
+                <div class="kpi-card">
+                    <div class="kpi-icon">📊</div>
+                    <div>
+                        <span class="kpi-label">Recaudación Total</span>
+                        <h2 id="kpi-total-recaudacion">0.00 Bs</h2>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">🏛️</div>
+                    <div>
+                        <span class="kpi-label">Gobernación (85%)</span>
+                        <h2 id="kpi-total-gobernacion">0.00 Bs</h2>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">🚜</div>
+                    <div>
+                        <span class="kpi-label">Municipios (15%)</span>
+                        <h2 id="kpi-total-municipios">0.00 Bs</h2>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">⛏️</div>
+                    <div>
+                        <span class="kpi-label">Mineral Líder</span>
+                        <h2 id="kpi-mineral-lider">-</h2>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección de Trabajo: Calculadora e Historial -->
+            <div class="workspace-grid">
+                
+                <!-- Calculadora de Regalías -->
+                <section class="card-focus calc-card">
+                    <div class="card-header">
+                        <h2>Calculadora Metalúrgica y Tributaria</h2>
+                        <p>Ingrese los datos del mineral cargado para simular la liquidación en tiempo real.</p>
+                    </div>
+
+                    <form id="form-liquidacion" autocomplete="off">
+                        <div class="form-group">
+                            <label for="input-empresa">Cooperativa / Empresa Minera</label>
+                            <input type="text" id="input-empresa" placeholder="Ej. Coop. Huanuni R.L." required>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="select-municipio">Municipio Productor</label>
+                                <select id="select-municipio" required>
+                                    <option value="">Seleccione...</option>
+                                    <option value="Huanuni">Huanuni</option>
+                                    <option value="Antequera">Antequera</option>
+                                    <option value="Poopó">Poopó</option>
+                                    <option value="Challapata">Challapata</option>
+                                    <option value="Machacamarca">Machacamarca</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="select-mineral">Mineral a Declarar</label>
+                                <select id="select-mineral" required>
+                                    <option value="">Seleccione...</option>
+                                    <option value="Estaño">Estaño (Sn)</option>
+                                    <option value="Zinc">Zinc (Zn)</option>
+                                    <option value="Plata">Plata (Ag)</option>
+                                    <option value="Plomo">Plomo (Pb)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="input-peso-humedo">Peso Neto Húmedo (kg)</label>
+                                <input type="number" id="input-peso-humedo" min="1" placeholder="Ej. 10000" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="input-humedad">Humedad (%)</label>
+                                <input type="number" id="input-humedad" min="0" max="100" step="0.1" placeholder="Ej. 3.5" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="input-ley">Ley del Mineral (%)</label>
+                                <input type="number" id="input-ley" min="0.0001" max="100" step="0.0001" placeholder="Ej. 62.5" required>
+                            </div>
+                        </div>
+
+                        <!-- Panel de visualización de cálculos rápidos -->
+                        <div class="calculator-live-results">
+                            <h4>Simulación Metalúrgica en Vivo</h4>
+                            <div class="results-grid">
+                                <div class="res-item"><span>Peso Seco:</span> <strong id="val-peso-seco">0.00 kg</strong></div>
+                                <div class="res-item"><span>Peso Fino:</span> <strong id="val-peso-fino">0.00 kg</strong></div>
+                                <div class="res-item"><span>Cotización Ref:</span> <strong id="val-cotizacion">-</strong></div>
+                                <div class="res-item"><span>Valor Bruto (Bs):</span> <strong id="val-bruto-bs">0.00 Bs</strong></div>
+                                <div class="res-item"><span>Alícuota Legal:</span> <strong id="val-alicuota">0.0%</strong></div>
+                                <div class="res-item"><span>Regalía Estimada:</span> <strong id="val-regalia-total" class="copper-highlight">0.00 Bs</strong></div>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="btn-registrar-liquidacion" class="btn-copper-glow">Registrar Liquidación Oficial</button>
+                    </form>
+                </section>
+
+                <!-- Bandeja de Registros -->
+                <section class="card-focus table-card">
+                    <div class="card-header">
+                        <h2>Liquidaciones Registradas</h2>
+                        <p>Historial correlativo de declaraciones y liquidaciones impositivas mineras.</p>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Empresa/Cooperativa</th>
+                                    <th>Mineral</th>
+                                    <th>Regalía Total (Bs)</th>
+                                    <th>Gobernación (85%)</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-liquidaciones">
+                                <!-- Filas dinámicas -->
+                            </tbody>
+                        </table>
+
+                        <div id="tabla-vacia" class="empty-state">
+                            <div class="empty-animation">⛏️</div>
+                            <h3>Sin registros declarados</h3>
+                            <p>Registre una nueva liquidación para poblar los indicadores departamentales.</p>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Modal de Boleta Bancaria para Impresión -->
+    <div id="modal-boleta" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button type="button" id="btn-cerrar-modal" class="btn-close-modal">&times;</button>
+            
+            <div id="boleta-imprimible" class="boleta-bancaria">
+                <div class="boleta-header">
+                    <span class="gob-shield">🏛️</span>
+                    <div class="header-text">
+                        <h3>GOBERNACIÓN AUTÓNOMA DEPARTAMENTAL DE ORURO</h3>
+                        <p>DIRECCIÓN DE MINERÍA, METALURGIA Y RECURSOS ENERGÉTICOS</p>
+                        <h4>BOLETA DE LIQUIDACIÓN Y PAGO DE REGALÍAS MINERAS</h4>
+                    </div>
+                </div>
+
+                <div class="boleta-bar">
+                    <div>Código Liquidación: <strong id="bol-codigo">-</strong></div>
+                    <div>Fecha Emisión: <strong id="bol-fecha">-</strong></div>
+                </div>
+
+                <table class="boleta-table">
+                    <tbody>
+                        <tr>
+                            <td><strong>Cooperativa / Empresa:</strong></td>
+                            <td id="bol-empresa">-</td>
+                            <td><strong>Municipio Productor:</strong></td>
+                            <td id="bol-municipio">-</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mineral Declarado:</strong></td>
+                            <td id="bol-mineral">-</td>
+                            <td><strong>Cotización de Referencia:</strong></td>
+                            <td id="bol-cotizacion">-</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Peso Neto Húmedo:</strong></td>
+                            <td id="bol-peso-humedo">-</td>
+                            <td><strong>Humedad Calculada:</strong></td>
+                            <td id="bol-humedad">-</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Peso Neto Seco:</strong></td>
+                            <td id="bol-peso-seco">-</td>
+                            <td><strong>Ley declarada:</strong></td>
+                            <td id="bol-ley">-</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Peso Fino / Contenido:</strong></td>
+                            <td id="bol-peso-fino">-</td>
+                            <td><strong>Valor Bruto de Venta:</strong></td>
+                            <td id="bol-valor-bruto">-</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Alícuota Impositiva:</strong></td>
+                            <td id="bol-alicuota">-</td>
+                            <td><strong>Tipo de Cambio:</strong></td>
+                            <td>6.86 Bs/USD</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="boleta-distribution-box">
+                    <h4>DISTRIBUCIÓN DE APORTES (Bs)</h4>
+                    <div class="dist-grid">
+                        <div class="dist-cell">
+                            <span>REGALÍA TOTAL</span>
+                            <h3 id="bol-total-regalia">-</h3>
+                        </div>
+                        <div class="dist-cell">
+                            <span>GOBERNACIÓN ORURO (85%)</span>
+                            <h3 id="bol-gobernacion-85">-</h3>
+                        </div>
+                        <div class="dist-cell">
+                            <span>MUNICIPIO PRODUCTOR (15%)</span>
+                            <h3 id="bol-municipio-15">-</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="boleta-signatures">
+                    <div class="signature-line">
+                        <div class="line"></div>
+                        <p>Firma Funcionario Minero</p>
+                    </div>
+                    <div class="signature-line">
+                        <div class="line"></div>
+                        <p>Sello de Recepción Banco Unión</p>
+                    </div>
+                </div>
+
+                <div class="barcode-sim">
+                    ||||||| | ||||| | |||| ||| |||| | |||
+                    <p>SISREMIN-OR-CONTROL-DOCUMENTAL</p>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" id="btn-imprimir-boleta" class="btn-print-boleta">🖨️ Imprimir Boleta</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="src/main.js"></script>
+</body>
+
+</html>
