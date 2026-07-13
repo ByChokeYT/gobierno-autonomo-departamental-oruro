@@ -175,7 +175,10 @@
                         <p><strong>CUSTODIO:</strong> <span id="etiqueta-custodio">Nombre Custodio</span></p>
                         <p><strong>OFICINA:</strong> <span id="etiqueta-oficina">Oficina Destino</span></p>
                     </div>
-                    <button class="btn-primary btn-print-tag" onclick="imprimirEtiqueta()">🖨️ Imprimir Código QR</button>
+                    <div class="etiqueta-actions-row">
+                        <button class="btn-primary btn-print-tag" onclick="imprimirEtiqueta()">🖨️ Imprimir</button>
+                        <button class="btn-secondary btn-download-tag" onclick="descargarEtiqueta()">📥 Descargar PNG</button>
+                    </div>
                 </div>
 
                 <!-- Columna Derecha: Trazabilidad y Reasignación -->

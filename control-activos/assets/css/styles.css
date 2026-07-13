@@ -608,10 +608,18 @@ td {
     white-space: nowrap;
 }
 
-.btn-print-tag {
+.etiqueta-actions-row {
+    display: flex;
+    gap: 10px;
     width: 100%;
+}
+
+.btn-print-tag,
+.btn-download-tag {
+    flex: 1;
     padding: 10px;
     font-size: 0.8rem;
+    font-weight: 700;
 }
 
 /* Panel de Trazabilidad Derecha */
@@ -822,7 +830,7 @@ td {
         box-shadow: none !important;
     }
 
-    .btn-print-tag {
+    .etiqueta-actions-row {
         display: none !important;
     }
 }

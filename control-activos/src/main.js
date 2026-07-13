@@ -378,3 +378,87 @@ function obtenerFechaHoraActual() {
 function imprimirEtiqueta() {
     window.print();
 }
+
+// Descargar etiqueta completa en PNG limpio
+function descargarEtiqueta() {
+    if (!activoSeleccionado) return;
+
+    // Crear canvas temporal de la etiqueta física
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = 300;
+    tempCanvas.height = 420;
+    const ctx = tempCanvas.getContext("2d");
+
+    // Fondo blanco
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+    // Borde exterior discontinuo de corte
+    ctx.strokeStyle = "#000000";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([6, 4]);
+    ctx.strokeRect(10, 10, tempCanvas.width - 20, tempCanvas.height - 20);
+    ctx.setLineDash([]); // Resetear line dash
+
+    // Cabecera GOBIERNO DE ORURO
+    ctx.fillStyle = "#000000";
+    ctx.font = "bold 14px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("GOBIERNO DE ORURO", 150, 45);
+    
+    ctx.font = "10px sans-serif";
+    ctx.fillStyle = "#555555";
+    ctx.fillText("CONTROL DE ACTIVOS FIJOS", 150, 60);
+
+    // Línea divisoria
+    ctx.strokeStyle = "#000000";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(20, 72);
+    ctx.lineTo(280, 72);
+    ctx.stroke();
+
+    // Copiar el QR del canvas original
+    const qrCanvas = document.getElementById("qr-canvas");
+    if (qrCanvas) {
+        ctx.drawImage(qrCanvas, 60, 90, 180, 180);
+    }
+
+    // Línea divisoria inferior
+    ctx.strokeStyle = "#000000";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(20, 290);
+    ctx.lineTo(280, 290);
+    ctx.stroke();
+
+    // Detalles del Activo
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#000000";
+    ctx.font = "bold 11px monospace";
+    
+    ctx.fillText("CÓDIGO:", 30, 315);
+    ctx.fillText("CUSTODIO:", 30, 335);
+    ctx.fillText("OFICINA:", 30, 355);
+
+    ctx.font = "11px monospace";
+    const truncarText = (txt, max) => txt.length > max ? txt.substring(0, max) + "..." : txt;
+
+    ctx.fillText(activoSeleccionado.codigo, 100, 315);
+    ctx.fillText(truncarText(activoSeleccionado.custodio, 20), 100, 335);
+    ctx.fillText(truncarText(activoSeleccionado.oficina, 20), 100, 355);
+
+    // Pie de página de etiqueta
+    ctx.textAlign = "center";
+    ctx.font = "italic 9px sans-serif";
+    ctx.fillStyle = "#888888";
+    ctx.fillText("ETIQUETA OFICIAL DE INVENTARIO", 150, 395);
+
+    // Descargar PNG
+    const link = document.createElement("a");
+    link.download = `etiqueta_${activoSeleccionado.codigo}.png`;
+    link.href = tempCanvas.toDataURL("image/png");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
