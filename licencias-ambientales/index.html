@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gobernación de Oruro - Control de Licencias Ambientales</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./assets/css/styles.css">
+</head>
+<body>
+    <div class="app-workspace">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon">🍃</div>
+                <div>
+                    <h2>GOBIERNO DE ORURO</h2>
+                    <p>MEDIO AMBIENTE Y AGUA</p>
+                </div>
+            </div>
+            
+            <nav class="navigation-menu">
+                <button class="nav-item active" onclick="switchTab('mapa')">🗺️ Mapa y Monitoreo</button>
+                <button class="nav-item" onclick="switchTab('registro')">➕ Registrar Licencia</button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="server-status">
+                    <span class="status-indicator online"></span>
+                    <span>Auditoría de Pasivos Ambientales</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div>
+                    <span class="section-indicator">FASE 7 - Control Territorial</span>
+                    <h1 id="page-title">Mapa de Riesgo Ambiental Departamental</h1>
+                </div>
+                <div class="top-bar-stats">
+                    <div class="quick-stat">
+                        <span class="stat-num" id="stat-total">0</span>
+                        <span class="stat-lbl">Licencias FA/MA</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="stat-num text-danger" id="stat-critico">0</span>
+                        <span class="stat-lbl">Riesgo Alto</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="stat-num text-info" id="stat-minerias">0</span>
+                        <span class="stat-lbl">Mineras Activas</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Tab Mapa & Monitoreo -->
+            <div id="tab-mapa" class="tab-pane active">
+                <div class="map-and-table-layout">
+                    <!-- Mapa SVG Panel -->
+                    <div class="card-focus map-card">
+                        <div class="card-header flex-header">
+                            <div>
+                                <h2>Mapa del Departamento de Oruro</h2>
+                                <p>Pasa el cursor por las provincias para ver su nivel de riesgo medio o haz clic para filtrar.</p>
+                            </div>
+                            <button class="btn-secondary" onclick="resetFiltroProvincia()">Mostrar Todo</button>
+                        </div>
+                        
+                        <div class="map-container">
+                            <svg id="mapa-oruro" viewBox="0 0 500 550" class="mapa-svg">
+                                <!-- Sajama (NW) -->
+                                <path d="M 50 100 L 150 70 L 170 150 L 80 180 Z" id="prov-Sajama" class="provincia" data-nombre="Sajama" />
+                                <!-- San Pedro de Totora (N) -->
+                                <path d="M 150 70 L 220 50 L 240 120 L 170 150 Z" id="prov-Totora" class="provincia" data-nombre="San Pedro de Totora" />
+                                <!-- Carangas -->
+                                <path d="M 170 150 L 240 120 L 250 200 L 180 210 Z" id="prov-Carangas" class="provincia" data-nombre="Carangas" />
+                                <!-- Nor Carangas -->
+                                <path d="M 220 50 L 300 40 L 310 110 L 240 120 Z" id="prov-NorCarangas" class="provincia" data-nombre="Nor Carangas" />
+                                <!-- Cercado (NE) -->
+                                <path d="M 300 40 L 390 60 L 360 160 L 310 110 Z" id="prov-Cercado" class="provincia" data-nombre="Cercado" />
+                                <!-- Tomás Barrón -->
+                                <path d="M 390 60 L 440 80 L 420 130 L 360 160 Z" id="prov-TomasBarron" class="provincia" data-nombre="Tomás Barrón" />
+                                <!-- Pantaleón Dalence -->
+                                <path d="M 360 160 L 420 130 L 430 200 L 370 210 Z" id="prov-Dalence" class="provincia" data-nombre="Pantaleón Dalence" />
+                                <!-- Saucarí -->
+                                <path d="M 240 120 L 310 110 L 320 180 L 250 200 Z" id="prov-Saucari" class="provincia" data-nombre="Saucarí" />
+                                <!-- Poopó -->
+                                <path d="M 320 180 L 370 210 L 350 290 L 300 270 Z" id="prov-Poopo" class="provincia" data-nombre="Poopó" />
+                                <!-- Eduardo Abaroa -->
+                                <path d="M 350 290 L 410 320 L 380 400 L 320 380 Z" id="prov-Abaroa" class="provincia" data-nombre="Eduardo Abaroa" />
+                                <!-- Sebastián Pagador -->
+                                <path d="M 380 400 L 430 420 L 410 490 L 350 470 Z" id="prov-Pagador" class="provincia" data-nombre="Sebastián Pagador" />
+                                <!-- Sur Carangas -->
+                                <path d="M 180 210 L 250 200 L 260 280 L 190 290 Z" id="prov-SurCarangas" class="provincia" data-nombre="Sur Carangas" />
+                                <!-- Litoral -->
+                                <path d="M 80 180 L 180 210 L 190 290 L 90 270 Z" id="prov-Litoral" class="provincia" data-nombre="Litoral" />
+                                <!-- Sabaya -->
+                                <path d="M 90 270 L 190 290 L 200 400 L 100 390 Z" id="prov-Sabaya" class="provincia" data-nombre="Sabaya" />
+                                <!-- Ladislao Cabrera (S) -->
+                                <path d="M 200 400 L 320 380 L 300 500 L 180 480 Z" id="prov-Cabrera" class="provincia" data-nombre="Ladislao Cabrera" />
+                                <!-- Mejillones (W) -->
+                                <path d="M 40 280 L 90 270 L 100 390 L 50 370 Z" id="prov-Mejillones" class="provincia" data-nombre="Mejillones" />
+                            </svg>
+                            <div id="map-tooltip" class="map-tooltip"></div>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de Licencias -->
+                    <div class="card-focus table-card">
+                        <div class="card-header">
+                            <h2 id="table-title">Registros Ambientales (Todos)</h2>
+                            <p>Bandeja de fiscalización oficial de operadoras registradas.</p>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Operador / Proyecto</th>
+                                        <th>Provincia</th>
+                                        <th>Tipo Actividad</th>
+                                        <th>Puntaje</th>
+                                        <th>Riesgo</th>
+                                        <th>Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-licencias">
+                                    <!-- Filas dinámicas -->
+                                </tbody>
+                            </table>
+                            
+                            <!-- Empty State -->
+                            <div id="estado-vacio-licencias" class="empty-state" style="display: none;">
+                                <div class="empty-animation">🍃</div>
+                                <h3>Sin Licencias en esta Provincia</h3>
+                                <p>No existen registros ambientales para la provincia seleccionada.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Registro -->
+            <div id="tab-registro" class="tab-pane">
+                <div class="card-focus centered-card">
+                    <div class="card-header">
+                        <h2>Registrar Nueva Licencia Ambiental</h2>
+                        <p>Ingrese los datos técnicos de la operadora y la ubicación para calcular de forma automatizada su nivel de impacto y riesgo ambiental.</p>
+                    </div>
+
+                    <form id="form-licencia" onsubmit="registrarNuevaLicencia(event)">
+                        <div class="form-group">
+                            <label for="lic-operador">Operador o Nombre del Proyecto</label>
+                            <input type="text" id="lic-operador" placeholder="Ej. Cooperativa Minera San José R.L." required autocomplete="off">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="lic-tipo-actividad">Tipo de Actividad</label>
+                                <select id="lic-tipo-actividad" onchange="calcularRiesgoFormulario()" required>
+                                    <option value="Minería Pesada">Explotación Minera Pesada</option>
+                                    <option value="Concentración de Minerales">Planta Concentradora / Dique de Colas</option>
+                                    <option value="Agroindustrial">Industria Alimenticia / Agroindustrial</option>
+                                    <option value="Servicios/Infraestructura">Obras Públicas / Servicios</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="lic-provincia">Provincia de Operación</label>
+                                <select id="lic-provincia" required>
+                                    <option value="Cercado">Cercado</option>
+                                    <option value="Sajama">Sajama</option>
+                                    <option value="Totora">San Pedro de Totora</option>
+                                    <option value="Carangas">Carangas</option>
+                                    <option value="NorCarangas">Nor Carangas</option>
+                                    <option value="TomasBarron">Tomás Barrón</option>
+                                    <option value="Dalence">Pantaleón Dalence</option>
+                                    <option value="Saucari">Saucarí</option>
+                                    <option value="Poopo">Poopó</option>
+                                    <option value="Abaroa">Eduardo Abaroa</option>
+                                    <option value="Pagador">Sebastián Pagador</option>
+                                    <option value="SurCarangas">Sur Carangas</option>
+                                    <option value="Litoral">Litoral</option>
+                                    <option value="Sabaya">Sabaya</option>
+                                    <option value="Cabrera">Ladislao Cabrera</option>
+                                    <option value="Mejillones">Mejillones</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Criterios Geográficos de Vulnerabilidad</label>
+                            <div class="checklist-container">
+                                <label class="checklist-item">
+                                    <input type="checkbox" id="chk-agua" onchange="calcularRiesgoFormulario()">
+                                    <span>¿Operación cercana a cuencas hídricas, ríos o lagos (ej. Lago Poopó)? (+3 Pts)</span>
+                                </label>
+                                <label class="checklist-item">
+                                    <input type="checkbox" id="chk-poblacion" onchange="calcularRiesgoFormulario()">
+                                    <span>¿Proximidad a centros poblados o comunidades originarias? (+2 Pts)</span>
+                                </label>
+                                <label class="checklist-item">
+                                    <input type="checkbox" id="chk-reserva" onchange="calcularRiesgoFormulario()">
+                                    <span>¿Ubicada en áreas protegidas o reservas ecológicas? (+3 Pts)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Panel de Riesgo Calculado -->
+                        <div class="riesgo-calculador-box" id="riesgo-box">
+                            <div class="riesgo-score-circle" id="riesgo-score-circ">3</div>
+                            <div>
+                                <h4>Clasificación de Riesgo Estimado</h4>
+                                <p id="riesgo-detalle">Puntaje base por Actividad Minera: 3. Riesgo de impacto **Bajo**.</p>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-glow">Emitir Licencia Ambiental</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="./src/main.js"></script>
+</body>
+</html>

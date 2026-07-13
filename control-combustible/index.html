@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gobernación de Oruro - Control de Vales de Combustible</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./assets/css/styles.css">
+</head>
+<body>
+    <div class="app-workspace">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon">⛽</div>
+                <div>
+                    <h2>GOBIERNO DE ORURO</h2>
+                    <p>CONTROL DE COMBUSTIBLE</p>
+                </div>
+            </div>
+            
+            <nav class="navigation-menu">
+                <button class="nav-item active" onclick="switchTab('vales')">📋 Vales Emitidos</button>
+                <button class="nav-item" onclick="switchTab('registro')">✍️ Emitir Nuevo Vale</button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="server-status">
+                    <span class="status-indicator online"></span>
+                    <span>Tokens HASH Activos</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div>
+                    <span class="section-indicator">FASE 10 - Conciliación Operativa</span>
+                    <h1 id="page-title">Gestión de Vales de Combustible</h1>
+                </div>
+                <div class="top-bar-stats">
+                    <div class="quick-stat">
+                        <span class="stat-num" id="stat-litros">0 Lts</span>
+                        <span class="stat-lbl">Combustible Asignado</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="stat-num text-warning" id="stat-tanque-gasolina">0 Lts</span>
+                        <span class="stat-lbl">Tanque Gasolina (5K Lts)</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="stat-num text-info" id="stat-tanque-diesel">0 Lts</span>
+                        <span class="stat-lbl">Tanque Diésel (5K Lts)</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Tab Vales -->
+            <div id="tab-vales" class="tab-pane active">
+                <!-- Alertas de Inventario Crítico -->
+                <div id="alerta-reserva" class="alerta-critica" style="display: none;">
+                    <strong>🚨 ALERTA DE RESERVA DE COMBUSTIBLE:</strong> ¡Uno de los depósitos centrales está por debajo del 20% de capacidad! Es urgente realizar la compra pública para evitar desabastecimiento.
+                </div>
+
+                <div class="card-focus table-card">
+                    <div class="card-header flex-header">
+                        <div>
+                            <h2>Bandeja de Fiscalización de Combustible</h2>
+                            <p>Registro completo de vales despachados y conciliados.</p>
+                        </div>
+                        <button class="btn-primary" onclick="switchTab('registro')">+ Emitir Vale</button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Conductor Destinatario</th>
+                                    <th>Placa</th>
+                                    <th>Combustible</th>
+                                    <th>Litros</th>
+                                    <th>Token HASH de Seguridad</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-vales">
+                                <!-- Filas dinámicas -->
+                            </tbody>
+                        </table>
+                        
+                        <!-- Empty State -->
+                        <div id="estado-vacio" class="empty-state">
+                            <div class="empty-animation">⛽</div>
+                            <h3>Sin Vales Emitidos</h3>
+                            <p>No se encontraron vales de combustible en el sistema. Emita uno nuevo para comenzar.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Registro -->
+            <div id="tab-registro" class="tab-pane">
+                <div class="card-focus centered-card">
+                    <div class="card-header">
+                        <h2>Emitir Vale de Combustible</h2>
+                        <p>Ingrese los datos vehiculares del comisionado para calcular la huella hash criptográfica del cupón.</p>
+                    </div>
+
+                    <form id="form-vale" onsubmit="registrarVale(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="val-conductor">Conductor Destinatario</label>
+                                <input type="text" id="val-conductor" placeholder="Nombre completo" required autocomplete="off">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="val-placa">Placa del Vehículo Oficial</label>
+                                <input type="text" id="val-placa" placeholder="Ej. 2451-FDS" required autocomplete="off">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="val-tipo">Tipo de Combustible</label>
+                                <select id="val-tipo" required>
+                                    <option value="Gasolina Especial">Gasolina Especial (Tanque Principal)</option>
+                                    <option value="Diésel Oíl">Diésel Oíl (Tanque SEDECA)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="val-litros">Cantidad en Litros</label>
+                                <input type="number" id="val-litros" min="5" max="150" placeholder="Ej. 40" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="val-destino">Ruta de Comisión / Justificación</label>
+                            <input type="text" id="val-destino" placeholder="Ej. Comisión de Inspección Caminera Oruro - Huanuni" required autocomplete="off">
+                        </div>
+
+                        <button type="submit" class="btn-glow">Emitir y Firmar Criptográficamente</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Boleta Imprimible -->
+    <div id="modal-boleta" class="modal-overlay">
+        <div class="modal-content-small">
+            <div class="modal-actions-bar">
+                <h3>Boleta de Vale Emitido</h3>
+                <button class="btn-secondary" onclick="cerrarModal()">Cerrar</button>
+            </div>
+            
+            <div class="boleta-body-holder">
+                <!-- Vale Formato Ticket Térmico -->
+                <div class="ticket-combustible" id="ticket-impresion">
+                    <div class="ticket-header">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo Oruro" class="ticket-escudo">
+                        <h3>GOBIERNO AUTÓNOMO DE ORURO</h3>
+                        <p>VALE DE COMBUSTIBLE OFICIAL</p>
+                        <p class="sub-ticket-info">Sistemas Administrativos - Ley N° 1178</p>
+                    </div>
+
+                    <div class="ticket-divider">*********************************</div>
+
+                    <div class="ticket-details">
+                        <p><strong>CÓDIGO VALE:</strong> <span id="t-codigo">VAL-2026-0001</span></p>
+                        <p><strong>FECHA EMISIÓN:</strong> <span id="t-fecha">13 Jul 2026</span></p>
+                        <p><strong>CONDUCTOR:</strong> <span id="t-conductor">Nombre</span></p>
+                        <p><strong>PLACA VEHÍCULO:</strong> <span id="t-placa">2451-FDS</span></p>
+                        <p><strong>COMBUSTIBLE:</strong> <span id="t-tipo">Gasolina Especial</span></p>
+                        <p><strong>CANTIDAD:</strong> <span id="t-litros">40 Litros</span></p>
+                        <p><strong>DESTINO:</strong> <span id="t-destino">Comisión</span></p>
+                    </div>
+
+                    <div class="ticket-divider">*********************************</div>
+
+                    <!-- Token de Seguridad -->
+                    <div class="ticket-seguridad">
+                        <p class="token-lbl">TOKEN HASH DE AUDITORÍA:</p>
+                        <div class="token-value" id="t-token">SHA-OR-23423A3B43C56D78</div>
+                        
+                        <!-- Código de Barras Simulado CSS -->
+                        <div class="barcode-simulado">
+                            <div class="bar w1"></div><div class="bar w3"></div><div class="bar w2"></div>
+                            <div class="bar w1"></div><div class="bar w4"></div><div class="bar w1"></div>
+                            <div class="bar w2"></div><div class="bar w3"></div><div class="bar w1"></div>
+                            <div class="bar w4"></div><div class="bar w2"></div><div class="bar w1"></div>
+                        </div>
+                    </div>
+
+                    <div class="ticket-firmas">
+                        <div class="ticket-firma-line">
+                            <div class="f-line"></div>
+                            <p>Firma Responsable</p>
+                            <p>GAD-ORURO</p>
+                        </div>
+                        <div class="ticket-firma-line">
+                            <div class="f-line"></div>
+                            <p>Firma Conductor</p>
+                            <p>Beneficiario</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="boleta-actions">
+                    <button class="btn-glow" onclick="imprimirBoleta()">🖨️ Imprimir Vale de Combustible</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="./src/main.js"></script>
+</body>
+</html>

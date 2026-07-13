@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gobernación de Oruro - Control de Personerías Jurídicas</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./assets/css/styles.css">
+</head>
+<body>
+    <div class="app-workspace">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon">🏛️</div>
+                <div>
+                    <h2>GOBIERNO DE ORURO</h2>
+                    <p>PERSONERÍAS JURÍDICAS</p>
+                </div>
+            </div>
+            
+            <nav class="navigation-menu">
+                <button class="nav-item active" onclick="switchTab('dashboard')">📋 Bandeja de Control</button>
+                <button class="nav-item" onclick="switchTab('registro')">✍️ Nueva Solicitud</button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="server-status">
+                    <span class="status-indicator online"></span>
+                    <span>Consola de Auditoría Activa</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div>
+                    <span class="section-indicator">FASE 6 - Misión Crítica</span>
+                    <h1 id="page-title">Bandeja de Control de Solicitudes</h1>
+                </div>
+                <div class="top-bar-stats">
+                    <div class="quick-stat">
+                        <span class="stat-num" id="stat-total">0</span>
+                        <span class="stat-lbl">Total Trámites</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="stat-num text-success" id="stat-aprobados">0</span>
+                        <span class="stat-lbl">Aprobadas</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="stat-num text-warning" id="stat-tramite">0</span>
+                        <span class="stat-lbl">En Trámite</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Tab Dashboard -->
+            <div id="tab-dashboard" class="tab-pane active">
+                <div class="card-focus table-card">
+                    <div class="card-header flex-header">
+                        <div>
+                            <h2>Bandeja Administrativa Departamental</h2>
+                            <p>Supervisión y control del flujo de aprobación legal de personerías jurídicas.</p>
+                        </div>
+                        <button class="btn-primary" onclick="switchTab('registro')">+ Nueva Solicitud</button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Organización</th>
+                                    <th>Tipo</th>
+                                    <th>Provincia</th>
+                                    <th>Requisitos</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-solicitudes">
+                                <!-- Filas dinámicas -->
+                            </tbody>
+                        </table>
+                        
+                        <!-- Empty State -->
+                        <div id="estado-vacio" class="empty-state">
+                            <div class="empty-animation">📂</div>
+                            <h3>Sin Solicitudes Registradas</h3>
+                            <p>No se encontraron personerías en trámite. Registra una nueva para comenzar.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Registro -->
+            <div id="tab-registro" class="tab-pane">
+                <div class="card-focus centered-card">
+                    <div class="card-header">
+                        <h2>Registrar Nueva Solicitud</h2>
+                        <p>Ingrese los datos de la organización civil o comunidad y valide su checklist de requisitos legales.</p>
+                    </div>
+
+                    <form id="form-solicitud" onsubmit="registrarNuevaSolicitud(event)">
+                        <div class="form-group">
+                            <label for="org-nombre">Nombre de la Organización</label>
+                            <input type="text" id="org-nombre" placeholder="Ej. Junta Vecinal Oruro Moderno" required autocomplete="off">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="org-tipo">Tipo de Entidad</label>
+                                <select id="org-tipo" required>
+                                    <option value="OTB">Junta Vecinal (OTB)</option>
+                                    <option value="Comunidad Indígena">Comunidad Originaria</option>
+                                    <option value="Sindicato Agrario">Sindicato Agrario</option>
+                                    <option value="Asociación Civil">Asociación Civil sin Fines de Lucro</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="org-provincia">Provincia</label>
+                                <select id="org-provincia" required>
+                                    <option value="Cercado">Cercado</option>
+                                    <option value="Abaroa">Eduardo Abaroa</option>
+                                    <option value="Carangas">Carangas</option>
+                                    <option value="Poopó">Poopó</option>
+                                    <option value="Sajama">Sajama</option>
+                                    <option value="Sabaya">Sabaya</option>
+                                    <option value="Dalence">Pantaleón Dalence</option>
+                                    <option value="Sebastián Pagador">Sebastián Pagador</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="org-representante">Representante Legal</label>
+                            <input type="text" id="org-representante" placeholder="Nombre completo" required autocomplete="off">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Checklist de Requisitos Documentales Obligatorios</label>
+                            <div class="checklist-container">
+                                <label class="checklist-item">
+                                    <input type="checkbox" id="chk-acta" onchange="verificarDocumentacion()">
+                                    <span>Acta de Fundación / Constitución</span>
+                                </label>
+                                <label class="checklist-item">
+                                    <input type="checkbox" id="chk-estatuto" onchange="verificarDocumentacion()">
+                                    <span>Estatuto Orgánico</span>
+                                </label>
+                                <label class="checklist-item">
+                                    <input type="checkbox" id="chk-reglamento" onchange="verificarDocumentacion()">
+                                    <span>Reglamento Interno</span>
+                                </label>
+                                <label class="checklist-item">
+                                    <input type="checkbox" id="chk-directorio" onchange="verificarDocumentacion()">
+                                    <span>Acta de Elección y Posesión del Directorio</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="info-aviso" id="aviso-estado">
+                            ⚠️ Estado inicial: <strong>En Trámite</strong> (Falta documentación obligatoria).
+                        </div>
+
+                        <button type="submit" class="btn-glow">Registrar y Procesar</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal de Resolución Departamental -->
+    <div id="modal-resolucion" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-actions-bar">
+                <button class="btn-secondary" onclick="cerrarResolucion()">Cerrar Previsualización</button>
+                <button class="btn-primary" onclick="imprimirResolucion()">🖨️ Imprimir Resolución</button>
+            </div>
+            
+            <!-- Documento Imprimible -->
+            <div class="documento-resolucion" id="area-impresion">
+                <div class="escudo-agua"></div>
+                <div class="resolucion-header">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo de Oruro" class="res-escudo">
+                    <div class="res-header-text">
+                        <h3>GOBIERNO AUTÓNOMO DEPARTAMENTAL DE ORURO</h3>
+                        <h5>RESOLUCIÓN ADMINISTRATIVA DEPARTAMENTAL</h5>
+                        <h4 id="res-codigo">RESOL. ADM. DEPT. N° RD-OR-2026-XXXX</h4>
+                    </div>
+                </div>
+
+                <div class="resolucion-body">
+                    <p class="fecha-emision">Oruro, <span id="res-fecha">13 de Julio de 2026</span></p>
+                    
+                    <p><strong>VISTOS:</strong> La solicitud de personalidad jurídica presentada por el representante legal 
+                    <strong><span id="res-representante">Representante</span></strong> en favor de la organización civil denominada 
+                    <strong>"<span id="res-nombre">Organización</span>"</strong>, con domicilio en la provincia 
+                    <strong><span id="res-provincia">Provincia</span></strong> del Departamento de Oruro; y</p>
+
+                    <p><strong>CONSIDERANDO:</strong> Que el equipo técnico legal de la Dirección Jurídica del Gobierno Autónomo Departamental de Oruro ha revisado y constatado el cumplimiento formal de todos los requisitos e instrumentos exigidos por ley, evidenciando la presentación y conformidad del Acta de Fundación, Estatutos Orgánicos, Reglamento Interno y Acta de Posesión de Directorio.</p>
+                    
+                    <p>Que el Estatuto Orgánico y el Reglamento Interno no contienen disposiciones contrarias a la Constitución Política del Estado ni a las leyes nacionales vigentes, encontrándose enmarcado en el desarrollo social y participativo de su región.</p>
+
+                    <p><strong>POR TANTO:</strong> El Gobernador del Departamento de Oruro, en uso de sus atribuciones conferidas por la Constitución Política del Estado, Ley N° 031 de Autonomías y Descentralización, y demás normas conexas;</p>
+
+                    <p class="por-tanto">RESUELVE:</p>
+
+                    <p><strong>PRIMERO.-</strong> Otorgar la **PERSONERÍA JURÍDICA** a la entidad denominada: 
+                    <strong>"<span id="res-nombre-cuerpo">Organización</span>"</strong>, bajo la tipología de 
+                    <strong><span id="res-tipo">Tipo</span></strong>, establecida en la provincia 
+                    <strong><span id="res-provincia-cuerpo">Provincia</span></strong>, disponiendo su registro oficial en la base de datos de la Gobernación Autónoma Departamental de Oruro.</p>
+
+                    <p><strong>SEGUNDO.-</strong> Disponer el archivo de una copia física y digital de los Estatutos Orgánicos y reglamentos de la organización en la Dirección de Coordinación con Movimientos Sociales y Organizaciones del Departamento.</p>
+
+                    <p>Regístrese, comuníquese y archívese.</p>
+                </div>
+
+                <div class="resolucion-firmas">
+                    <div class="firma-block">
+                        <div class="linea-firma"></div>
+                        <p><strong>Dr. Abg. Asesor Jurídico Principal</strong></p>
+                        <p>Dirección General de Asuntos Jurídicos</p>
+                        <p>Gobierno Autónomo Departamental de Oruro</p>
+                    </div>
+                    <div class="firma-block">
+                        <div class="linea-firma"></div>
+                        <p><strong>Gobernador del Departamento</strong></p>
+                        <p>Máxima Autoridad Ejecutiva (M.A.E.)</p>
+                        <p>Gobierno Autónomo Departamental de Oruro</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="./src/main.js"></script>
+</body>
+</html>

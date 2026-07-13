@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gobernación de Oruro - Control de Obras viales (EVM)</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./assets/css/styles.css">
+</head>
+<body>
+    <div class="app-workspace">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon">🚧</div>
+                <div>
+                    <h2>GOBIERNO DE ORURO</h2>
+                    <p>INVERSIÓN PÚBLICA / SEDECA</p>
+                </div>
+            </div>
+            
+            <nav class="navigation-menu">
+                <button class="nav-item active" onclick="switchTab('dashboard')">📋 Monitoreo Vial (EVM)</button>
+                <button class="nav-item" onclick="switchTab('registro')">✍️ Registrar Proyecto</button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="server-status">
+                    <span class="status-indicator online"></span>
+                    <span>Auditoría de Inversión (EVM)</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div>
+                    <span class="section-indicator">FASE 9 - Control Presupuestario</span>
+                    <h1 id="page-title">Monitoreo Financiero de Proyectos Viales</h1>
+                </div>
+                <div class="top-bar-stats">
+                    <div class="quick-stat">
+                        <span class="stat-num" id="stat-presupuesto">Bs 0.00</span>
+                        <span class="stat-lbl">Presupuesto Total</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="stat-num text-info" id="stat-spi-promedio">0.00</span>
+                        <span class="stat-lbl">SPI Promedio (Plazo)</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="stat-num text-success" id="stat-cpi-promedio">0.00</span>
+                        <span class="stat-lbl">CPI Promedio (Costo)</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Tab Dashboard -->
+            <div id="tab-dashboard" class="tab-pane active">
+                <div class="card-focus table-card">
+                    <div class="card-header flex-header">
+                        <div>
+                            <h2>Control de Avance mediante Valor Ganado</h2>
+                            <p>Seguimiento de obras ejecutadas por el Servicio Departamental de Caminos y contratistas.</p>
+                        </div>
+                        <button class="btn-primary" onclick="switchTab('registro')">+ Registrar Obra</button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Proyecto Vial</th>
+                                    <th>Presupuesto (BAC)</th>
+                                    <th>Costo Real (AC)</th>
+                                    <th>Progreso (Planificado vs Real)</th>
+                                    <th>SPI (Cronograma)</th>
+                                    <th>CPI (Costo)</th>
+                                    <th>Desviación Monetaria</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-proyectos">
+                                <!-- Filas dinámicas -->
+                            </tbody>
+                        </table>
+                        
+                        <!-- Empty State -->
+                        <div id="estado-vacio" class="empty-state">
+                            <div class="empty-animation">🚧</div>
+                            <h3>Sin Obras Registradas</h3>
+                            <p>No se encontraron proyectos viales cargados. Agrega uno nuevo para comenzar.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Leyenda e Interpretación Técnica -->
+                <div class="card-focus legend-card">
+                    <h3>Guía de Interpretación de Indicadores EVM</h3>
+                    <div class="legend-grid">
+                        <div class="legend-item">
+                            <span class="indicator-dot dot-green"></span>
+                            <div>
+                                <strong>Rendimiento Óptimo (SPI / CPI &ge; 1.0)</strong>
+                                <p>El proyecto se ejecuta antes del plazo planificado o con menor costo del presupuestado.</p>
+                            </div>
+                        </div>
+                        <div class="legend-item">
+                            <span class="indicator-dot dot-yellow"></span>
+                            <div>
+                                <strong>Rendimiento Aceptable / Alerta (0.85 - 0.99)</strong>
+                                <p>Existe un leve retraso en cronograma o un incremento menor en los costos. Requiere supervisión.</p>
+                            </div>
+                        </div>
+                        <div class="legend-item">
+                            <span class="indicator-dot dot-red"></span>
+                            <div>
+                                <strong>Desviación Crítica (&lt; 0.85)</strong>
+                                <p>Retraso grave en la entrega física o sobrecosto crítico. Alerta inmediata para auditoría física.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Registro -->
+            <div id="tab-registro" class="tab-pane">
+                <div class="card-focus centered-card">
+                    <div class="card-header">
+                        <h2>Registrar Proyecto Vial</h2>
+                        <p>Ingrese los datos presupuestarios y de avance reportados por la supervisión de obra.</p>
+                    </div>
+
+                    <form id="form-proyecto" onsubmit="registrarProyecto(event)">
+                        <div class="form-group">
+                            <label for="pro-nombre">Nombre de la Obra</label>
+                            <input type="text" id="pro-nombre" placeholder="Ej. Doble Vía Oruro - Challapata (Tramo II)" required autocomplete="off">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="pro-provincia">Provincia</label>
+                                <select id="pro-provincia" required>
+                                    <option value="Cercado">Cercado</option>
+                                    <option value="Eduardo Abaroa">Eduardo Abaroa</option>
+                                    <option value="Pantaleón Dalence">Pantaleón Dalence</option>
+                                    <option value="Poopó">Poopó</option>
+                                    <option value="Ladislao Cabrera">Ladislao Cabrera</option>
+                                    <option value="Sebastián Pagador">Sebastián Pagador</option>
+                                    <option value="Sajama">Sajama</option>
+                                    <option value="Sabaya">Sabaya</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="pro-presupuesto">Presupuesto Asignado (Bs. BAC)</label>
+                                <input type="number" id="pro-presupuesto" min="1000" placeholder="Ej. 5000000" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="pro-avance-plan">Avance Físico Planificado (%)</label>
+                                <input type="number" id="pro-avance-plan" min="0" max="100" placeholder="0 - 100" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="pro-avance-real">Avance Físico Real (%)</label>
+                                <input type="number" id="pro-avance-real" min="0" max="100" placeholder="0 - 100" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pro-costo-real">Costo Real Devengado a la Fecha (Bs. AC)</label>
+                            <input type="number" id="pro-costo-real" min="0" placeholder="Ej. 4200000" required>
+                        </div>
+
+                        <button type="submit" class="btn-glow">Registrar y Procesar EVM</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="./src/main.js"></script>
+</body>
+</html>

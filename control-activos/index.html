@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gobernación de Oruro - Control de Activos Fijos</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./assets/css/styles.css">
+</head>
+<body>
+    <div class="app-workspace">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon">🖥️</div>
+                <div>
+                    <h2>GOBIERNO DE ORURO</h2>
+                    <p>ACTIVOS FIJOS</p>
+                </div>
+            </div>
+            
+            <nav class="navigation-menu">
+                <button class="nav-item active" onclick="switchTab('inventario')">📋 Inventario de Bienes</button>
+                <button class="nav-item" onclick="switchTab('registro')">✍️ Registrar Activo</button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="server-status">
+                    <span class="status-indicator online"></span>
+                    <span>Trazabilidad QR Habilitada</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div>
+                    <span class="section-indicator">FASE 8 - Inventario Físico</span>
+                    <h1 id="page-title">Inventario de Activos Departamentales</h1>
+                </div>
+                <div class="top-bar-stats">
+                    <div class="quick-stat">
+                        <span class="stat-num" id="stat-total">0</span>
+                        <span class="stat-lbl">Bienes Activos</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="stat-num text-info" id="stat-computo">0</span>
+                        <span class="stat-lbl">Equipos de Cómputo</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="stat-num text-success" id="stat-transferencias">0</span>
+                        <span class="stat-lbl">Transferencias Logs</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Tab Inventario -->
+            <div id="tab-inventario" class="tab-pane active">
+                <div class="card-focus table-card">
+                    <div class="card-header flex-header">
+                        <div>
+                            <h2>Bandeja de Activos Registrados</h2>
+                            <p>Listado de activos fijos asignados en la Gobernación Autónoma de Oruro.</p>
+                        </div>
+                        <button class="btn-primary" onclick="switchTab('registro')">+ Registrar Bien</button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Código Activo</th>
+                                    <th>Categoría</th>
+                                    <th>Descripción</th>
+                                    <th>Oficina</th>
+                                    <th>Custodio Responsable</th>
+                                    <th>Historial</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-activos">
+                                <!-- Filas dinámicas -->
+                            </tbody>
+                        </table>
+                        
+                        <!-- Empty State -->
+                        <div id="estado-vacio" class="empty-state">
+                            <div class="empty-animation">📦</div>
+                            <h3>Sin Activos Inventariados</h3>
+                            <p>No se encontraron bienes en el sistema. Registra un nuevo activo para comenzar.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Registro -->
+            <div id="tab-registro" class="tab-pane">
+                <div class="card-focus centered-card">
+                    <div class="card-header">
+                        <h2>Registrar Nuevo Activo Fijo</h2>
+                        <p>Ingrese las especificaciones técnicas del bien e indique la asignación inicial del custodio.</p>
+                    </div>
+
+                    <form id="form-activo" onsubmit="registrarActivo(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="act-tipo">Categoría del Activo</label>
+                                <select id="act-tipo" required>
+                                    <option value="Equipos de Computación">Equipos de Computación</option>
+                                    <option value="Maquinaria y Equipos">Maquinaria y Equipos Pesados</option>
+                                    <option value="Muebles y Enseres">Muebles y Enseres de Oficina</option>
+                                    <option value="Vehículos Terrestres">Vehículos Oficiales</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="act-modelo">Descripción / Modelo</label>
+                                <input type="text" id="act-modelo" placeholder="Ej. Laptop HP EliteBook G8 / Escritorio de Roble" required autocomplete="off">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="act-oficina">Oficina Asignada</label>
+                                <select id="act-oficina" required>
+                                    <option value="Secretaría General">Secretaría General</option>
+                                    <option value="Dirección Jurídica">Dirección de Asuntos Jurídicos</option>
+                                    <option value="Secretaría de Minería">Secretaría Departamental de Minería</option>
+                                    <option value="Servicio de Caminos (SEDECA)">Servicio Departamental de Caminos</option>
+                                    <option value="Ventanilla Única">Ventanilla Única de Trámites</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="act-custodio">Custodio Responsable</label>
+                                <input type="text" id="act-custodio" placeholder="Nombre completo del servidor" required autocomplete="off">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-glow">Registrar en Inventario</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal de Etiqueta QR y Escáner de Auditoría -->
+    <div id="modal-qr" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-actions-bar">
+                <h3 id="modal-title">Etiqueta e Historial del Activo</h3>
+                <button class="btn-secondary" onclick="cerrarModal()">Cerrar Auditoría</button>
+            </div>
+            
+            <div class="modal-grid-body">
+                <!-- Columna Izquierda: Etiqueta QR Imprimible -->
+                <div class="etiqueta-qr-card">
+                    <div class="etiqueta-header">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo Oruro" class="etiqueta-escudo">
+                        <div>
+                            <h4>GOBIERNO DE ORURO</h4>
+                            <p>Control de Activos Fijos</p>
+                        </div>
+                    </div>
+                    
+                    <div class="qr-canvas-holder">
+                        <canvas id="qr-canvas" width="180" height="180"></canvas>
+                    </div>
+
+                    <div class="etiqueta-detalles">
+                        <p><strong>CÓDIGO:</strong> <span id="etiqueta-codigo">ACT-2026-0001</span></p>
+                        <p><strong>CUSTODIO:</strong> <span id="etiqueta-custodio">Nombre Custodio</span></p>
+                        <p><strong>OFICINA:</strong> <span id="etiqueta-oficina">Oficina Destino</span></p>
+                    </div>
+                    <button class="btn-primary btn-print-tag" onclick="imprimirEtiqueta()">🖨️ Imprimir Código QR</button>
+                </div>
+
+                <!-- Columna Derecha: Trazabilidad y Reasignación -->
+                <div class="trazabilidad-panel">
+                    <h4>Simulador de Escáner y Historial</h4>
+                    
+                    <!-- Simulador Escáner Visual -->
+                    <div class="escaner-camara-mock">
+                        <div class="escaner-lasersweep"></div>
+                        <div class="escaner-reticle"></div>
+                        <div class="escaner-status-overlay">ESCANER CONECTADO - LEYENDO MODULOS DE CANVAS...</div>
+                    </div>
+
+                    <!-- Formulario de Reasignación -->
+                    <form id="form-transfer" onsubmit="transferirActivo(event)" class="form-transfer-inline">
+                        <h5>Transferir Custodia / Reasignación</h5>
+                        <div class="form-row-compact">
+                            <div class="form-group-compact">
+                                <label for="trans-oficina">Nueva Oficina</label>
+                                <select id="trans-oficina" required>
+                                    <option value="Secretaría General">Secretaría General</option>
+                                    <option value="Dirección Jurídica">Dirección de Asuntos Jurídicos</option>
+                                    <option value="Secretaría de Minería">Secretaría Departamental de Minería</option>
+                                    <option value="Servicio de Caminos (SEDECA)">Servicio Departamental de Caminos</option>
+                                    <option value="Ventanilla Única">Ventanilla Única de Trámites</option>
+                                </select>
+                            </div>
+                            <div class="form-group-compact">
+                                <label for="trans-custodio">Nuevo Custodio</label>
+                                <input type="text" id="trans-custodio" placeholder="Nombre completo" required autocomplete="off">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-glow btn-compact">Ejecutar Transferencia</button>
+                    </form>
+
+                    <!-- Historial del Activo -->
+                    <div class="historial-logs">
+                        <h5>Bitácora de Auditoría (Logs de Transferencias)</h5>
+                        <div class="logs-container" id="logs-auditoria">
+                            <!-- Logs dinámicos -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="./src/main.js"></script>
+</body>
+</html>
