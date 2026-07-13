@@ -1,0 +1,20 @@
+# Configuración de GitLab CI/CD para Servir el Portafolio mediante GitLab Pages
+
+image: alpine:latest
+
+pages:
+  stage: deploy
+  script:
+    # Crear directorio público requerido por GitLab Pages
+    - mkdir -p public
+    
+    # Copiar todos los archivos y subcarpetas del proyecto al directorio público
+    - cp -r * public/ || true
+    
+    # Limpiar redundancias para evitar recursiones infinitas
+    - rm -rf public/public
+  artifacts:
+    paths:
+      - public
+  only:
+    - main

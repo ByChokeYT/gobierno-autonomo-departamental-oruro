@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gobernación Autónoma Departamental de Oruro - Portal de Sistemas</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0a0b0e;
+            --bg-card: #111317;
+            --bg-card-hover: #171a21;
+            --border-main: rgba(255, 255, 255, 0.05);
+            --primary-color: #d97706; /* Amber Dark */
+            --primary-light: #f59e0b; /* Amber Light */
+            --text-main: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --radius-lg: 20px;
+            --radius-md: 10px;
+            --transition-smooth: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 60px;
+        }
+
+        /* Background Grid Overlay */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(217, 119, 6, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(245, 158, 11, 0.05) 0%, transparent 40%);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+        }
+
+        .escudo-header {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 4px 12px rgba(245, 158, 11, 0.2));
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #ffffff 60%, var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            color: var(--primary-light);
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .desc-portal {
+            max-width: 600px;
+            margin: 0 auto 30px;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .stat-badge {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-main);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-badge::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            box-shadow: 0 0 6px var(--primary-light);
+        }
+
+        /* Grid de Sistemas */
+        .systems-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            margin-top: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .systems-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .systems-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Cards */
+        .system-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-main);
+            border-radius: var(--radius-lg);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: var(--transition-smooth);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .system-card:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(245, 158, 11, 0.2);
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-top {
+            margin-bottom: 24px;
+        }
+
+        .system-icon {
+            font-size: 2.2rem;
+            background: rgba(255, 255, 255, 0.02);
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            transition: var(--transition-smooth);
+        }
+
+        .system-card:hover .system-icon {
+            background: rgba(245, 158, 11, 0.08);
+            border-color: rgba(245, 158, 11, 0.2);
+        }
+
+        .system-card h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.01em;
+            transition: var(--transition-smooth);
+        }
+
+        .system-card:hover h2 {
+            color: var(--primary-light);
+        }
+
+        .system-card p {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .card-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        .tag {
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-muted);
+            border: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        .system-card:hover .tag {
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .btn-launch {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-main);
+            color: var(--text-main);
+            padding: 12px;
+            border-radius: var(--radius-md);
+            font-size: 0.85rem;
+            font-weight: 700;
+            transition: var(--transition-smooth);
+            margin-top: 10px;
+        }
+
+        .system-card:hover .btn-launch {
+            background: var(--primary-color);
+            color: #000000;
+            border-color: var(--primary-color);
+        }
+
+        /* Footer */
+        footer.portal-footer {
+            text-align: center;
+            margin-top: 80px;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border-main);
+            padding-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+
+    <div class="container">
+        <!-- Encabezado del Portal -->
+        <header>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo de Oruro" class="escudo-header">
+            <span class="subtitle">Gobierno Autónomo Departamental de Oruro</span>
+            <h1>Portal de Sistemas Administrativos</h1>
+            <p class="desc-portal">
+                Plataforma integrada de control, auditoría interna y modernización del servicio civil departamental. Todos los módulos funcionan de forma descentralizada y segura.
+            </p>
+            
+            <div class="stats-bar">
+                <div class="stat-badge">11 Módulos Operativos</div>
+                <div class="stat-badge">Descentralizado en LocalStorage</div>
+                <div class="stat-badge">Criptografía y QR Nativos</div>
+            </div>
+        </header>
+
+        <!-- Rejilla de Módulos (11 Proyectos) -->
+        <section class="systems-grid">
+
+            <!-- 1. Personerías Jurídicas -->
+            <a href="./control-personerias/index.html" class="system-card">
+                <div class="card-top">
+                    <div class="system-icon">⚖️</div>
+                    <h2>Personerías Jurídicas</h2>
+                    <p>Registro de firmas oficiales, checklists de documentos requeridos y emisión de resoluciones administrativas listas para imprimir.</p>
+                    <div class="card-tags">
+                        <span class="tag">Impresión A4</span>
+                        <span class="tag">Checklist</span>
+                    </div>
+                </div>
+                <div class="btn-launch">Abrir Módulo ↗</div>
+            </a>
+
+            <!-- 2. Licencias Ambientales -->
+            <a href="./licencias-ambientales/index.html" class="system-card">
+                <div class="card-top">
+                    <div class="system-icon">🍃</div>
+                    <h2>Licencias Ambientales</h2>
+                    <p>Monitoreo ecológico departamental mediante mapa interactivo de las 16 provincias y calculadora de riesgo ambiental de industrias.</p>
+                    <div class="card-tags">
+                        <span class="tag">Mapa SVG</span>
+                        <span class="tag">Fórmula Riesgo</span>
+                    </div>
+                </div>
+                <div class="btn-launch">Abrir Módulo ↗</div>
+            </a>
+
+            <!-- 3. Control de Activos Fijos -->
+            <a href="./control-activos/index.html" class="system-card">
+                <div class="card-top">
+                    <div class="system-icon">🖥️</div>
+                    <h2>Control de Activos</h2>
+                    <p>Inventario de activos fijos gubernamentales con generador nativo de códigos QR en Canvas 2D y simulador de escaneo.</p>
+                    <div class="card-tags">
+                        <span class="tag">QR Canvas</span>
+                        <span class="tag">Escáner HUD</span>
+                    </div>
+                </div>
+                <div class="btn-launch">Abrir Módulo ↗</div>
+            </a>
+
+            <!-- 4. Seguimiento de Obras EVM -->
+            <a href="./seguimiento-obras/index.html" class="system-card">
+                <div class="card-top">
+                    <div class="system-icon">🚧</div>
+                    <h2>Seguimiento de Obras</h2>
+                    <p>Control financiero de caminos y puentes (SEDECA) con métricas de Valor Ganado (EVM) y visualización de doble barra de progreso.</p>
+                    <div class="card-tags">
+                        <span class="tag">EVM Math</span>
+                        <span class="tag">SPI / CPI</span>
+                    </div>
+                </div>
+                <div class="btn-launch">Abrir Módulo ↗</div>
+            </a>
+
+            <!-- 5. Vales de Combustible -->
+            <a href="./control-combustible/index.html" class="system-card">
+                <div class="card-top">
+                    <div class="system-icon">⛽</div>
+                    <h2>Vales de Combustible</h2>
+                    <p>Despacho y conciliación de gasolina/diésel con generación de firmas criptográficas hash SHA-simuladas y boletas de ticket térmico.</p>
+                    <div class="card-tags">
+                        <span class="tag">Tokens Hash</span>
+                        <span class="tag">Impresión térmica</span>
+                    </div>
+                </div>
+                <div class="btn-launch">Abrir Módulo ↗</div>
+            </a>
+
+            <!-- 6. Sistema de Correspondencia -->
+            <a href="./sistema-correspondencia/index.html" class="system-card">
+                <div class="card-top">
+                    <div class="system-icon">📬</div>
+                    <h2>Correspondencia</h2>
+                    <p>Control de radicación, distribución y seguimiento de documentos ingresados a la Gobernación con asignación de prioridades.</p>
+                    <div class="card-tags">
+                        <span class="tag">Hojas de Ruta</span>
+                        <span class="tag">Bandejas</span>
+                    </div>
+                </div>
+                <div class="btn-launch">Abrir Módulo ↗</div>
+            </a>
+
+            <!-- 7. Liquidación de Regalías -->
+            <a href="./liquidacion-regalias/index.html" class="system-card">
+                <div class="card-top">
+                    <div class="system-icon">⛏️</div>
+                    <h2>Liquidación de Regalías</h2>
+                    <p>Cálculo analítico de tributos mineros departamentales aplicados a las exportaciones de estaño, plata, zinc y otros metales.</p>
+                    <div class="card-tags">
+                        <span class="tag">Minería</span>
+                        <span class="tag">Cálculo de Tasas</span>
+                    </div>
+                </div>
+                <div class="btn-launch">Abrir Módulo ↗</div>
+            </a>
+
+            <!-- 8. Sistema de Turnos -->
+            <a href="./sistema-turnos/index.html" class="system-card">
+                <div class="card-top">
+                    <div class="system-icon">🎟️</div>
+                    <h2>Distribución de Turnos</h2>
+                    <p>Gestión de filas y llamadas a ventanillas para el público general, con generador interactivo de tickets de atención.</p>
+                    <div class="card-tags">
+                        <span class="tag">Colas</span>
+                        <span class="tag">Llamado Ventanilla</span>
+                    </div>
+                </div>
+                <div class="btn-launch">Abrir Módulo ↗</div>
+            </a>
+
+            <!-- 9. Registro de Trámites -->
+            <a href="./registro-tramites/index.html" class="system-card">
+                <div class="card-top">
+                    <div class="system-icon">📋</div>
+                    <h2>Registro de Trámites</h2>
+                    <p>Plataforma de seguimiento al estado de los trámites públicos gubernamentales con barra de búsqueda rápida e historial.</p>
+                    <div class="card-tags">
+                        <span class="tag">Trámites</span>
+                        <span class="tag">Historial</span>
+                    </div>
+                </div>
+                <div class="btn-launch">Abrir Módulo ↗</div>
+            </a>
+
+            <!-- 10. Monitor del Dólar -->
+            <a href="./monitor-dolar/index.html" class="system-card">
+                <div class="card-top">
+                    <div class="system-icon">💵</div>
+                    <h2>Monitor Tipo de Cambio</h2>
+                    <p>Conversor de divisas y registro de tasas históricas para fines presupuestarios y de planificación gubernamental.</p>
+                    <div class="card-tags">
+                        <span class="tag">Conversor</span>
+                        <span class="tag">Histórico</span>
+                    </div>
+                </div>
+                <div class="btn-launch">Abrir Módulo ↗</div>
+            </a>
+
+            <!-- 11. Tablero Demográfico -->
+            <a href="./Panel-de-control/index.html" class="system-card">
+                <div class="card-top">
+                    <div class="system-icon">📊</div>
+                    <h2>Tablero Demográfico</h2>
+                    <p>Dashboard analítico con KPIs e indicadores basados en los datos demográficos y de vivienda del censo de Oruro.</p>
+                    <div class="card-tags">
+                        <span class="tag">KPIs censo</span>
+                        <span class="tag">Gráficos / Tablas</span>
+                    </div>
+                </div>
+                <div class="btn-launch">Abrir Módulo ↗</div>
+            </a>
+
+        </section>
+
+        <!-- Pie de página oficial -->
+        <footer class="portal-footer">
+            <p>© 2026 Gobierno Autónomo Departamental de Oruro. Todos los derechos reservados.</p>
+            <p style="margin-top: 4px; font-size: 0.75rem;">Sistemas de Modernización Pública y Descentralización de Procesos.</p>
+        </footer>
+    </div>
+</body>
+</html>
