@@ -96,3 +96,48 @@ Este conjunto de proyectos refleja la capacidad de resolver retos de ingeniería
 *   **Seguridad Fiscal**: El cálculo exacto y boletas estandarizadas de regalías mineras protegen la recaudación departamental.
 *   **Decisiones Basadas en Datos**: El Dashboard demográfico permite una mejor asignación de presupuestos provinciales.
 *   **Código Limpio e Institucional**: Estilos visuales consistentes con la identidad de la Gobernación de Oruro, priorizando usabilidad, velocidad de carga y accesibilidad.
+
+---
+
+## 🚀 Planificación de Ingeniería y Próximos Módulos (Arquitectura Senior - +20 años de experiencia)
+
+Con el fin de consolidar un **Gobierno Digital Integrado y Seguro** para el departamento de Oruro, se ha estructurado una planificación estratégica orientada al desarrollo de futuras extensiones. Esta planificación ha sido diseñada bajo estándares de arquitectura corporativa de misión crítica:
+
+```mermaid
+graph TD
+    A["Plataforma Base: Ventanilla & Core"] --> B["Fase I: Control Administrativo y Activos"]
+    A --> C["Fase II: Fiscalización Minera y Medio Ambiente"]
+    B --> D["Fase III: Integración con Redes del Estado (SICOES/SIGEP)"]
+    C --> D
+```
+
+### 📋 Módulos Planificados en el Roadmap Tecnológico
+
+#### 1. 📂 Gestión de Personerías Jurídicas (`control-personerias`)
+*   **Propósito**: Digitalizar el ciclo de vida del trámite para el reconocimiento de Personerías Jurídicas de comunidades indígenas, OTBs y sindicatos agrarios en el departamento.
+*   **Criterio de Ingeniería**: Implementación de un gestor documental con firma digital y verificación de requisitos legales mínimos, automatizando la generación de la Resolución Departamental.
+
+#### 🍃 2. Monitoreo e Impacto de Licencias Ambientales (`licencias-ambientales`)
+*   **Propósito**: Seguimiento y fiscalización de Fichas Ambientales (FA) y Manifiestos Ambientales (MA) de operadoras industriales y cooperativas mineras.
+*   **Criterio de Ingeniería**: Integración con un módulo de mapas (SIG/GIS) para georreferenciar zonas con pasivos ambientales activos e impactos hídricos en cuencas vulnerables (ej. Lago Poopó).
+
+#### 🖥️ 3. Auditoría de Activos Fijos mediante Código QR (`control-activos`)
+*   **Propósito**: Control físico y contable del equipamiento y parque automotor asignado a los servidores públicos del Gobierno Autónomo.
+*   **Criterio de Ingeniería**: Sistema descentralizado que genera y valida firmas hash contenidas en códigos QR dinámicos para inventarios rápidos sin conexión a internet.
+
+#### 🚧 4. Control de Inversión Pública y Mantenimiento Vial (`seguimiento-obras`)
+*   **Propósito**: Seguimiento físico y presupuestario del mantenimiento vial llevado a cabo por el Servicio Departamental de Caminos (SEDECA).
+*   **Criterio de Ingeniería**: Modelado bajo metodologías de Valor Ganado (EVM) para medir la desviación presupuestaria respecto al avance de obras reportado desde las provincias.
+
+#### ⛽ 5. Fiscalización de Combustible y Flota Oficial (`control-combustible`)
+*   **Propósito**: Control de asignación de diésel/gasolina para la maquinaria pesada y parque automotor de la gobernación.
+*   **Criterio de Ingeniería**: Validación biométrica o vales digitales tokenizados de un solo uso para prevenir la desviación de recursos públicos y controlar la eficiencia de km/galón por vehículo.
+
+---
+
+## 🔒 Estándares de Calidad y Gobernanza de Datos (+20 Años de Experiencia)
+
+El desarrollo en entornos públicos estatales bolivianos exige el estricto cumplimiento de principios de auditoría de sistemas:
+1.  **Trazabilidad Absoluta (Write-Once-Read-Many)**: Cualquier modificación sobre datos fiscales o de correspondencia administrativa debe registrar un log inmutable de auditoría con fecha, hora y firma del funcionario responsable.
+2.  **Seguridad y Privilegios Mínimos**: Roles estrictamente delimitados (Secretarios, Directores, Operadores) para resguardar la confidencialidad de la información y la integridad de los datos financieros.
+3.  **Alineación Normativa**: Todos los sistemas deben modelar de forma nativa las leyes nacionales vigentes, incluyendo la **Ley N° 1178 (SAFCO)** de Administración y Control Gubernamentales, y la **Ley N° 535** de Minería y Metalurgia.
