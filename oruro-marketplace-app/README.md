@@ -17,11 +17,12 @@ El PRD define el qué y el por qué del proyecto[cite: 1].
 ## 2. Documento de Requisitos Técnicos (TRD)
 El TRD traduce el PRD en decisiones de ingeniería[cite: 1].
 * **Stack Tecnológico:** 
-  * *Frontend:* Aplicación desarrollada con React y estilizada con Tailwind CSS para garantizar una interfaz sumamente ligera y responsiva.
-  * *Backend & Base de Datos:* Entorno Node.js con base de datos PostgreSQL.
+  * *Frontend Móvil:* Aplicación desarrollada con **React Native (Expo)** y estilizada con **NativeWind (Tailwind CSS)** para garantizar un rendimiento e interfaz 100% nativos tanto en Android como en iOS (Apple).
+  * *Frontend Web:* Consola administrativa desarrollada en **React (Vite)** y **Tailwind CSS** para escritorios.
+  * *Backend & Base de Datos:* Entorno Node.js con base de datos PostgreSQL y Prisma ORM.
 * **Entorno de Desarrollo:** Configuración estructurada y optimizada para entornos basados en Linux.
 * **Autoría & Estándares:** Arquitectura central y desarrollo impulsado bajo los estándares de código de ByChokeYT.
-* **Seguridad y Rendimiento:** Autenticación JWT y algoritmos de compresión de imágenes en el lado del cliente (vital para mitigar la lentitud de subida de fotos en áreas rurales con baja conectividad).
+* **Seguridad y Rendimiento:** Autenticación JWT y algoritmos de compresión de imágenes nativos en el dispositivo móvil antes de su carga (clave para lidiar con el ancho de banda limitado en provincias de Oruro).
 
 ## 3. App Flow (Flujo de la Aplicación)
 Mapeo de la navegación del usuario[cite: 1].
@@ -283,53 +284,58 @@ Hoja de ruta adaptada a metodologías ágiles para cumplir con el cronograma ofi
 * **Estrategia de Analítica:** Dado que las ventas se cierran por WhatsApp (fuera de la app), el KPI principal de comercio se medirá rastreando los clics en el "Botón de Contacto", lo que permitirá a la Gobernación inferir la demanda real[cite: 1].
 
 ## 8. Estructura de Directorios del Proyecto
-El proyecto está diseñado bajo una arquitectura de monorepo estructurado que separa la lógica de negocio del Backend (servicios Node.js y conexión Postgres) y el cliente Frontend (React.js + Tailwind CSS):
+El proyecto está diseñado bajo una arquitectura de monorepo estructurado que separa la lógica de negocio del Backend (servicios Node.js y conexión Postgres), el cliente de aplicación móvil (React Native/Expo) y el panel web de escritorio (React.js/Vite):
 
 ```text
 oruro-marketplace-app/
 ├── README.md                      # Documentación del estándar de arquitectura
-├── database/
-│   └── schema.sql                 # Scripts DDL de base de datos PostgreSQL
-├── backend/                       # API REST con Node.js y Express
+├── datos.md                       # Mapa de base de datos relacional y diccionario
+├── backend/                       # API REST con Node.js y Express (Prisma ORM)
 │   ├── package.json
 │   ├── server.js                  # Punto de entrada de la aplicación Node
-│   ├── config/
-│   │   └── db.js                  # Conexión al pool de PostgreSQL (pg)
+│   ├── prisma/
+│   │   ├── schema.prisma          # Modelado de base de datos
+│   │   └── seed.js                # Poblado de datos semilla
 │   ├── controllers/
 │   │   ├── authController.js      # Registro y login de usuarios
 │   │   ├── productController.js   # CRUD de productos y filtros
 │   │   └── analyticController.js  # Registro de métricas e informes de la Gobernación
 │   ├── middleware/
-│   │   ├── authMiddleware.js      # Verificación de JWT
-│   │   └── errorMiddleware.js     # Manejador centralizado de excepciones (sin fugas SQL)
-│   ├── models/
-│   │   └── queries.js             # Sentencias SQL parametrizadas (Previene SQLi)
+│   │   └── authMiddleware.js      # Verificación de JWT (HS256)
 │   └── routes/
 │       ├── authRoutes.js
 │       ├── productRoutes.js
 │       └── analyticRoutes.js
-└── frontend/                      # Cliente React.js + Tailwind CSS (Vite)
+├── mobile/                        # Cliente Móvil (React Native + Expo)
+│   ├── package.json
+│   ├── app.json                   # Configuración del proyecto Expo
+│   ├── tailwind.config.js         # Configuración de NativeWind
+│   ├── App.js                     # Enrutador principal de la app móvil
+│   └── src/
+│       ├── components/            # Componentes nativos (tarjetas, botones primarios negros)
+│       │   ├── ProductCard.js
+│       │   └── CategorySelector.js
+│       ├── pages/                 # Pantallas móviles (Android/iOS)
+│       │   ├── SplashScreen.js    # Pantalla de bienvenida
+│       │   ├── AuthScreen.js      # Registro dual (Productor / Comprador)
+│       │   ├── FeedScreen.js      # Catálogo con filtros de municipio/precio
+│       │   ├── DetailScreen.js    # Detalle de producto y clics de contacto
+│       │   └── ProducerPanel.js   # CRUD del vendedor (Agregar/Editar productos)
+│       └── utils/
+│           ├── imageCompressor.js # Compresor de imágenes en cliente (nativa)
+│           └── api.js             # Cliente Axios configurado para llamadas a la API
+└── web/                           # Panel Web de la Gobernación (React + Tailwind CSS)
     ├── package.json
     ├── tailwind.config.js
     ├── index.html
     └── src/
-        ├── main.jsx               # Punto de inicio React
-        ├── App.jsx                # Enrutador y layout base (Tema negro puro)
-        ├── assets/
-        │   └── css/
-        │       └── index.css      # Directivas de Tailwind CSS
+        ├── main.jsx               # Punto de inicio React Web
+        ├── App.jsx                # Enrutador y layout base (Tema negro de escritorio)
         ├── components/
-        │   ├── PhoneFrame.jsx     # Contenedor simulador de interfaz Android
-        │   ├── ProductCard.jsx    # Tarjeta de producto reactiva
-        │   └── StatCard.jsx       # Tarjetas de KPIs para la Gobernación
+        │   └── StatCard.jsx       # Tarjetas de KPIs (Total productos, clicks WhatsApp/llamadas)
         ├── pages/
-        │   ├── SplashScreen.jsx   # Pantalla de bienvenida
-        │   ├── AuthScreen.jsx     # Registro de productor/comprador
-        │   ├── FeedScreen.jsx     # Catálogo con filtros y buscador
-        │   ├── DetailScreen.jsx   # Detalle de producto y botón de WhatsApp
-        │   ├── ProducerPanel.jsx  # CRUD de productor (Agregar/Editar)
-        │   └── GovDashboard.jsx   # Panel exclusivo web de moderación y analítica
+        │   └── GovDashboard.jsx   # Tablero de analítica y bandeja de moderación
         └── utils/
-            ├── imageCompressor.js # Función de compresión de fotos antes de subida
-            └── api.js             # Cliente Axios configurado para llamadas a la API
-```
+            └── api.js             # Cliente API Axios
+```
+
