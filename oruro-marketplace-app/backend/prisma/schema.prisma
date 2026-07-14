@@ -1,0 +1,80 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Perfil {
+  productor
+  comprador
+  admin
+}
+
+enum Categoria {
+  Quinua_Real @map("Quinua Real")
+  Camelidos   @map("Camélidos")
+  Textiles    @map("Textiles")
+  Otros       @map("Otros")
+}
+
+enum EstadoModeracion {
+  activo
+  suspendido
+}
+
+enum EstadoProducto {
+  activo
+  eliminado
+  pendiente
+}
+
+enum TipoContacto {
+  clic_whatsapp
+  clic_llamada
+}
+
+model Usuario {
+  id                String            @id @default(uuid()) @db.Uuid
+  telefonoWhatsapp  String            @unique @map("telefono_whatsapp")
+  tipoPerfil        Perfil            @map("tipo_perfil")
+  municipio         String
+  estadoModeracion  EstadoModeracion  @default(activo) @map("estado_moderacion")
+  creadoEn          DateTime          @default(now()) @map("creado_en")
+  productos         Producto[]
+
+  @@map("usuarios")
+}
+
+model Producto {
+  id              String         @id @default(uuid()) @db.Uuid
+  usuarioId       String         @map("usuario_id") @db.Uuid
+  usuario         Usuario        @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  titulo          String
+  descripcion     String
+  categoria       Categoria
+  precio          Decimal        @db.Decimal(10, 2)
+  fotosUrl        String[]       @default([]) @map("fotos_url")
+  municipioOrigen String         @map("municipio_origen")
+  estado          EstadoProducto @default(activo)
+  creadoEn        DateTime       @default(now()) @map("creado_en")
+  interacciones   Interaccion[]
+
+  @@index([municipioOrigen])
+  @@index([categoria])
+  @@map("productos")
+}
+
+model Interaccion {
+  id           String       @id @default(uuid()) @db.Uuid
+  productoId   String       @map("producto_id") @db.Uuid
+  producto     Producto     @relation(fields: [productoId], references: [id], onDelete: Cascade)
+  tipoContacto TipoContacto @map("tipo_contacto")
+  fecha        DateTime     @default(now())
+
+  @@index([productoId])
+  @@index([fecha])
+  @@map("interacciones")
+}
