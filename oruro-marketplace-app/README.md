@@ -280,7 +280,7 @@ Hoja de ruta adaptada a metodologías ágiles para cumplir con el cronograma ofi
 
 ## 7. Gestión de Riesgos e Infraestructura
 * **Gestión de Riesgos:** Para evitar un "cuello de botella" en la moderación, se implementarán reportes comunitarios donde los mismos usuarios puedan marcar publicaciones indebidas, aligerando la carga manual de la Gobernación[cite: 1].
-* **DevOps (CI/CD):** Enlace de repositorios Git, pruebas de integración automatizadas, despliegue continuo de la SPA web a servidores Linux locales de la Gobernación y generación y empaquetamiento automático de APKs de Android.
+* **DevOps (CI/CD):** Enlace de repositorios Git,  pruebas de integración automatizadas, despliegue continuo de la SPA web a servidores Linux locales de la Gobernación y generación y empaquetamiento automático de APKs de Android.
 * **Estrategia de Analítica:** Dado que las ventas se cierran por WhatsApp (fuera de la app), el KPI principal de comercio se medirá rastreando los clics en el "Botón de Contacto", lo que permitirá a la Gobernación inferir la demanda real[cite: 1].
 
 ## 8. Estructura de Directorios del Proyecto
