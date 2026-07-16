@@ -326,34 +326,62 @@ export default function App() {
           
           {/* Logo y Enlace a Inicio + Menú Hamburguesa en Móvil */}
           <div className="flex items-center justify-between w-full sm:w-auto shrink-0">
-            <button 
-              onClick={() => {
-                setCurrentView('landing')
-                setActiveCategory('all')
-                setActiveMunicipio('Todos los municipios')
-                setSearch('')
-              }}
-              className="text-left focus:outline-none cursor-pointer flex items-center gap-2.5 group"
-            >
-              <div className="w-9 h-9 rounded-xl bg-amber-600 flex items-center justify-center font-extrabold text-black text-lg shadow-md group-hover:bg-amber-500 transition-colors">
-                O
-              </div>
-              <div>
-                <p className="text-white font-extrabold text-lg tracking-tight leading-none group-hover:text-amber-400 transition-colors font-display">
-                  Market<span className="text-amber-500">Oruro</span>
-                </p>
-                <p className="text-neutral-500 text-[10px] font-semibold tracking-wider uppercase mt-0.5">Catálogo Departamental</p>
-              </div>
-            </button>
+            <div className="flex items-center gap-3">
+              {/* Botón Hamburguesa en Móvil (Esquina Izquierda) */}
+              <button 
+                onClick={() => setMobileMenuOpen(true)}
+                className="lg:hidden p-2.5 text-neutral-400 hover:text-white bg-neutral-900 border border-neutral-800 rounded-xl cursor-pointer active:scale-95 transition-all"
+                title="Abrir menú de navegación"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
+              </button>
 
-            {/* Botón Hamburguesa en Móvil */}
-            <button 
-              onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden p-2.5 text-neutral-400 hover:text-white bg-neutral-900 border border-neutral-800 rounded-xl cursor-pointer active:scale-95 transition-all"
-              title="Abrir menú de navegación"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
-            </button>
+              <button 
+                onClick={() => {
+                  setCurrentView('landing')
+                  setActiveCategory('all')
+                  setActiveMunicipio('Todos los municipios')
+                  setSearch('')
+                }}
+                className="text-left focus:outline-none cursor-pointer flex items-center gap-2.5 group"
+              >
+                <div className="w-9 h-9 rounded-xl bg-amber-600 flex items-center justify-center font-extrabold text-black text-lg shadow-md group-hover:bg-amber-500 transition-colors">
+                  O
+                </div>
+                <div>
+                  <p className="text-white font-extrabold text-lg tracking-tight leading-none group-hover:text-amber-400 transition-colors font-display">
+                    Market<span className="text-amber-500">Oruro</span>
+                  </p>
+                  <p className="text-neutral-500 text-[10px] font-semibold tracking-wider uppercase mt-0.5">Catálogo Departamental</p>
+                </div>
+              </button>
+            </div>
+
+            {/* Perfil del Usuario en Móvil (Esquina Derecha) */}
+            <div className="flex lg:hidden items-center">
+              {currentUser ? (
+                <div className="flex items-center gap-2 bg-neutral-900 border border-neutral-800 rounded-xl px-2 py-1">
+                  <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-amber-600 to-orange-500 flex items-center justify-center text-black text-[10px] font-black select-none">
+                    {currentUser.name[0].toUpperCase()}
+                  </div>
+                  <button 
+                    onClick={handleLogout}
+                    title="Cerrar Sesión"
+                    className="text-neutral-500 hover:text-red-400 transition-colors p-1"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-3.5 h-3.5"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" /></svg>
+                  </button>
+                </div>
+              ) : (
+                <button 
+                  onClick={() => setAuthOpen(true)}
+                  className="bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 text-neutral-300 hover:text-white px-2.5 py-1.5 rounded-xl text-[10px] font-bold transition-all flex items-center gap-1"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-3 h-3"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg>
+                  Ingresar
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Buscador Integrado */}
@@ -373,8 +401,8 @@ export default function App() {
             </div>
           </div>
 
-          {/* Botones de Acción y Usuario (Auth) */}
-          <div className="flex items-center gap-4 shrink-0">
+          {/* Botones de Acción y Usuario (Auth) (Escritorio) */}
+          <div className="hidden lg:flex items-center gap-4 shrink-0">
             <button
               onClick={handlePublishClick}
               className="bg-amber-600 hover:bg-amber-500 active:scale-95 text-black font-extrabold text-xs px-5 py-3 rounded-xl transition-all shadow-md shadow-amber-950/20 flex items-center gap-1.5"
