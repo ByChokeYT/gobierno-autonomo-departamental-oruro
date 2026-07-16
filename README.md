@@ -20,7 +20,7 @@ Los proyectos abordan problemáticas reales de la administración pública local
 
 ## 📂 Resumen de Proyectos y Sistemas Implementados
 
-El ecosistema de desarrollo consta de **6 proyectos modulares**, estructurados de forma pedagógica y técnica según diversas fases de complejidad en ingeniería de software:
+El ecosistema de desarrollo consta de **7 proyectos modulares**, estructurados de forma pedagógica y técnica según diversas fases de complejidad en ingeniería de software:
 
 | # | Proyecto / Módulo | Nivel / Fase | Descripción Principal | Tecnologías Clave |
 |---|---|---|---|---|
@@ -30,6 +30,7 @@ El ecosistema de desarrollo consta de **6 proyectos modulares**, estructurados d
 | 4 | **[Registro de Trámites CRUD](./registro-tramites)** | Fase 2 (Básico-Medio) | Mini-sistema CRUD de correspondencia ciudadana con persistencia local permanente. | LocalStorage API, Sincronización asíncrona del DOM, Control de estados vacíos. |
 | 5 | **[Sistema de Turnos FIFO](./sistema-turnos)** | Fase 1 (Básico) | Emisor y gestor de turnos secuenciales para salas de atención al ciudadano. | Estructuras de colas en memoria, Programación de algoritmos FIFO (`.shift()`, `.push()`). |
 | 6 | **[Monitor del Dólar](./monitor-dolar)** | Herramienta Auxiliar | Dashboard de visualización del tipo de cambio e histórico del dólar en tiempo real. | ES6 Modules, Fetch API asíncrona, Control y actualización del DOM. |
+| 7 | **[MarketOruro](./oruro-marketplace-app)** | Fase 6 (Avanzado - Firebase) | Plataforma de fomento comercial directo para productores del altiplano y moderación de la Gobernación. | React, Vite, Firebase Auth (Google Sign-In), Onboarding de productores, Grilla responsiva 2-cols y bottom navigation. |
 
 ---
 
@@ -69,6 +70,18 @@ Mapea el flujo de atención al ciudadano en las oficinas centrales de la Goberna
 Un panel auxiliar que permite monitorear cotizaciones de monedas extranjeras para estimaciones presupuestarias en licitaciones internacionales.
 *   **Asincronía**: Implementación nativa de la Fetch API para llamadas no bloqueantes.
 *   **Modularidad**: Código altamente reutilizable estructurado bajo ES6 Modules (`import`/`export`).
+
+### 🌾 7. Plataforma de Fomento Comercial - MarketOruro (`oruro-marketplace-app`)
+Portal oficial del **Gobierno Autónomo Departamental de Oruro** diseñado para incentivar el comercio solidario y directo de productores agrícolas, camélidos y artesanos del altiplano, eliminando la intermediación comercial.
+*   **Autenticación e Inicio de Sesión**: Integración real con el SDK oficial de **Firebase v10.8.0** para registro de productores locales con correo/contraseña y acceso simplificado mediante **Google Sign-In (Popups)**, con fallback transparente a almacenamiento local persistente en caso de caída de red.
+*   **Onboarding Obligatorio de Productores**: Intercepta de manera segura los accesos de nuevos productores para obligarles a registrar su Municipio de origen en el departamento de Oruro y su número de WhatsApp antes de publicar.
+*   **Diseño Móvil Premium (Estilo Facebook Marketplace)**:
+    *   **Grilla Responsiva 2-Columnas**: Muestra los productos en dos columnas compactas en pantallas móviles para un escaneo visual de alta densidad.
+    *   **Carrusel de Categorías Táctil**: Swipe horizontal nativo en celular para alternar entre categorías.
+    *   **Drawer de Navegación Móvil (Botón Hamburguesa)**: Oculta el menú pesado de escritorio bajo un botón `☰` que despliega un drawer translúcido deslizable.
+    *   **Barra de Navegación Inferior Fija (Bottom Tab Bar)**: Acceso directo táctil con efecto blur a Inicio, Catálogo, Publicar (botón central flotante), Mis Ventas y Soporte Técnico.
+*   **Moderación Institucional**: Consola administrativa protegida por roles (solo accesible para el correo institucional `admin@oruro.gob.bo`) para que los moderadores de la Gobernación supervisen, aprueben o suspendan ofertas comerciales.
+*   **Canales Directos**: Conexión de un solo toque para iniciar chats por WhatsApp con plantillas dinámicas autocompletadas de negociación, o llamadas telefónicas directas al celular del productor.
 
 ---
 

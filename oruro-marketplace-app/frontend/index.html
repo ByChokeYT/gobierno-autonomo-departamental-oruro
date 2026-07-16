@@ -8,9 +8,41 @@
     <meta name="theme-color" content="#0a0a0a" />
     <title>MarketOruro — Plataforma de Productores de Oruro</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+      import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+      
+      const firebaseConfig = {
+        apiKey: "AIzaSyCYgAXhdlw3j2MfpDMXndYjrWxoI9rCuJM",
+        authDomain: "oruro-marketplace-app-34cec.firebaseapp.com",
+        projectId: "oruro-marketplace-app-34cec",
+        storageBucket: "oruro-marketplace-app-34cec.firebasestorage.app",
+        messagingSenderId: "753489945487",
+        appId: "1:753489945487:web:908e39a3704ba2233d61fa",
+        measurementId: "G-PCZ8DPG2LV"
+      };
+
+      try {
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        window.firebaseAuth = {
+          auth,
+          signInWithEmailAndPassword,
+          createUserWithEmailAndPassword,
+          signOut,
+          onAuthStateChanged,
+          GoogleAuthProvider,
+          signInWithPopup
+        };
+        console.log("Firebase initialized successfully via Script CDN.");
+      } catch (e) {
+        console.error("Firebase initialization failed: ", e);
+      }
+    </script>
   </head>
-  <body>
+  <body class="bg-[#0b0b0d] text-neutral-100 font-sans selection:bg-amber-500/30 selection:text-amber-200 antialiased overflow-x-hidden">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

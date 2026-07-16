@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+@theme {
+  --font-display: "Outfit", sans-serif;
+  --font-sans: "Inter", sans-serif;
+}
+
 @layer base {
   * {
     box-sizing: border-box;
@@ -8,27 +13,79 @@
   }
   
   html {
-    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-family: var(--font-sans);
+    scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
   }
 
   body {
-    background-color: #0a0a0a;
-    color: #ffffff;
+    background-color: #0c0c0e;
+    color: #f3f4f6;
     min-height: 100vh;
   }
 
+  /* Custom Scrollbar */
   ::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
+    height: 8px;
   }
   ::-webkit-scrollbar-track {
-    background: #111;
+    background: #0f0f12;
   }
   ::-webkit-scrollbar-thumb {
-    background: #333;
-    border-radius: 3px;
+    background: #27272a;
+    border-radius: 9999px;
+    border: 2px solid #0f0f12;
   }
   ::-webkit-scrollbar-thumb:hover {
     background: #d97706;
   }
 }
+
+/* Premium UI Utilities */
+.glass-panel {
+  background: rgba(20, 20, 25, 0.7);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.glass-panel-light {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.glow-amber:hover {
+  box-shadow: 0 0 25px rgba(217, 119, 6, 0.15);
+  border-color: rgba(217, 119, 6, 0.3);
+}
+
+.animate-gradient-slow {
+  background-size: 200% 200%;
+  animation: moveGradient 8s ease infinite;
+}
+
+@keyframes moveGradient {
+  0% { background-position: 0% 50% }
+  50% { background-position: 100% 50% }
+  100% { background-position: 0% 50% }
+}
+
+/* Hide default select styling in custom dropdowns */
+.select-clean {
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='%23a3a3a3' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 28px;
+}
+
+/* Ocultar barra de desplazamiento */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;  /* IE y Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
