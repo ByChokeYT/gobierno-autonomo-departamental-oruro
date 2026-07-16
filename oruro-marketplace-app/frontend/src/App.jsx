@@ -22,6 +22,24 @@ export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [supportOpen, setSupportOpen] = useState(false)
   const [toast, setToast] = useState(null)
+  
+  // Lista de IDs favoritos
+  const [favorites, setFavorites] = useState(() => {
+    try {
+      const saved = localStorage.getItem('market_oruro_favorites')
+      return saved ? JSON.parse(saved) : []
+    } catch (_e) {
+      return []
+    }
+  })
+
+  // Filtro de Productor Seleccionado
+  const [selectedSeller, setSelectedSeller] = useState(null)
+
+  // Guardar favoritos en localStorage
+  useEffect(() => {
+    localStorage.setItem('market_oruro_favorites', JSON.stringify(favorites))
+  }, [favorites])
 
   const showToast = (message, type = 'info') => {
     setToast({ message, type })
@@ -118,6 +136,31 @@ export default function App() {
     }
   }
 
+  // Guardar/Quitar Favorito
+  const handleToggleFavorite = (prodId) => {
+    setFavorites(prev => {
+      const exists = prev.includes(prodId)
+      if (exists) {
+        showToast('Se quitó de tus favoritos.', 'info')
+        return prev.filter(id => id !== prodId)
+      } else {
+        showToast('¡Guardado en tus favoritos! ✨', 'success')
+        return [...prev, prodId]
+      }
+    })
+  }
+
+  // Compartir oferta (Copia al portapapeles)
+  const handleShareProduct = (product) => {
+    try {
+      const shareText = `¡Mira esta oferta en MarketOruro! 🌾\n\n*${product.title}*\nPrecio: ${product.price} Bs / ${product.unit}\nOrigen: Municipio de ${product.location}\nContacto del productor: https://wa.me/${product.phone}\n\nCatálogo de Fomento Comercial - Gobernación de Oruro.`
+      navigator.clipboard.writeText(shareText)
+      showToast('¡Detalles de la oferta copiados al portapapeles! Compártelos por WhatsApp.', 'success')
+    } catch (_err) {
+      showToast('No se pudo copiar el enlace automáticamente.', 'error')
+    }
+  }
+
   // Cerrar Sesión
   const handleLogout = () => {
     if (window.firebaseAuth) {
@@ -150,18 +193,26 @@ export default function App() {
         return p.seller.toLowerCase() === currentUser.name.toLowerCase()
       }
 
+      // Si estamos en Favoritos, filtramos solo los favoritos del usuario
+      if (currentView === 'favorites') {
+        return favorites.includes(p.id) && p.status === 'activo'
+      }
+
       const matchCat = activeCategory === 'all' || p.category === activeCategory
       const matchMun = activeMunicipio === 'Todos los municipios' || p.location.toLowerCase() === activeMunicipio.toLowerCase()
       
+      // Filtro de productor seleccionado
+      const matchSeller = !selectedSeller || p.seller.toLowerCase() === selectedSeller.toLowerCase()
+
       const searchLower = search.toLowerCase()
       const matchSearch = p.title.toLowerCase().includes(searchLower) ||
         p.location.toLowerCase().includes(searchLower) ||
         p.description.toLowerCase().includes(searchLower) ||
         p.seller.toLowerCase().includes(searchLower)
 
-      return matchCat && matchMun && matchSearch
+      return matchCat && matchMun && matchSearch && matchSeller
     })
-  }, [products, activeCategory, activeMunicipio, search, currentView, currentUser])
+  }, [products, activeCategory, activeMunicipio, search, currentView, currentUser, favorites, selectedSeller])
 
   // Helper para renderizar los bloques del Sidebar
   const renderSidebarContent = () => (
@@ -184,7 +235,7 @@ export default function App() {
           </button>
 
           <button
-            onClick={() => { setCurrentView('marketplace'); setMobileMenuOpen(false); }}
+            onClick={() => { setCurrentView('marketplace'); setSelectedSeller(null); setMobileMenuOpen(false); }}
             className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold transition-all text-left ${
               currentView === 'marketplace'
                 ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
@@ -193,6 +244,26 @@ export default function App() {
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-4 h-4 text-inherit"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 13.5h3.86a2.25 2.25 0 0 1 2.008 1.24l.885 1.77a2.25 2.25 0 0 0 2.007 1.24h1.98a2.25 2.25 0 0 0 2.007-1.24l.885-1.77a2.25 2.25 0 0 1 2.007-1.24h3.86m-18 0h18a2.25 2.25 0 0 1 2.25 2.25v4.25A2.25 2.25 0 0 1 18.75 21H5.25A2.25 2.25 0 0 1 3 18.75V15.75a2.25 2.25 0 0 1 2.25-2.25Zm0-4.5h18A2.25 2.25 0 0 0 21 9V6a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 6v3a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
             Catálogo de Oferta
+          </button>
+
+          {/* Mis Favoritos */}
+          <button
+            onClick={() => { setCurrentView('favorites'); setSelectedSeller(null); setMobileMenuOpen(false); }}
+            className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-bold transition-all text-left ${
+              currentView === 'favorites'
+                ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                : 'text-neutral-400 hover:bg-white/5 hover:text-white border border-transparent'
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-rose-500"><path d="m11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z" /></svg>
+              <span>Mis Favoritos</span>
+            </div>
+            {favorites.length > 0 && (
+              <span className="bg-rose-600/80 text-white text-[9px] px-2 py-0.5 rounded-full font-black">
+                {favorites.length}
+              </span>
+            )}
           </button>
 
           {/* Vista Mis Publicaciones */}
@@ -407,7 +478,24 @@ export default function App() {
                 <button onClick={() => setSearch('')} className="text-neutral-500 hover:text-white text-xs">✕</button>
               )}
             </div>
+
+            {/* ─── Sugerencias Rápidas de Búsqueda ─── */}
+            {!search && (
+              <div className="flex items-center gap-1.5 flex-wrap mt-1.5">
+                <span className="text-neutral-600 text-[9px] uppercase tracking-widest font-bold shrink-0">Buscar:</span>
+                {['Quinua Real', 'Charque Llama', 'Lana Alpaca', 'Poncho', 'Salinas', 'Challapata', 'Orgánico'].map(s => (
+                  <button
+                    key={s}
+                    onClick={() => { setSearch(s); setCurrentView('marketplace'); }}
+                    className="text-[9px] px-2 py-0.5 rounded-full bg-neutral-900 hover:bg-amber-600/10 border border-neutral-800 hover:border-amber-500/30 text-neutral-500 hover:text-amber-400 transition-all font-semibold cursor-pointer active:scale-95"
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
+
 
           {/* Botones de Acción y Usuario (Auth) (Escritorio) */}
           <div className="hidden lg:flex items-center gap-4 shrink-0">
@@ -535,14 +623,22 @@ export default function App() {
               {/* ENCABEZADO DE RESULTADOS */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/5 pb-4">
                 <div>
-                  <h2 className="text-white font-extrabold text-lg tracking-tight flex items-center gap-2 font-display">
+                  <h2 className="text-white font-extrabold text-lg tracking-tight flex items-center gap-2 font-display flex-wrap">
                     {currentView === 'my-products' 
                       ? 'Mis Ofertas Activas' 
+                      : currentView === 'favorites'
+                      ? 'Mis Favoritos ❤️'
                       : (CATEGORIES.find(c => c.id === activeCategory)?.label || 'Todos los Productos')
                     }
-                    {activeMunicipio !== 'Todos los municipios' && currentView !== 'my-products' && (
+                    {activeMunicipio !== 'Todos los municipios' && currentView !== 'my-products' && currentView !== 'favorites' && (
                       <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-neutral-900 border border-white/5 text-neutral-300">
                         📍 {activeMunicipio}
+                      </span>
+                    )}
+                    {selectedSeller && currentView !== 'my-products' && (
+                      <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-600/10 border border-amber-500/20 text-amber-400 flex items-center gap-1.5 shrink-0">
+                        👤 {selectedSeller}
+                        <button onClick={() => setSelectedSeller(null)} className="hover:text-red-400 font-bold transition-colors">✕</button>
                       </span>
                     )}
                   </h2>
@@ -550,12 +646,13 @@ export default function App() {
                 </div>
 
                 <div className="flex items-center gap-2.5">
-                  {(activeCategory !== 'all' || activeMunicipio !== 'Todos los municipios' || search) && (
+                  {(activeCategory !== 'all' || activeMunicipio !== 'Todos los municipios' || search || selectedSeller) && (
                     <button
                       onClick={() => {
                         setActiveCategory('all')
                         setActiveMunicipio('Todos los municipios')
                         setSearch('')
+                        setSelectedSeller(null)
                       }}
                       className="text-neutral-500 hover:text-white text-xs font-bold border border-neutral-800 hover:border-neutral-700 px-3 py-1.5 rounded-xl transition-all"
                     >
@@ -594,6 +691,13 @@ export default function App() {
                       product={product} 
                       onContact={setContactProduct} 
                       isAdminView={false}
+                      isFavorite={favorites.includes(product.id)}
+                      onToggleFavorite={handleToggleFavorite}
+                      onShare={handleShareProduct}
+                      onSelectSeller={(seller) => {
+                        setSelectedSeller(seller);
+                        setCurrentView('marketplace');
+                      }}
                     />
                   ))}
                 </div>
@@ -808,15 +912,32 @@ export default function App() {
           <span className="text-[9px] uppercase tracking-wide">Mis Ventas</span>
         </button>
 
-        {/* Soporte GAD */}
+        {/* Favoritos */}
         <button
-          onClick={() => setSupportOpen(true)}
-          className={`flex flex-col items-center gap-1 focus:outline-none transition-colors ${
-            supportOpen ? 'text-amber-500 font-bold' : 'hover:text-white'
+          onClick={() => {
+            setCurrentView('favorites');
+            setSelectedSeller(null);
+          }}
+          className={`flex flex-col items-center gap-1 focus:outline-none transition-colors relative ${
+            currentView === 'favorites' ? 'text-rose-500 font-bold' : 'hover:text-white'
           }`}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M8.625 9.75a.625.625 0 1 1-1.25 0 .625.625 0 0 1 1.25 0Zm0 0H8.63v.01h-.005V9.75Zm5.625 0a.625.625 0 1 1-1.25 0 .625.625 0 0 1 1.25 0Zm0 0h.01v.01h-.01V9.75Zm-3 0a.625.625 0 1 1-1.25 0 .625.625 0 0 1 1.25 0Zm0 0H11.3v.01h-.005V9.75Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M9 20.247 12 21a2 2 0 0 0 2-2v-.247a18.232 18.232 0 0 0 4.19-.949A2.25 2.25 0 0 0 21 15.688V9.75a2.25 2.25 0 0 0-2.81-2.185A18.18 18.18 0 0 0 12.006 6.75a18.18 18.18 0 0 0-6.195.815A2.25 2.25 0 0 0 3 9.75v5.938c0 1.09.78 2.02 1.848 2.204a18.236 18.236 0 0 0 4.153.905Z" /></svg>
-          <span className="text-[9px] uppercase tracking-wide">Soporte</span>
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            viewBox="0 0 24 24" 
+            fill={currentView === 'favorites' ? 'currentColor' : 'none'} 
+            stroke="currentColor" 
+            strokeWidth="2.5" 
+            className="w-5 h-5"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+          </svg>
+          <span className="text-[9px] uppercase tracking-wide">Favoritos</span>
+          {favorites.length > 0 && (
+            <span className="absolute -top-1 -right-1 bg-rose-600 text-white text-[8px] px-1.5 py-0.5 rounded-full font-black scale-90">
+              {favorites.length}
+            </span>
+          )}
         </button>
 
         {/* Panel GAD */}

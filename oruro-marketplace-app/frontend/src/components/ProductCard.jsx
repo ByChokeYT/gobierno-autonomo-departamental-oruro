@@ -1,7 +1,16 @@
 import React from 'react'
 import { BADGE_STYLES } from '../constants/marketData'
 
-export default function ProductCard({ product, onContact, isAdminView, onModerate }) {
+export default function ProductCard({ 
+  product, 
+  onContact, 
+  isAdminView, 
+  onModerate,
+  isFavorite,
+  onToggleFavorite,
+  onShare,
+  onSelectSeller
+}) {
   const isSuspended = product.status === 'suspendido';
 
   return (
@@ -30,6 +39,43 @@ export default function ProductCard({ product, onContact, isAdminView, onModerat
           <span className={`absolute top-2 left-2 sm:top-3 sm:left-3 text-[8px] sm:text-[10px] uppercase font-bold tracking-wider px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md sm:rounded-lg backdrop-blur-md ${BADGE_STYLES[product.badgeColor || 'amber']}`}>
             {product.badge}
           </span>
+
+          {/* Botones de Acción sobre la Imagen (Favorito y Compartir) */}
+          {!isAdminView && (
+            <div className="absolute top-2 right-2 sm:top-3 sm:right-3 flex gap-1.5 z-10">
+              {/* Compartir */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onShare) { onShare(product); }
+                }}
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-neutral-950/60 hover:bg-neutral-900 backdrop-blur-md border border-white/10 flex items-center justify-center text-neutral-300 hover:text-white transition-all active:scale-90 cursor-pointer"
+                title="Compartir oferta"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-3.5 h-3.5"><path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186.011-.005a2.25 2.25 0 1 1 2.897 2.897l-.013-.005m-2.895-2.887L11.75 8.22M13.684 20.73l-2.684-1.397m2.684 1.397a2.25 2.25 0 1 0 0-2.186m0 2.186-.013-.005a2.25 2.25 0 1 1 2.897-2.897l-.011-.005M11 16.13l-2.684-1.397" /></svg>
+              </button>
+
+              {/* Favorito */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onToggleFavorite) { onToggleFavorite(product.id); }
+                }}
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-neutral-950/60 hover:bg-neutral-900 backdrop-blur-md border border-white/10 flex items-center justify-center transition-all active:scale-90 cursor-pointer"
+                title={isFavorite ? "Quitar de favoritos" : "Guardar en favoritos"}
+              >
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  viewBox="0 0 24 24" 
+                  strokeWidth="2.5" 
+                  stroke="currentColor" 
+                  className={`w-3.5 h-3.5 ${isFavorite ? 'fill-rose-500 text-rose-500' : 'fill-none text-neutral-300 hover:text-rose-400'}`}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                </svg>
+              </button>
+            </div>
+          )}
 
           {/* Badge Administrativo (solo en modo admin/moderador) */}
           {isAdminView && (
@@ -97,7 +143,7 @@ export default function ProductCard({ product, onContact, isAdminView, onModerat
               onClick={() => onContact(product)}
               className="bg-neutral-900 hover:bg-amber-600 hover:text-black text-amber-400 border border-amber-500/20 hover:border-transparent active:scale-95 font-bold text-[10px] sm:text-xs px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl transition-all duration-200 flex items-center justify-center gap-1 shadow-md hover:shadow-amber-500/10"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-inherit"><path strokeLinecap="round" strokeLinejoin="round" d="M8.625 9.75a.625.625 0 1 1-1.25 0 .625.625 0 0 1 1.25 0Zm0 0H8.63v.01h-.005V9.75Zm5.625 0a.625.625 0 1 1-1.25 0 .625.625 0 0 1 1.25 0Zm0 0h.01v.01h-.01V9.75Zm-3 0a.625.625 0 1 1-1.25 0 .625.625 0 0 1 1.25 0Zm0 0H11.3v.01h-.005V9.75Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M9 20.247 12 21a2 2 0 0 0 2-2v-.247a18.232 18.232 0 0 0 4.19-.949A2.25 2.25 0 0 0 21 15.688V9.75a2.25 2.25 0 0 0-2.81-2.185A18.18 18.18 0 0 0 12.006 6.75a18.18 18.18 0 0 0-6.195.815A2.25 2.25 0 0 0 3 9.75v5.938c0 1.09.78 2.02 1.848 2.204a18.236 18.236 0 0 0 4.153.905Z" /></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-3 sm:w-3.5 sm:h-3.5 text-inherit"><path strokeLinecap="round" strokeLinejoin="round" d="M8.625 9.75a.625.625 0 1 1-1.25 0 .625.625 0 0 1 1.25 0Zm0 0H8.63v.01h-.005V9.75Zm5.625 0a.625.625 0 1 1-1.25 0 .625.625 0 0 1 1.25 0Zm0 0h.01v.01h-.01V9.75Zm-3 0a.625.625 0 1 1-1.25 0 .625.625 0 0 1 1.25 0Zm0 0H11.3v.01h-.005V9.75Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M9 20.247 12 21a2 2 0 0 0 2-2v-.247a18.232 18.232 0 0 0 4.19-.949A2.25 2.25 0 0 0 21 15.688V9.75a2.25 2.25 0 0 0-2.81-2.185A18.18 18.18 0 0 0 12.006 6.75a18.18 18.18 0 0 0-6.195.815A2.25 2.25 0 0 0 3 9.75v5.938c0 1.09.78 2.02 1.848 2.204a18.236 18.236 0 0 0 4.153.905Z" /></svg>
               Contactar
             </button>
           )}
@@ -108,7 +154,13 @@ export default function ProductCard({ product, onContact, isAdminView, onModerat
           <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-amber-800/50 flex items-center justify-center text-amber-200 text-[8px] font-bold">
             {product.seller[0].toUpperCase()}
           </div>
-          <span className="truncate max-w-[80px] sm:max-w-none">{product.seller}</span>
+          <button 
+            onClick={() => onSelectSeller && onSelectSeller(product.seller)}
+            className="truncate max-w-[80px] sm:max-w-none hover:underline hover:text-amber-500 text-left focus:outline-none transition-colors"
+            title={`Ver todas las ofertas de ${product.seller}`}
+          >
+            {product.seller}
+          </button>
         </div>
       </div>
     </div>
