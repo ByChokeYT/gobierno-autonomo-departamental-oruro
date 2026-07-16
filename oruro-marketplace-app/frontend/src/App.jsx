@@ -21,6 +21,14 @@ export default function App() {
   const [authOpen, setAuthOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [supportOpen, setSupportOpen] = useState(false)
+  const [toast, setToast] = useState(null)
+
+  const showToast = (message, type = 'info') => {
+    setToast({ message, type })
+    setTimeout(() => {
+      setToast(prev => prev && prev.message === message ? null : prev)
+    }, 4500)
+  }
 
   // Estado del usuario autenticado (persiste en localStorage)
   const [currentUser, setCurrentUser] = useState(() => {
@@ -101,10 +109,10 @@ export default function App() {
   // Click en Publicar Producto (Control de acceso con Auth)
   const handlePublishClick = () => {
     if (!currentUser) {
-      alert('Debe iniciar sesión o registrarse como productor para publicar un anuncio en el catálogo.')
+      showToast('Debe iniciar sesión o registrarse como productor para publicar un anuncio.', 'warning')
       setAuthOpen(true)
     } else if (currentUser.role === 'admin') {
-      alert('La cuenta de la Gobernación no puede publicar anuncios comerciales. Inicie sesión como productor.')
+      showToast('La cuenta de la Gobernación no puede publicar anuncios comerciales. Inicie sesión como productor.', 'error')
     } else {
       setPublishOpen(true)
     }
@@ -192,10 +200,10 @@ export default function App() {
             onClick={() => {
               setMobileMenuOpen(false);
               if (!currentUser) {
-                alert('Debe iniciar sesión como Productor para ver sus publicaciones.')
+                showToast('Debe iniciar sesión como Productor para ver sus publicaciones.', 'warning')
                 setAuthOpen(true)
               } else if (currentUser.role !== 'productor') {
-                alert('Su rol actual es institucional. Regístrese o inicie sesión como productor.')
+                showToast('Su rol actual es institucional. Inicie sesión como productor.', 'error')
               } else {
                 setCurrentView('my-products')
               }
@@ -215,10 +223,10 @@ export default function App() {
             onClick={() => {
               setMobileMenuOpen(false);
               if (!currentUser) {
-                alert('Acceso Institucional: Debe iniciar sesión con credenciales de la Gobernación.')
+                showToast('Acceso Institucional: Inicie sesión con credenciales de la Gobernación.', 'warning')
                 setAuthOpen(true)
               } else if (currentUser.role !== 'admin') {
-                alert('Acceso restringido. Esta sección requiere una cuenta de la Gobernación (GAD).')
+                showToast('Acceso restringido. Esta sección requiere cuenta de la Gobernación.', 'error')
               } else {
                 setCurrentView('dashboard')
               }
@@ -300,7 +308,7 @@ export default function App() {
           onClick={(e) => {
             e.preventDefault()
             setMobileMenuOpen(false)
-            alert("Para registrarse: pulse 'Ingresar' arriba, regístrese como productor y complete sus datos. No requiere intermediarios.")
+            showToast("Para registrarse: pulse 'Ingresar' arriba, regístrese como productor y complete sus datos.", "info")
           }}
           className="text-amber-500 hover:text-amber-400 font-black text-[10px] uppercase tracking-wider"
         >
@@ -662,6 +670,27 @@ export default function App() {
         onSaveSuccess={setCurrentUser} 
       />
 
+      {/* ─── TOAST DE NOTIFICACIONES PERSONALIZADO (AESTHETIC GLASS) ─── */}
+      {toast && (
+        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-55 w-full max-w-sm px-4 animate-in fade-in slide-in-from-top-4 duration-300 pointer-events-none">
+          <div className={`glass-panel border-l-4 p-4 rounded-2xl flex items-center justify-between shadow-2xl gap-3 pointer-events-auto ${
+            toast.type === 'success' ? 'border-l-emerald-500 bg-neutral-900/90' :
+            toast.type === 'error' ? 'border-l-red-500 bg-neutral-900/90' :
+            toast.type === 'warning' ? 'border-l-amber-500 bg-neutral-900/90' : 'border-l-sky-500 bg-neutral-900/90'
+          }`}>
+            <div className="flex items-center gap-3">
+              <span className="text-lg">
+                {toast.type === 'success' ? '✨' :
+                 toast.type === 'error' ? '🚫' :
+                 toast.type === 'warning' ? '⚠️' : 'ℹ️'}
+              </span>
+              <p className="text-white text-xs font-semibold leading-relaxed">{toast.message}</p>
+            </div>
+            <button onClick={() => setToast(null)} className="text-neutral-500 hover:text-white transition-colors text-xs font-black p-1">✕</button>
+          </div>
+        </div>
+      )}
+
       {/* ─── MODAL DE SOPORTE / CONTACTO GAD ─── */}
       {supportOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/80 backdrop-blur-md" onClick={() => setSupportOpen(false)}>
@@ -763,10 +792,10 @@ export default function App() {
         <button
           onClick={() => {
             if (!currentUser) {
-              alert('Debe iniciar sesión como Productor para ver sus publicaciones.');
+              showToast('Debe iniciar sesión como Productor para ver sus publicaciones.', 'warning');
               setAuthOpen(true);
             } else if (currentUser.role !== 'productor') {
-              alert('Su rol actual es institucional. Regístrese o inicie sesión como productor.');
+              showToast('Su rol actual es institucional. Inicie sesión como productor.', 'error');
             } else {
               setCurrentView('my-products');
             }
