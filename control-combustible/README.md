@@ -1,46 +1,64 @@
-# ⛽ Fase 10: Sistema de Emisión y Conciliación de Vales de Combustible (Oruro)
+# ⛽ Control, Emisión y Conciliación de Vales de Combustible con Firmas SHA-256
 
-Este módulo controla, emite y fiscaliza la asignación de vales de gasolina y diésel para la flota vehicular oficial de la Gobernación de Oruro (Secretaría General, SEDECA, etc.), implementando **tokens criptográficos simulados** para prevenir la falsificación y clonación de vales.
-
----
-
-## 🎯 Objetivo de Aprendizaje
-Dominar la **seguridad informática aplicada al frontend** mediante algoritmos de generación de firmas hash de control (SHA-256 simulado) y la creación de **documentos de control de tesorería imprimibles** con validación descentralizada.
+**Gobernación Autónoma Departamental de Oruro (Bolivia)**  
+*Cumplimiento Ley N° 1178 (SAFCO) · Fiscalización de Carburantes y Tesorería*
 
 ---
 
-## 📂 Estructura del Proyecto
-El proyecto está estructurado de la siguiente forma:
+## 📌 Descripción General
+
+Este módulo forma parte del sistema de gestión pública de Oruro. Controla, fiscaliza y emite los vales de **Gasolina Especial** y **Diésel Oíl** para la flota de vehículos oficiales de la Gobernación (Secretaría General, Servicio Departamental de Caminos SEDECA, Direcciones e Inspecciones Técnicas).
+
+Incorpora **tokens de seguridad criptográficos SHA-256**, **monitoreo en tiempo real de niveles de tanques centrales**, **alertas automáticas de reserva crítica (<20%)**, **boletas impresas en formato ticket térmico con código de barras** y **verificador antifraude de vales**.
+
+---
+
+## 🚀 Características Principales
+
+### 1. 🛡️ Tokens Criptográficos SHA-256 Antifraude
+* Cálculo determinístico de huella de control (`SHA-OR-XXXX-XXXX`) combinando: `Código de Vale + Placa + Litros + Destino + Clave Secreta de Tesorería`.
+* Impide la clonación o falsificación física de cupones impresos.
+* **Verificador Antifraude Integrado:** Herramienta para validación instantánea de autenticidad en estaciones de servicio.
+
+### 2. 🛢️ Control Dinámico de Depósitos Centrales
+* **Tanque Principal Gasolina Especial (5,000 Lts):** Decremento automático al emitir vales y restitución al anular cupones.
+* **Tanque SEDECA Diésel Oíl (5,000 Lts):** Indicadores visuales de porcentaje disponible y opción de registro de compra/reposición.
+* **Alerta de Reserva Crítica:** Notificación visual cuando cualquier depósito cae por debajo de 1,000 Litros.
+
+### 3. 🧾 Boleta Imprimible en Formato Ticket Térmico
+* Formato optimizado para impresión rápida (`Ctrl+P`) con código de barras simulado, resumen de comisión, firma del comisionado y sello oficial de Tesorería.
+
+### 4. ⌨️ Búsqueda, Filtrado & Exportación CSV
+* **Atajo `Ctrl + K`:** Acceso directo a la barra de búsqueda universal.
+* **Ordenamiento Dinámico:** Filtrado por código, conductor, placa o carburante.
+* **Exportar CSV con UTF-8 BOM:** Genera reportes de fiscalización compatibles con Microsoft Excel.
+
+### 5. 🎨 Diseño UI/UX Senior Obsidian
+* Tema oscuro petróleo con orbes ambientales radiales.
+* Iconografía 100% vectorial SVG sin emojis genéricos.
+* Reloj institucional en vivo en tipografía monoespaciada `JetBrains Mono`.
+
+---
+
+## 📂 Estructura de Archivos
 
 ```text
 control-combustible/
-├── index.html                   (Tablero operativo, inventario de combustible y vales emitidos)
+├── index.html                   # Dashboard de conciliación, emisión de vales, medidores de tanques y modal ticket
 ├── assets/
 │   └── css/
-│       └── styles.css           (Tema operativo industrial oscuro, estilos de impresión de vales)
+│       └── styles.css           # Estilos obsidian dark, barras de medidores de tanques y print styles
 └── src/
-    └── main.js                  (Algoritmos de dispersión de token, control de inventario y LocalStorage)
+    └── main.js                  # Lógica de inventario, firmas SHA-256, verificador y LocalStorage
 ```
 
 ---
 
-## ⚠️ Reglas del Reto
-1. **Prevención de Fraude (Token Criptográfico)**: Cada vale emitido debe generar un token de seguridad único calculado mediante un algoritmo hash que fusione:
-   * Código de Vale + Placa del Vehículo + Cantidad de Litros + Clave Secreta Gubernamental.
-   * El token resultante se dibuja en la boleta impresa en formato de texto y barras.
-2. **Consumo de Inventario Reactivo**: Al emitir un vale de gasolina o diésel, el inventario virtual del tanque de la gobernación (ej. Tanque Base de 5,000 Litros) debe decrementarse reactivamente y mostrar alertas visuales si cae por debajo del 20% (Reserva Crítica).
-3. **Boleta Oficial de Impresión**: El sistema debe incluir un botón de impresión que emita la boleta/vale en formato térmico o A6, optimizado bajo `@media print` para ser canjeado directamente en las estaciones de servicio autorizadas.
+## ⚡ Instalación y Ejecución
+
+1. No requiere instalación de librerías ni servidor backend (`Zero dependencies`).
+2. Abre [index.html](file:///c:/Users/Admin/Downloads/gobierno-autonomo-departamental-oruro/control-combustible/index.html) directamente en tu navegador web.
 
 ---
 
-## 📈 Ruta de Aprendizaje e Ingeniería (Los 3 Niveles)
-
-### 🟢 Nivel 1: Básico (Registro Simple de Vales en Lista)
-*   **Foco**: Registro plano en texto de litros entregados a cada conductor, sin hashes ni decremento de tanques.
-*   **Problema**: Elevada vulnerabilidad a la falsificación de firmas y duplicación manual de vales.
-
-### 🟡 Nivel 2: Intermedio (Decremento de Inventario General)
-*   **Foco**: Vinculación de consumos con la capacidad del tanque general para alertas de desabastecimiento, pero sin token criptográfico de validación.
-
-### 🔴 Nivel 3: Avanzado (Fase Actual - Token Hash y Conciliación Criptográfica)
-*   **Foco**: Emisión de vales de alta seguridad con tokens hash inalterables que evitan la falsificación física del cupón impreso, combinados con un control de inventario de tanques centralizado e inmutable en `LocalStorage`.
+*Gobernación Autónoma Departamental de Oruro — Transparencia y Eficiencia en Gestión de Recursos*

@@ -3,86 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gobernación de Oruro - Control de Vales de Combustible</title>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Gobernación de Oruro — SAFCO · Control de Vales de Combustible</title>
+    <meta name="description" content="Sistema de fiscalización, emisión y conciliación de vales de gasolina y diésel para la flota vehicular oficial de la Gobernación Autónoma Departamental de Oruro.">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./assets/css/styles.css">
 </head>
 <body>
+    <!-- Fondo ambiental dinámico -->
+    <div class="bg-glow-orb orb-1"></div>
+    <div class="bg-glow-orb orb-2"></div>
+    <div class="bg-noise-overlay"></div>
+
     <div class="app-workspace">
-        <!-- Sidebar -->
-        <aside class="sidebar">
+        <!-- ══════════════ SIDEBAR ══════════════ -->
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-brand">
-                <div class="brand-icon">⛽</div>
+                <div class="brand-escudo-wrap">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo de Oruro" class="brand-escudo">
+                    <div class="brand-pulse-ring"></div>
+                </div>
                 <div>
                     <h2>GOBIERNO DE ORURO</h2>
-                    <p>CONTROL DE COMBUSTIBLE</p>
+                    <p class="brand-sub">VALES COMBUSTIBLE · SAFCO</p>
                 </div>
             </div>
-            
+
+            <!-- Live Clock -->
+            <div class="live-clock-widget">
+                <div class="clock-time" id="clock-time">00:00:00</div>
+                <div class="clock-date" id="clock-date">Cargando...</div>
+                <div class="clock-badge">
+                    <span class="clock-badge-dot"></span>
+                    GAD-ORU Tesorería en Línea
+                </div>
+            </div>
+
             <nav class="navigation-menu">
-                <button class="nav-item active" onclick="switchTab('vales')">📋 Vales Emitidos</button>
-                <button class="nav-item" onclick="switchTab('registro')">✍️ Emitir Nuevo Vale</button>
+                <div class="nav-section-label">MÓDULOS OPERATIVOS</div>
+                <button class="nav-item active" id="nav-vales" onclick="switchTab('vales')">
+                    <div class="nav-icon-box">
+                        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    </div>
+                    <span>Vales Emitidos</span>
+                    <span class="nav-count" id="nav-count">0</span>
+                </button>
+
+                <button class="nav-item" id="nav-registro" onclick="switchTab('registro')">
+                    <div class="nav-icon-box">
+                        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                    </div>
+                    <span>Emitir Nuevo Vale</span>
+                </button>
+
+                <button class="nav-item" id="nav-tanques" onclick="switchTab('tanques')">
+                    <div class="nav-icon-box">
+                        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </div>
+                    <span>Nivel de Tanques</span>
+                </button>
+
+                <div class="nav-section-label" style="margin-top:12px;">ACCIONES</div>
+                <button class="nav-item" onclick="abrirVerificadorDirecto()">
+                    <div class="nav-icon-box cyan-glow">
+                        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    </div>
+                    <span>Verificar Token Hash</span>
+                </button>
+
+                <button class="nav-item" onclick="exportarCSV()">
+                    <div class="nav-icon-box">
+                        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    </div>
+                    <span>Exportar Vales CSV</span>
+                </button>
             </nav>
 
             <div class="sidebar-footer">
-                <div class="server-status">
-                    <span class="status-indicator online"></span>
-                    <span>Tokens HASH Activos</span>
+                <div class="user-operator-pill">
+                    <div class="operator-avatar">TC</div>
+                    <div class="operator-info">
+                        <span class="operator-name">Operador Tesorería</span>
+                        <span class="operator-role">Fiscalización Flota GAD-ORU</span>
+                    </div>
+                    <div class="operator-status"></div>
+                </div>
+                <div class="hash-integrity-badge">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    Token SHA-256 Activo
                 </div>
             </div>
         </aside>
 
-        <!-- Main Content -->
-        <main class="main-content">
+        <!-- ══════════════ MAIN CONTENT ══════════════ -->
+        <main class="main-content" id="main-content">
+
             <!-- Top Bar -->
             <header class="top-bar">
-                <div>
-                    <span class="section-indicator">FASE 10 - Conciliación Operativa</span>
+                <div class="top-bar-left">
+                    <div class="badge-institutional">
+                        <span class="badge-dot"></span>
+                        FISCALIZACIÓN DE COMBUSTIBLE · LEY N° 1178 (SAFCO) · FASE 10
+                    </div>
                     <h1 id="page-title">Gestión de Vales de Combustible</h1>
                 </div>
-                <div class="top-bar-stats">
-                    <div class="quick-stat">
-                        <span class="stat-num" id="stat-litros">0 Lts</span>
-                        <span class="stat-lbl">Combustible Asignado</span>
+
+                <div class="top-bar-kpis">
+                    <div class="kpi-card kpi-amber">
+                        <div class="kpi-icon-box amber">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        </div>
+                        <div class="kpi-data">
+                            <span class="kpi-value" id="stat-litros">0 Lts</span>
+                            <span class="kpi-label">Despacho Acumulado</span>
+                        </div>
                     </div>
-                    <div class="quick-stat">
-                        <span class="stat-num text-warning" id="stat-tanque-gasolina">0 Lts</span>
-                        <span class="stat-lbl">Tanque Gasolina (5K Lts)</span>
+
+                    <div class="kpi-card kpi-cyan">
+                        <div class="kpi-icon-box cyan">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </div>
+                        <div class="kpi-data">
+                            <span class="kpi-value kpi-value-sm" id="stat-tanque-gasolina">0 Lts</span>
+                            <span class="kpi-label">Tanque Gasolina (5K L)</span>
+                        </div>
                     </div>
-                    <div class="quick-stat">
-                        <span class="stat-num text-info" id="stat-tanque-diesel">0 Lts</span>
-                        <span class="stat-lbl">Tanque Diésel (5K Lts)</span>
+
+                    <div class="kpi-card kpi-emerald">
+                        <div class="kpi-icon-box emerald">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9C2.1 11.2 2 11.6 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
+                        </div>
+                        <div class="kpi-data">
+                            <span class="kpi-value kpi-value-sm" id="stat-tanque-diesel">0 Lts</span>
+                            <span class="kpi-label">Tanque Diésel (5K L)</span>
+                        </div>
                     </div>
                 </div>
             </header>
 
-            <!-- Tab Vales -->
+            <!-- ═══════ TAB: VALES ═══════ -->
             <div id="tab-vales" class="tab-pane active">
-                <!-- Alertas de Inventario Crítico -->
+
+                <!-- Alerta de Reserva Crítica -->
                 <div id="alerta-reserva" class="alerta-critica" style="display: none;">
-                    <strong>🚨 ALERTA DE RESERVA DE COMBUSTIBLE:</strong> ¡Uno de los depósitos centrales está por debajo del 20% de capacidad! Es urgente realizar la compra pública para evitar desabastecimiento.
+                    <div class="alerta-icon">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    </div>
+                    <div>
+                        <strong>ALERTA DE RESERVA CRÍTICA DE COMBUSTIBLE:</strong> ¡Uno de los depósitos centrales se encuentra por debajo del 20% de su capacidad! Se requiere gestionar la reposición mediante compra pública para evitar el desabastecimiento de la flota.
+                    </div>
                 </div>
 
                 <div class="card-focus table-card">
                     <div class="card-header flex-header">
                         <div>
-                            <h2>Bandeja de Fiscalización de Combustible</h2>
-                            <p>Registro completo de vales despachados y conciliados.</p>
+                            <h2>Bandeja de Fiscalización y Conciliación de Vales</h2>
+                            <p>Registro centralizado de cupones de combustible emitidos con firma hash de seguridad.</p>
                         </div>
-                        <button class="btn-primary" onclick="switchTab('registro')">+ Emitir Vale</button>
+                        <div class="header-actions">
+                            <button class="btn-secondary" onclick="exportarCSV()">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                Exportar CSV
+                            </button>
+                            <button class="btn-primary" onclick="switchTab('registro')">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                                Emitir Vale
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Toolbar Filtros -->
+                    <div class="filter-toolbar">
+                        <div class="search-box">
+                            <svg class="search-box-icon" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                            <input type="text" id="input-buscar" placeholder="Buscar por código, conductor, placa o comisión..." oninput="filtrarVales()">
+                            <span class="search-shortcut-badge">Ctrl+K</span>
+                        </div>
+
+                        <select id="filtro-tipo" onchange="filtrarVales()" class="filter-select">
+                            <option value="">Todos los Carburantes</option>
+                            <option value="Gasolina Especial">Gasolina Especial</option>
+                            <option value="Diésel Oíl">Diésel Oíl</option>
+                        </select>
+
+                        <div class="filter-result-badge" id="filter-result-badge">0 resultados</div>
                     </div>
 
                     <div class="table-responsive">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Código</th>
-                                    <th>Conductor Destinatario</th>
-                                    <th>Placa</th>
-                                    <th>Combustible</th>
-                                    <th>Litros</th>
-                                    <th>Token HASH de Seguridad</th>
+                                    <th onclick="ordenarPor('codigo')" class="th-sortable">Código Vale <span class="sort-icon">↕</span></th>
+                                    <th onclick="ordenarPor('conductor')" class="th-sortable">Conductor Destinatario <span class="sort-icon">↕</span></th>
+                                    <th onclick="ordenarPor('placa')" class="th-sortable">Placa <span class="sort-icon">↕</span></th>
+                                    <th>Carburante</th>
+                                    <th onclick="ordenarPor('litros')" class="th-sortable">Litros <span class="sort-icon">↕</span></th>
+                                    <th>Token Hash SHA-256</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
@@ -90,41 +205,62 @@
                                 <!-- Filas dinámicas -->
                             </tbody>
                         </table>
-                        
+
                         <!-- Empty State -->
-                        <div id="estado-vacio" class="empty-state">
-                            <div class="empty-animation">⛽</div>
-                            <h3>Sin Vales Emitidos</h3>
-                            <p>No se encontraron vales de combustible en el sistema. Emita uno nuevo para comenzar.</p>
+                        <div id="estado-vacio" class="empty-state" style="display: none;">
+                            <div class="empty-icon-wrap">
+                                <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" opacity="0.4"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            </div>
+                            <h3>Sin Vales Emitidos Coincidentes</h3>
+                            <p>No se encontraron registros de vales de combustible con los parámetros seleccionados.</p>
+                            <button class="btn-secondary" onclick="limpiarFiltros()" style="margin-top:16px;">Limpiar Filtros</button>
                         </div>
+                    </div>
+
+                    <!-- Footer Totales -->
+                    <div class="table-footer" id="table-footer">
+                        <span id="table-total-count">0 vales conciliados</span>
+                        <span id="table-total-litros" class="table-total-valor">0 Litros totales en esta vista</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Tab Registro -->
+            <!-- ═══════ TAB: REGISTRO ═══════ -->
             <div id="tab-registro" class="tab-pane">
                 <div class="card-focus centered-card">
                     <div class="card-header">
-                        <h2>Emitir Vale de Combustible</h2>
-                        <p>Ingrese los datos vehiculares del comisionado para calcular la huella hash criptográfica del cupón.</p>
+                        <div class="card-header-icon">
+                            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                        </div>
+                        <h2>Emitir Vale de Combustible Oficial</h2>
+                        <p>Ingrese los datos vehiculares del comisionado para firmar el cupón con la huella hash criptográfica.</p>
                     </div>
 
                     <form id="form-vale" onsubmit="registrarVale(event)">
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="val-conductor">Conductor Destinatario</label>
-                                <input type="text" id="val-conductor" placeholder="Nombre completo" required autocomplete="off">
+                                <label for="val-conductor">
+                                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    Conductor Destinatario
+                                </label>
+                                <input type="text" id="val-conductor" placeholder="Nombre completo del servidor público" required>
                             </div>
 
                             <div class="form-group">
-                                <label for="val-placa">Placa del Vehículo Oficial</label>
-                                <input type="text" id="val-placa" placeholder="Ej. 2451-FDS" required autocomplete="off">
+                                <label for="val-placa">
+                                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9C2.1 11.2 2 11.6 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
+                                    Placa del Vehículo Oficial
+                                </label>
+                                <input type="text" id="val-placa" placeholder="Ej. 2451-FDS" required style="text-transform:uppercase;">
                             </div>
                         </div>
 
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="val-tipo">Tipo de Combustible</label>
+                                <label for="val-tipo">
+                                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                    Tipo de Carburante
+                                </label>
                                 <select id="val-tipo" required>
                                     <option value="Gasolina Especial">Gasolina Especial (Tanque Principal)</option>
                                     <option value="Diésel Oíl">Diésel Oíl (Tanque SEDECA)</option>
@@ -132,61 +268,151 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="val-litros">Cantidad en Litros</label>
-                                <input type="number" id="val-litros" min="5" max="150" placeholder="Ej. 40" required>
+                                <label for="val-litros">
+                                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                    Cantidad en Litros (Lts)
+                                </label>
+                                <input type="number" id="val-litros" min="5" max="250" placeholder="Ej. 40" required>
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label for="val-destino">Ruta de Comisión / Justificación</label>
-                            <input type="text" id="val-destino" placeholder="Ej. Comisión de Inspección Caminera Oruro - Huanuni" required autocomplete="off">
+                        <div class="form-group full-width">
+                            <label for="val-destino">
+                                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                Ruta de Comisión / Justificación Institucional
+                            </label>
+                            <input type="text" id="val-destino" placeholder="Ej. Comisión de Inspección Caminera Oruro - Huanuni - Challapata" required>
                         </div>
 
-                        <button type="submit" class="btn-glow">Emitir y Firmar Criptográficamente</button>
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary" onclick="switchTab('vales')">Cancelar</button>
+                            <button type="submit" class="btn-glow">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                Emitir Vale y Generar Token Criptográfico
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
+
+            <!-- ═══════ TAB: TANQUES ═══════ -->
+            <div id="tab-tanques" class="tab-pane">
+                <div class="tanques-grid">
+                    <!-- Tanque Gasolina -->
+                    <div class="tanque-card amber">
+                        <div class="tanque-header">
+                            <div class="tanque-title-wrap">
+                                <div class="tanque-badge amber">TANQUE 01</div>
+                                <h3>Tanque Principal — Gasolina Especial</h3>
+                            </div>
+                            <span class="tanque-cap-tag">Capacidad Max: 5,000 L</span>
+                        </div>
+
+                        <div class="tank-visual-meter">
+                            <div class="tank-fill amber" id="meter-gasolina" style="width: 80%;"></div>
+                        </div>
+
+                        <div class="tank-metrics-row">
+                            <div>
+                                <span class="tank-metric-label">Disponible</span>
+                                <span class="tank-metric-val amber" id="val-gasolina-disp">4,000 Lts</span>
+                            </div>
+                            <div>
+                                <span class="tank-metric-label">Porcentaje</span>
+                                <span class="tank-metric-val" id="pct-gasolina-disp">80%</span>
+                            </div>
+                        </div>
+
+                        <button class="btn-secondary btn-full" onclick="recargarTanque('Gasolina Especial')">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                            Registrar Compra / Reposición Gasolina
+                        </button>
+                    </div>
+
+                    <!-- Tanque Diésel -->
+                    <div class="tanque-card cyan">
+                        <div class="tanque-header">
+                            <div class="tanque-title-wrap">
+                                <div class="tanque-badge cyan">TANQUE 02</div>
+                                <h3>Tanque SEDECA — Diésel Oíl</h3>
+                            </div>
+                            <span class="tanque-cap-tag">Capacidad Max: 5,000 L</span>
+                        </div>
+
+                        <div class="tank-visual-meter">
+                            <div class="tank-fill cyan" id="meter-diesel" style="width: 85%;"></div>
+                        </div>
+
+                        <div class="tank-metrics-row">
+                            <div>
+                                <span class="tank-metric-label">Disponible</span>
+                                <span class="tank-metric-val cyan" id="val-diesel-disp">4,250 Lts</span>
+                            </div>
+                            <div>
+                                <span class="tank-metric-label">Porcentaje</span>
+                                <span class="tank-metric-val" id="pct-diesel-disp">85%</span>
+                            </div>
+                        </div>
+
+                        <button class="btn-secondary btn-full" onclick="recargarTanque('Diésel Oíl')">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                            Registrar Compra / Reposición Diésel
+                        </button>
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
 
-    <!-- Modal Boleta Imprimible -->
+    <!-- ═══════ MODAL BOLETA IMPRIMIBLE ═══════ -->
     <div id="modal-boleta" class="modal-overlay">
-        <div class="modal-content-small">
+        <div class="modal-content modal-scanner">
             <div class="modal-actions-bar">
-                <h3>Boleta de Vale Emitido</h3>
-                <button class="btn-secondary" onclick="cerrarModal()">Cerrar</button>
+                <div class="modal-title-group">
+                    <div class="modal-title-icon amber">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    </div>
+                    <div>
+                        <h3>Cupón de Vale Emitido</h3>
+                        <p class="modal-subtitle" id="t-codigo-sub">VAL-2026-0001 · GAD-ORU</p>
+                    </div>
+                </div>
+                <button class="btn-icon-close" onclick="cerrarModal()" title="Cerrar">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </button>
             </div>
-            
+
             <div class="boleta-body-holder">
                 <!-- Vale Formato Ticket Térmico -->
                 <div class="ticket-combustible" id="ticket-impresion">
                     <div class="ticket-header">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo Oruro" class="ticket-escudo">
                         <h3>GOBIERNO AUTÓNOMO DE ORURO</h3>
-                        <p>VALE DE COMBUSTIBLE OFICIAL</p>
-                        <p class="sub-ticket-info">Sistemas Administrativos - Ley N° 1178</p>
+                        <p class="ticket-sub">VALE DE COMBUSTIBLE OFICIAL</p>
+                        <p class="sub-ticket-info">Sistemas Administrativos · Ley N° 1178</p>
                     </div>
 
                     <div class="ticket-divider">*********************************</div>
 
                     <div class="ticket-details">
-                        <p><strong>CÓDIGO VALE:</strong> <span id="t-codigo">VAL-2026-0001</span></p>
-                        <p><strong>FECHA EMISIÓN:</strong> <span id="t-fecha">13 Jul 2026</span></p>
-                        <p><strong>CONDUCTOR:</strong> <span id="t-conductor">Nombre</span></p>
-                        <p><strong>PLACA VEHÍCULO:</strong> <span id="t-placa">2451-FDS</span></p>
-                        <p><strong>COMBUSTIBLE:</strong> <span id="t-tipo">Gasolina Especial</span></p>
-                        <p><strong>CANTIDAD:</strong> <span id="t-litros">40 Litros</span></p>
-                        <p><strong>DESTINO:</strong> <span id="t-destino">Comisión</span></p>
+                        <div class="t-row"><span>CÓDIGO VALE:</span><strong id="t-codigo">VAL-2026-0001</strong></div>
+                        <div class="t-row"><span>FECHA EMISIÓN:</span><span id="t-fecha">13 Jul 2026</span></div>
+                        <div class="t-row"><span>CONDUCTOR:</span><span id="t-conductor">Nombre Conductor</span></div>
+                        <div class="t-row"><span>PLACA VEHÍCULO:</span><strong id="t-placa">2451-FDS</strong></div>
+                        <div class="t-row"><span>CARBURANTE:</span><span id="t-tipo">Gasolina Especial</span></div>
+                        <div class="t-row"><span>CANTIDAD:</span><strong id="t-litros">40 Litros</strong></div>
+                        <div class="t-row"><span>DESTINO:</span><span id="t-destino">Comisión de Servicio</span></div>
                     </div>
 
                     <div class="ticket-divider">*********************************</div>
 
-                    <!-- Token de Seguridad -->
+                    <!-- Token & Código de Barras / Canvas QR -->
                     <div class="ticket-seguridad">
-                        <p class="token-lbl">TOKEN HASH DE AUDITORÍA:</p>
+                        <p class="token-lbl">TOKEN HASH SHA-256 DE VERIFICACIÓN:</p>
                         <div class="token-value" id="t-token">SHA-OR-23423A3B43C56D78</div>
-                        
-                        <!-- Código de Barras Simulado CSS -->
+
+                        <!-- Barcode Simulado -->
                         <div class="barcode-simulado">
                             <div class="bar w1"></div><div class="bar w3"></div><div class="bar w2"></div>
                             <div class="bar w1"></div><div class="bar w4"></div><div class="bar w1"></div>
@@ -199,7 +425,7 @@
                         <div class="ticket-firma-line">
                             <div class="f-line"></div>
                             <p>Firma Responsable</p>
-                            <p>GAD-ORURO</p>
+                            <p>Tesorería GAD-ORU</p>
                         </div>
                         <div class="ticket-firma-line">
                             <div class="f-line"></div>
@@ -210,13 +436,52 @@
                 </div>
 
                 <div class="boleta-actions">
-                    <button class="btn-glow" onclick="imprimirBoleta()">🖨️ Imprimir Vale de Combustible</button>
+                    <button class="btn-primary btn-full" onclick="imprimirBoleta()">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                        Imprimir Vale Oficial
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Scripts -->
+    <!-- ═══════ MODAL: Verificador de Token ═══════ -->
+    <div id="modal-verificador" class="modal-overlay">
+        <div class="modal-content modal-scanner">
+            <div class="modal-actions-bar">
+                <div class="modal-title-group">
+                    <div class="modal-title-icon cyan">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    </div>
+                    <div>
+                        <h3>Verificador de Token Criptográfico</h3>
+                        <p class="modal-subtitle">Auditoría Antifraude · GAD-ORU</p>
+                    </div>
+                </div>
+                <button class="btn-icon-close" onclick="cerrarVerificadorDirecto()">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <div class="modal-scanner-body">
+                <div class="form-group scanner-input-group">
+                    <label>Ingrese el Token Hash del Vale</label>
+                    <div class="scanner-input-row">
+                        <input type="text" id="input-token-verificar" placeholder="Ej. SHA-OR-8F32C69DA564" style="text-transform:uppercase;" onkeydown="if(event.key==='Enter'){verificarToken();}">
+                        <button class="btn-primary" onclick="verificarToken()">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                            Verificar
+                        </button>
+                    </div>
+                </div>
+                <div id="resultado-verificacion" class="verification-result-box" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
     <script src="./src/main.js"></script>
 </body>
 </html>
