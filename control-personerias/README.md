@@ -1,44 +1,62 @@
-# 📂 Fase 6: Sistema de Registro y Emisión de Personerías Jurídicas (Oruro)
+# 📜 Registro y Emisión de Personerías Jurídicas (Oruro)
 
-Este módulo automatiza y controla el proceso de emisión del reconocimiento de **Personerías Jurídicas** de comunidades indígenas, juntas vecinales (OTBs), sindicatos agrarios y asociaciones civiles dentro de la jurisdicción del Gobierno Autónomo Departamental de Oruro.
-
----
-
-## 🎯 Objetivo de Aprendizaje
-Dominar la **validación de estados complejos**, la estructuración de flujos de aprobación basados en requerimientos legales acumulativos (checklists documentales) y el formato y emisión de resoluciones institucionales mediante estilos imprimibles (`@media print`).
+**Gobernación Autónoma Departamental de Oruro (Bolivia)**  
+*Cumplimiento Ley N° 031 Marco de Autonomías y Descentralización · Dirección General de Asuntos Jurídicos*
 
 ---
 
-## 📂 Estructura del Proyecto
-El proyecto está estructurado de la siguiente forma:
+## 📌 Descripción General
+
+Este módulo automatiza y fiscaliza el flujo de aprobación legal para la emisión de **Personerías Jurídicas** de organizaciones civiles, comunidades indígenas originarias, juntas vecinales (OTBs), sindicatos agrarios y asociaciones sin fines de lucro en el Departamento de Oruro.
+
+Incluye **checklist dinámico de validación documental**, **emisión de Resoluciones Administrativas Departamentales membretadas**, **generación de correlativos institucionales (`RD-OR-2026-XXXX`)**, **exportación de registros en CSV** y **filtro universal con atajos de teclado**.
+
+---
+
+## 🚀 Características Principales
+
+### 1. 📋 Checklist de Validación Documental 4/4
+* **Verificación de 4 Requisitos Obligatorios:**
+  1. Acta de Fundación / Constitución Legal.
+  2. Estatuto Orgánico Institucional.
+  3. Reglamento Interno Aprobado.
+  4. Acta de Elección y Posesión del Directorio.
+* **Aprobación Automática:** Los trámites que cumplen con el 100% de la documentación pasan automáticamente al estado `Aprobado`, generando el código correlativo de resolución.
+
+### 2. 🏛️ Emisión e Impresión de Resoluciones Departamentales
+* Documento oficial previsualizable e imprimible (`Ctrl+P`) con el **Escudo de Oruro como marca de agua**, visto, considerandos, por tanto, resuelve y líneas de firma del Asesor Jurídico y del Gobernador.
+
+### 3. ⌨️ Accesibilidad, Filtros & CSV
+* **Atajo `Ctrl + K`:** Acceso directo e instantáneo a la búsqueda universal.
+* **Filtros por Tipo y Provincia:** Selección rápida por provicia (Cercado, Eduardo Abaroa, Carangas, Sajama, Sabaya, Poopó, Dalence, etc.).
+* **Exportar CSV con BOM UTF-8:** Descarga de reportes compatibles con Microsoft Excel.
+
+### 4. 🎨 Diseño UI/UX Royal Navy & Legal Gold
+* Tema oscuro institucional con detalles en oro legal y azul marino real.
+* Iconografía 100% vectorial SVG sin emojis genéricos.
+* Reloj institucional en vivo `HH:MM:SS` en `JetBrains Mono`.
+
+---
+
+## 📂 Estructura de Archivos
 
 ```text
 control-personerias/
-├── index.html                   (Panel administrativo de registro, checklist y resoluciones)
+├── index.html                   # Dashboard de control legal, formulario con checklist y modal de resolución
 ├── assets/
 │   └── css/
-│       └── styles.css           (Hojas de estilo corporativas y formato de impresión)
+│       └── styles.css           # Estilos royal navy dark, checklist customizado y documento de resolución imprimible
 └── src/
-    └── main.js                  (Lógica de validación, correlativos y guardado local)
+    └── main.js                  # Lógica de validación 4/4, correlativos, exportador CSV y LocalStorage
 ```
 
 ---
 
-## ⚠️ Reglas del Reto
-1. **Validación Obligatoria**: No se puede cambiar el estado de un trámite a "Aprobado" si no se ha completado el 100% de la documentación obligatoria (Acta de Fundación, Estatuto Orgánico, Reglamento Interno y Acta de Elección).
-2. **Generación de Resoluciones**: Las Personerías Jurídicas aprobadas deben habilitar un botón para abrir y previsualizar la Resolución Departamental formal (estilo papel membretado oficial).
-3. **Persistencia Síncrona**: Cada cambio en el estado del trámite debe guardarse inmediatamente en `LocalStorage`.
+## ⚡ Instalación y Ejecución
+
+1. No requiere instalación de librerías externas (`Zero dependencies`).
+2. Abre [index.html](file:///c:/Users/Admin/Downloads/gobierno-autonomo-departamental-oruro/control-personerias/index.html) directamente en cualquier navegador web moderno.
 
 ---
 
-## 📈 Ruta de Aprendizaje e Ingeniería (Los 3 Niveles)
-
-### 🟢 Nivel 1: Básico (Registro Simple sin Validación Documental)
-*   **Foco**: Formularios de registro simples con estados estáticos (Aprobado/Rechazado) de entrada.
-*   **Problema**: Carga la bandeja con datos incompletos o personerías aprobadas sin sustento legal.
-
-### 🟡 Nivel 2: Intermedio (Flujo Documental y Aprobación Condicionada)
-*   **Foco**: Los estados cambian condicionalmente basados en el checklist documental. El estado pasa por "Pendiente", "En Revisión" y solo habilita "Aprobado" tras la carga del 100% de los documentos.
-
-### 🔴 Nivel 3: Avanzado (Fase Actual - Emisión de Resolución e Impresión)
-*   **Foco**: Generación de códigos correlativos institucionales (ej. `RD-OR-2026-0001`), impresión física limpia con directivas `@media print` para omitir botones del navegador, y persistencia síncrona en LocalStorage.
+*Gobernación Autónoma Departamental de Oruro — Servicio Jurídico Transparente y Eficiente*
