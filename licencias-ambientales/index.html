@@ -3,73 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gobernación de Oruro - Control de Licencias Ambientales</title>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Gobernación de Oruro — Control de Licencias Ambientales & Mapa de Riesgo</title>
+    <meta name="description" content="Sistema de fiscalización territorial, evaluación de impacto y registro de Licencias Ambientales FA/MA — Secretaría Departamental de Medio Ambiente y Agua de Oruro.">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./assets/css/styles.css">
 </head>
 <body>
+    <!-- Fondo ambiental dinámico -->
+    <div class="bg-glow-orb orb-1"></div>
+    <div class="bg-glow-orb orb-2"></div>
+    <div class="bg-noise-overlay"></div>
+
     <div class="app-workspace">
-        <!-- Sidebar -->
-        <aside class="sidebar">
+        <!-- ══════════════ SIDEBAR ══════════════ -->
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-brand">
-                <div class="brand-icon">🍃</div>
+                <div class="brand-escudo-wrap">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo de Oruro" class="brand-escudo">
+                    <div class="brand-pulse-ring"></div>
+                </div>
                 <div>
                     <h2>GOBIERNO DE ORURO</h2>
-                    <p>MEDIO AMBIENTE Y AGUA</p>
+                    <p class="brand-sub">MEDIO AMBIENTE · SAFCO</p>
                 </div>
             </div>
-            
+
+            <!-- Live Clock -->
+            <div class="live-clock-widget">
+                <div class="clock-time" id="clock-time">00:00:00</div>
+                <div class="clock-date" id="clock-date">Cargando...</div>
+                <div class="clock-badge">
+                    <span class="clock-badge-dot"></span>
+                    GAD-ORU Fiscalización Ambiental
+                </div>
+            </div>
+
             <nav class="navigation-menu">
-                <button class="nav-item active" onclick="switchTab('mapa')">🗺️ Mapa y Monitoreo</button>
-                <button class="nav-item" onclick="switchTab('registro')">➕ Registrar Licencia</button>
+                <div class="nav-section-label">MÓDULOS AMBIENTALES</div>
+                <button class="nav-item active" id="nav-mapa" onclick="switchTab('mapa')">
+                    <div class="nav-icon-box">
+                        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+                    </div>
+                    <span>Mapa &amp; Monitoreo</span>
+                    <span class="nav-count" id="nav-count">0</span>
+                </button>
+
+                <button class="nav-item" id="nav-registro" onclick="switchTab('registro')">
+                    <div class="nav-icon-box">
+                        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                    </div>
+                    <span>Registrar Licencia</span>
+                </button>
+
+                <div class="nav-section-label" style="margin-top:12px;">ACCIONES</div>
+                <button class="nav-item" onclick="exportarCSV()">
+                    <div class="nav-icon-box">
+                        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    </div>
+                    <span>Exportar Registro CSV</span>
+                </button>
             </nav>
 
             <div class="sidebar-footer">
-                <div class="server-status">
-                    <span class="status-indicator online"></span>
-                    <span>Auditoría de Pasivos Ambientales</span>
+                <div class="user-operator-pill">
+                    <div class="operator-avatar">MA</div>
+                    <div class="operator-info">
+                        <span class="operator-name">Auditor Ambiental</span>
+                        <span class="operator-role">Secretaría de Medio Ambiente</span>
+                    </div>
+                    <div class="operator-status"></div>
+                </div>
+                <div class="hash-integrity-badge">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    Monitoreo Territorial Activo
                 </div>
             </div>
         </aside>
 
-        <!-- Main Content -->
-        <main class="main-content">
+        <!-- ══════════════ MAIN CONTENT ══════════════ -->
+        <main class="main-content" id="main-content">
+
             <!-- Top Bar -->
             <header class="top-bar">
-                <div>
-                    <span class="section-indicator">FASE 7 - Control Territorial</span>
+                <div class="top-bar-left">
+                    <div class="badge-institutional">
+                        <span class="badge-dot"></span>
+                        PROTECCIÓN AMBIENTAL · LEY N° 1333 · FASE 7
+                    </div>
                     <h1 id="page-title">Mapa de Riesgo Ambiental Departamental</h1>
                 </div>
-                <div class="top-bar-stats">
-                    <div class="quick-stat">
-                        <span class="stat-num" id="stat-total">0</span>
-                        <span class="stat-lbl">Licencias FA/MA</span>
+
+                <div class="top-bar-kpis">
+                    <div class="kpi-card kpi-emerald">
+                        <div class="kpi-icon-box emerald">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        </div>
+                        <div class="kpi-data">
+                            <span class="kpi-value" id="stat-total">0</span>
+                            <span class="kpi-label">Licencias FA/MA</span>
+                        </div>
                     </div>
-                    <div class="quick-stat">
-                        <span class="stat-num text-danger" id="stat-critico">0</span>
-                        <span class="stat-lbl">Riesgo Alto</span>
+
+                    <div class="kpi-card kpi-rose">
+                        <div class="kpi-icon-box rose">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        </div>
+                        <div class="kpi-data">
+                            <span class="kpi-value" id="stat-critico">0</span>
+                            <span class="kpi-label">Riesgo Alto</span>
+                        </div>
                     </div>
-                    <div class="quick-stat">
-                        <span class="stat-num text-info" id="stat-minerias">0</span>
-                        <span class="stat-lbl">Mineras Activas</span>
+
+                    <div class="kpi-card kpi-amber">
+                        <div class="kpi-icon-box amber">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                        </div>
+                        <div class="kpi-data">
+                            <span class="kpi-value" id="stat-minerias">0</span>
+                            <span class="kpi-label">Mineras Activas</span>
+                        </div>
                     </div>
                 </div>
             </header>
 
-            <!-- Tab Mapa & Monitoreo -->
+            <!-- ═══════ TAB: MAPA & MONITOREO ═══════ -->
             <div id="tab-mapa" class="tab-pane active">
                 <div class="map-and-table-layout">
-                    <!-- Mapa SVG Panel -->
+                    <!-- Panel Mapa SVG -->
                     <div class="card-focus map-card">
                         <div class="card-header flex-header">
                             <div>
-                                <h2>Mapa del Departamento de Oruro</h2>
-                                <p>Pasa el cursor por las provincias para ver su nivel de riesgo medio o haz clic para filtrar.</p>
+                                <h2>Mapa Interactivo de Provincias de Oruro</h2>
+                                <p>Pasa el cursor por las provincias para ver su nivel de riesgo o haz clic para filtrar.</p>
                             </div>
                             <button class="btn-secondary" onclick="resetFiltroProvincia()">Mostrar Todo</button>
                         </div>
-                        
+
                         <div class="map-container">
                             <svg id="mapa-oruro" viewBox="0 0 500 550" class="mapa-svg">
                                 <!-- Sajama (NW) -->
@@ -107,61 +176,117 @@
                             </svg>
                             <div id="map-tooltip" class="map-tooltip"></div>
                         </div>
+
+                        <div class="map-legend">
+                            <div class="legend-item"><span class="legend-dot bajo"></span> Riesgo Bajo (1-3 Pts)</div>
+                            <div class="legend-item"><span class="legend-dot medio"></span> Riesgo Medio (4-6 Pts)</div>
+                            <div class="legend-item"><span class="legend-dot alto"></span> Riesgo Alto (7-11 Pts)</div>
+                        </div>
                     </div>
 
                     <!-- Tabla de Licencias -->
                     <div class="card-focus table-card">
-                        <div class="card-header">
-                            <h2 id="table-title">Registros Ambientales (Todos)</h2>
-                            <p>Bandeja de fiscalización oficial de operadoras registradas.</p>
+                        <div class="card-header flex-header">
+                            <div>
+                                <h2 id="table-title">Registros Ambientales (Todos)</h2>
+                                <p>Bandeja de fiscalización oficial de operadoras registradas.</p>
+                            </div>
+                            <button class="btn-secondary" onclick="exportarCSV()">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                Exportar CSV
+                            </button>
+                        </div>
+
+                        <!-- Toolbar Filtros -->
+                        <div class="filter-toolbar">
+                            <div class="search-box">
+                                <svg class="search-box-icon" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                                <input type="text" id="input-buscar" placeholder="Buscar por código, operador, actividad o provincia..." oninput="filtrarLicencias()">
+                                <span class="search-shortcut-badge">Ctrl+K</span>
+                            </div>
+
+                            <select id="filtro-actividad" onchange="filtrarLicencias()" class="filter-select">
+                                <option value="">Todas las Actividades</option>
+                                <option value="Minería Pesada">Minería Pesada</option>
+                                <option value="Concentración de Minerales">Planta Concentradora / Dique</option>
+                                <option value="Agroindustrial">Agroindustrial</option>
+                                <option value="Servicios/Infraestructura">Servicios / Obras</option>
+                            </select>
+
+                            <select id="filtro-riesgo" onchange="filtrarLicencias()" class="filter-select">
+                                <option value="">Todos los Riesgos</option>
+                                <option value="Bajo">Riesgo Bajo</option>
+                                <option value="Medio">Riesgo Medio</option>
+                                <option value="Alto">Riesgo Alto</option>
+                            </select>
+
+                            <div class="filter-result-badge" id="filter-result-badge">0 resultados</div>
                         </div>
 
                         <div class="table-responsive">
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>Código</th>
-                                        <th>Operador / Proyecto</th>
-                                        <th>Provincia</th>
+                                        <th onclick="ordenarPor('codigo')" class="th-sortable">Código Licencia <span class="sort-icon">↕</span></th>
+                                        <th onclick="ordenarPor('operador')" class="th-sortable">Operador / Proyecto <span class="sort-icon">↕</span></th>
+                                        <th onclick="ordenarPor('provincia')" class="th-sortable">Provincia <span class="sort-icon">↕</span></th>
                                         <th>Tipo Actividad</th>
-                                        <th>Puntaje</th>
-                                        <th>Riesgo</th>
-                                        <th>Acción</th>
+                                        <th onclick="ordenarPor('score')" class="th-sortable">Puntaje <span class="sort-icon">↕</span></th>
+                                        <th onclick="ordenarPor('riesgo')" class="th-sortable">Riesgo <span class="sort-icon">↕</span></th>
+                                        <th>Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tabla-licencias">
                                     <!-- Filas dinámicas -->
                                 </tbody>
                             </table>
-                            
+
                             <!-- Empty State -->
                             <div id="estado-vacio-licencias" class="empty-state" style="display: none;">
-                                <div class="empty-animation">🍃</div>
-                                <h3>Sin Licencias en esta Provincia</h3>
-                                <p>No existen registros ambientales para la provincia seleccionada.</p>
+                                <div class="empty-icon-wrap">
+                                    <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" opacity="0.4"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+                                </div>
+                                <h3>Sin Licencias en la Selección</h3>
+                                <p>No existen registros ambientales para los parámetros seleccionados.</p>
+                                <button class="btn-secondary" onclick="resetFiltroProvincia(); limpiarFiltros();" style="margin-top:16px;">Limpiar Filtros</button>
                             </div>
+                        </div>
+
+                        <!-- Footer Totales -->
+                        <div class="table-footer" id="table-footer">
+                            <span id="table-total-count">0 licencias registradas</span>
+                            <span id="table-total-riesgo" class="table-total-valor">0% Riesgo Alto</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Tab Registro -->
+            <!-- ═══════ TAB: REGISTRO ═══════ -->
             <div id="tab-registro" class="tab-pane">
                 <div class="card-focus centered-card">
                     <div class="card-header">
-                        <h2>Registrar Nueva Licencia Ambiental</h2>
+                        <div class="card-header-icon">
+                            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                        </div>
+                        <h2>Registrar Nueva Licencia Ambiental (FA / MA)</h2>
                         <p>Ingrese los datos técnicos de la operadora y la ubicación para calcular de forma automatizada su nivel de impacto y riesgo ambiental.</p>
                     </div>
 
                     <form id="form-licencia" onsubmit="registrarNuevaLicencia(event)">
-                        <div class="form-group">
-                            <label for="lic-operador">Operador o Nombre del Proyecto</label>
-                            <input type="text" id="lic-operador" placeholder="Ej. Cooperativa Minera San José R.L." required autocomplete="off">
+                        <div class="form-group full-width">
+                            <label for="lic-operador">
+                                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                                Operador / Nombre del Proyecto Ambiental
+                            </label>
+                            <input type="text" id="lic-operador" placeholder="Ej. Cooperativa Minera San José R.L. / Planta Huanuni" required>
                         </div>
 
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="lic-tipo-actividad">Tipo de Actividad</label>
+                                <label for="lic-tipo-actividad">
+                                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
+                                    Tipo de Actividad Industrial
+                                </label>
                                 <select id="lic-tipo-actividad" onchange="calcularRiesgoFormulario()" required>
                                     <option value="Minería Pesada">Explotación Minera Pesada</option>
                                     <option value="Concentración de Minerales">Planta Concentradora / Dique de Colas</option>
@@ -171,7 +296,10 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="lic-provincia">Provincia de Operación</label>
+                                <label for="lic-provincia">
+                                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                    Provincia de Operación
+                                </label>
                                 <select id="lic-provincia" required>
                                     <option value="Cercado">Cercado</option>
                                     <option value="Sajama">Sajama</option>
@@ -193,8 +321,8 @@
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label>Criterios Geográficos de Vulnerabilidad</label>
+                        <div class="form-group full-width">
+                            <label>Criterios Geográficos de Vulnerabilidad Ambiental</label>
                             <div class="checklist-container">
                                 <label class="checklist-item">
                                     <input type="checkbox" id="chk-agua" onchange="calcularRiesgoFormulario()">
@@ -216,18 +344,26 @@
                             <div class="riesgo-score-circle" id="riesgo-score-circ">3</div>
                             <div>
                                 <h4>Clasificación de Riesgo Estimado</h4>
-                                <p id="riesgo-detalle">Puntaje base por Actividad Minera: 3. Riesgo de impacto **Bajo**.</p>
+                                <p id="riesgo-detalle">Puntaje base por Actividad Minera: 3. Riesgo de impacto <strong>Bajo</strong>.</p>
                             </div>
                         </div>
 
-                        <button type="submit" class="btn-glow">Emitir Licencia Ambiental</button>
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary" onclick="switchTab('mapa')">Cancelar</button>
+                            <button type="submit" class="btn-glow">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                Emitir Licencia Ambiental
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Scripts -->
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
     <script src="./src/main.js"></script>
 </body>
 </html>

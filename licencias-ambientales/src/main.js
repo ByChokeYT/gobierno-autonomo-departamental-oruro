@@ -1,22 +1,73 @@
-// Lógica de Negocio - Control de Licencias Ambientales
-// Gobernación Autónoma Departamental de Oruro
+// ════════════════════════════════════════════════════════════════
+// SISTEMA DE MONITOREO DE LICENCIAS AMBIENTALES — GOBERNACIÓN DE ORURO
+// Ley N° 1333 (Medio Ambiente) · Mapa SVG Territorial & Risk Score
+// Senior Principal Software Architect Level
+// ════════════════════════════════════════════════════════════════
 
+'use strict';
+
+// ─── Estado Global ────────────────────────────────────────────────
 let licencias = [];
+let licenciasFiltradas = [];
 let filtroProvinciaActivo = null;
+let sortConfig = { campo: 'codigo', asc: true };
 
-// Cargar datos
+// ─── Inicialización ───────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
     inicializarDatos();
+    iniciarRelojVivo();
     actualizarEstadisticas();
     actualizarColoresMapa();
-    renderTabla();
+    filtrarLicencias();
     inicializarEventosMapa();
-    calcularRiesgoFormulario(); // Inicializar vista en formulario
+    calcularRiesgoFormulario();
+
+    // Atajo de teclado Ctrl + K → Búsqueda
+    document.addEventListener("keydown", (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+            e.preventDefault();
+            switchTab('mapa');
+            setTimeout(() => {
+                const input = document.getElementById("input-buscar");
+                if (input) {
+                    input.focus();
+                    input.select();
+                    mostrarToast("Búsqueda activada · Ctrl+K", "info");
+                }
+            }, 80);
+        }
+    });
 });
 
-// Inicializar datos semilla
+// ─── Reloj Institucional en Vivo ─────────────────────────────────
+function iniciarRelojVivo() {
+    const DIAS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+    const MESES = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+
+    const tick = () => {
+        const ahora = new Date();
+        const h = String(ahora.getHours()).padStart(2, "0");
+        const m = String(ahora.getMinutes()).padStart(2, "0");
+        const s = String(ahora.getSeconds()).padStart(2, "0");
+
+        const clockTime = document.getElementById("clock-time");
+        const clockDate = document.getElementById("clock-date");
+
+        if (clockTime) clockTime.textContent = `${h}:${m}:${s}`;
+        if (clockDate) {
+            const dia = DIAS[ahora.getDay()];
+            const fecha = `${dia} ${ahora.getDate()} ${MESES[ahora.getMonth()]} ${ahora.getFullYear()}`;
+            clockDate.textContent = fecha;
+        }
+    };
+
+    tick();
+    setInterval(tick, 1000);
+}
+
+// ─── Datos Iniciales ──────────────────────────────────────────────
 function inicializarDatos() {
-    const dataLocal = localStorage.getItem("oruro_licencias");
+    const dataLocal = localStorage.getItem("oruro_licencias_v2");
     if (dataLocal) {
         licencias = JSON.parse(dataLocal);
     } else {
@@ -27,8 +78,9 @@ function inicializarDatos() {
                 tipoActividad: "Minería Pesada",
                 provincia: "Dalence",
                 vulnerabilidad: { agua: true, poblacion: true, reserva: false },
-                score: 8, // 3 base + 3 agua + 2 poblacion
-                riesgo: "Alto"
+                score: 8,
+                riesgo: "Alto",
+                fecha: "12 Ene 2026 - 08:30"
             },
             {
                 codigo: "LIC-2026-0002",
@@ -36,17 +88,19 @@ function inicializarDatos() {
                 tipoActividad: "Agroindustrial",
                 provincia: "Abaroa",
                 vulnerabilidad: { agua: false, poblacion: true, reserva: false },
-                score: 4, // 2 base + 2 poblacion
-                riesgo: "Medio"
+                score: 4,
+                riesgo: "Medio",
+                fecha: "15 Feb 2026 - 10:15"
             },
             {
                 codigo: "LIC-2026-0003",
-                operador: "Dique de Colas Minera Bolivar",
+                operador: "Dique de Colas Minera Bolívar",
                 tipoActividad: "Concentración de Minerales",
                 provincia: "Poopo",
                 vulnerabilidad: { agua: true, poblacion: false, reserva: true },
-                score: 9, // 3 base + 3 agua + 3 reserva
-                riesgo: "Alto"
+                score: 9,
+                riesgo: "Alto",
+                fecha: "20 Jun 2026 - 14:00"
             },
             {
                 codigo: "LIC-2026-0004",
@@ -54,8 +108,9 @@ function inicializarDatos() {
                 tipoActividad: "Servicios/Infraestructura",
                 provincia: "Sabaya",
                 vulnerabilidad: { agua: true, poblacion: false, reserva: false },
-                score: 4, // 1 base + 3 agua
-                riesgo: "Medio"
+                score: 4,
+                riesgo: "Medio",
+                fecha: "05 Jul 2026 - 09:45"
             },
             {
                 codigo: "LIC-2026-0005",
@@ -63,8 +118,9 @@ function inicializarDatos() {
                 tipoActividad: "Servicios/Infraestructura",
                 provincia: "Cercado",
                 vulnerabilidad: { agua: false, poblacion: true, reserva: false },
-                score: 3, // 1 base + 2 poblacion
-                riesgo: "Bajo"
+                score: 3,
+                riesgo: "Bajo",
+                fecha: "10 Jul 2026 - 11:20"
             }
         ];
         guardarLocal();
@@ -72,100 +128,187 @@ function inicializarDatos() {
 }
 
 function guardarLocal() {
-    localStorage.setItem("oruro_licencias", JSON.stringify(licencias));
+    localStorage.setItem("oruro_licencias_v2", JSON.stringify(licencias));
 }
 
-// Cambiar de vista
+// ─── Navegación Pestañas ──────────────────────────────────────────
 function switchTab(tabName) {
-    document.querySelectorAll(".nav-item").forEach(btn => btn.classList.remove("active"));
-    document.querySelectorAll(".tab-pane").forEach(pane => pane.classList.remove("active"));
-    
-    if (tabName === 'mapa') {
-        document.querySelector("button[onclick=\"switchTab('mapa')\"]").classList.add("active");
-        document.getElementById("tab-mapa").classList.add("active");
-        document.getElementById("page-title").innerText = "Mapa de Riesgo Ambiental Departamental";
-    } else if (tabName === 'registro') {
-        document.querySelector("button[onclick=\"switchTab('registro')\"]").classList.add("active");
-        document.getElementById("tab-registro").classList.add("active");
-        document.getElementById("page-title").innerText = "Registrar Licencia Ambiental";
-    }
-    
+    document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
+    document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
+
+    const pane = document.getElementById(`tab-${tabName}`);
+    const navBtn = document.getElementById(`nav-${tabName}`);
+    if (pane) pane.classList.add("active");
+    if (navBtn) navBtn.classList.add("active");
+
+    const titles = {
+        mapa:     "Mapa de Riesgo Ambiental Departamental",
+        registro: "Registrar Nueva Licencia Ambiental"
+    };
+
+    const pageTitle = document.getElementById("page-title");
+    if (pageTitle && titles[tabName]) pageTitle.textContent = titles[tabName];
+
     actualizarEstadisticas();
     actualizarColoresMapa();
-    renderTabla();
+    filtrarLicencias();
 }
 
-// Calcular contadores
+// ─── Estadísticas & KPIs ─────────────────────────────────────────
 function actualizarEstadisticas() {
     const total = licencias.length;
     const criticos = licencias.filter(l => l.riesgo === "Alto").length;
     const minerias = licencias.filter(l => l.tipoActividad === "Minería Pesada" || l.tipoActividad === "Concentración de Minerales").length;
 
-    document.getElementById("stat-total").innerText = total;
-    document.getElementById("stat-critico").innerText = criticos;
-    document.getElementById("stat-minerias").innerText = minerias;
+    const el = (id) => document.getElementById(id);
+    if (el("stat-total"))    el("stat-total").textContent    = total;
+    if (el("stat-critico"))  el("stat-critico").textContent  = criticos;
+    if (el("stat-minerias")) el("stat-minerias").textContent = minerias;
+    if (el("nav-count"))     el("nav-count").textContent     = total;
 }
 
-// Renderizar listado de la bandeja
+// ─── Filtrado y Búsqueda ──────────────────────────────────────────
+function filtrarLicencias() {
+    const query     = (document.getElementById("input-buscar")?.value ?? "").toLowerCase().trim();
+    const actividad = document.getElementById("filtro-actividad")?.value ?? "";
+    const riesgo    = document.getElementById("filtro-riesgo")?.value ?? "";
+    const title     = document.getElementById("table-title");
+
+    licenciasFiltradas = licencias.filter(l => {
+        const q = !query
+            || l.codigo.toLowerCase().includes(query)
+            || l.operador.toLowerCase().includes(query)
+            || l.provincia.toLowerCase().includes(query)
+            || l.tipoActividad.toLowerCase().includes(query);
+
+        const a = !actividad || l.tipoActividad === actividad;
+        const r = !riesgo || l.riesgo === riesgo;
+        const p = !filtroProvinciaActivo || l.provincia.toLowerCase() === filtroProvinciaActivo.toLowerCase();
+
+        return q && a && r && p;
+    });
+
+    if (title) {
+        if (filtroProvinciaActivo) {
+            const provEl = document.getElementById(`prov-${filtroProvinciaActivo}`);
+            const nombreHumano = provEl ? provEl.getAttribute("data-nombre") : filtroProvinciaActivo;
+            title.textContent = `Registros en Prov. ${nombreHumano}`;
+        } else {
+            title.textContent = "Registros Ambientales (Todos)";
+        }
+    }
+
+    licenciasFiltradas = ordenarLicencias(licenciasFiltradas);
+    renderTabla();
+
+    const badge = document.getElementById("filter-result-badge");
+    if (badge) badge.textContent = `${licenciasFiltradas.length} resultado${licenciasFiltradas.length !== 1 ? 's' : ''}`;
+
+    const altosCount = licenciasFiltradas.filter(l => l.riesgo === "Alto").length;
+    const pctAltos   = licenciasFiltradas.length > 0 ? Math.round((altosCount / licenciasFiltradas.length) * 100) : 0;
+
+    const footerCount = document.getElementById("table-total-count");
+    const footerRiesgo = document.getElementById("table-total-riesgo");
+    if (footerCount)  footerCount.textContent  = `${licenciasFiltradas.length} de ${licencias.length} licencias`;
+    if (footerRiesgo) footerRiesgo.textContent = `${pctAltos}% Riesgo Alto en esta vista`;
+}
+
+function limpiarFiltros() {
+    const ids = ["input-buscar", "filtro-actividad", "filtro-riesgo"];
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = "";
+    });
+    filtrarLicencias();
+}
+
+// ─── Ordenamiento ─────────────────────────────────────────────────
+function ordenarPor(campo) {
+    if (sortConfig.campo === campo) {
+        sortConfig.asc = !sortConfig.asc;
+    } else {
+        sortConfig.campo = campo;
+        sortConfig.asc = true;
+    }
+    filtrarLicencias();
+}
+
+function ordenarLicencias(lista) {
+    return [...lista].sort((a, b) => {
+        let va = a[sortConfig.campo] ?? "";
+        let vb = b[sortConfig.campo] ?? "";
+        if (sortConfig.campo === "score") {
+            va = parseInt(va) || 0;
+            vb = parseInt(vb) || 0;
+        }
+        if (va < vb) return sortConfig.asc ? -1 : 1;
+        if (va > vb) return sortConfig.asc ? 1 : -1;
+        return 0;
+    });
+}
+
+// ─── Render Tabla ─────────────────────────────────────────────────
 function renderTabla() {
-    const tbody = document.getElementById("tabla-licencias");
+    const tbody      = document.getElementById("tabla-licencias");
     const emptyState = document.getElementById("estado-vacio-licencias");
-    const title = document.getElementById("table-title");
+
     tbody.innerHTML = "";
 
-    // Filtrar si hay una provincia seleccionada
-    let filtradas = licencias;
-    if (filtroProvinciaActivo) {
-        filtradas = licencias.filter(l => l.provincia.toLowerCase() === filtroProvinciaActivo.toLowerCase());
-        const provEl = document.getElementById(`prov-${filtroProvinciaActivo}`);
-        const nombreHumano = provEl ? provEl.getAttribute("data-nombre") : filtroProvinciaActivo;
-        title.innerText = `Registros en Prov. ${nombreHumano}`;
-    } else {
-        title.innerText = "Registros Ambientales (Todos)";
-    }
-
-    if (filtradas.length === 0) {
-        emptyState.style.display = "flex";
+    if (licenciasFiltradas.length === 0) {
+        if (emptyState) emptyState.style.display = "flex";
         return;
-    } else {
-        emptyState.style.display = "none";
     }
+    if (emptyState) emptyState.style.display = "none";
 
-    filtradas.forEach(lic => {
+    licenciasFiltradas.forEach((lic, idx) => {
         const tr = document.createElement("tr");
-        
-        let badgeCls = "badge-bajo";
-        if (lic.riesgo === "Medio") badgeCls = "badge-medio";
-        if (lic.riesgo === "Alto") badgeCls = "badge-alto";
+        tr.style.animationDelay = `${idx * 0.03}s`;
 
-        // Mapear provincia ID a Nombre Humano
+        let badgeClass = "badge-bajo";
+        if (lic.riesgo === "Medio") badgeClass = "badge-medio";
+        if (lic.riesgo === "Alto")  badgeClass = "badge-alto";
+
         const provEl = document.getElementById(`prov-${lic.provincia}`);
         const provNombre = provEl ? provEl.getAttribute("data-nombre") : lic.provincia;
 
         tr.innerHTML = `
-            <td><strong>${lic.codigo}</strong></td>
-            <td>${lic.operador}</td>
-            <td>${provNombre}</td>
-            <td>${lic.tipoActividad}</td>
-            <td>${lic.score} Pts</td>
-            <td><span class="badge ${badgeCls}">${lic.riesgo}</span></td>
             <td>
-                <button class="btn-delete" onclick="eliminarLicencia('${lic.codigo}')">Eliminar</button>
+                <div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:0.82rem;color:#fff;">${lic.codigo}</div>
+                <div style="font-size:0.65rem;color:var(--text-muted);">${lic.fecha || ''}</div>
+            </td>
+            <td>
+                <div style="font-weight:700;font-size:0.875rem;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${lic.operador}">${lic.operador}</div>
+            </td>
+            <td>
+                <span style="font-size:0.82rem;font-weight:600;color:var(--text-secondary);">${provNombre}</span>
+            </td>
+            <td>
+                <span style="font-size:0.82rem;font-weight:600;color:var(--text-secondary);">${lic.tipoActividad}</span>
+            </td>
+            <td>
+                <span style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:0.85rem;color:var(--primary-light);">${lic.score} Pts</span>
+            </td>
+            <td>
+                <span class="badge ${badgeClass}"><span class="badge-dot-indicator"></span> ${lic.riesgo}</span>
+            </td>
+            <td>
+                <button class="btn-delete" onclick="eliminarLicencia('${lic.codigo}')" title="Eliminar registro">
+                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
             </td>
         `;
         tbody.appendChild(tr);
     });
 }
 
-// Lógica de cálculo en caliente del formulario
+// ─── Calculadora de Riesgo Formulario ─────────────────────────────
 function calcularRiesgoFormulario() {
-    const tipo = document.getElementById("lic-tipo-actividad").value;
-    const chkAgua = document.getElementById("chk-agua").checked;
-    const chkPoblacion = document.getElementById("chk-poblacion").checked;
-    const chkReserva = document.getElementById("chk-reserva").checked;
+    const tipo         = document.getElementById("lic-tipo-actividad")?.value ?? "Minería Pesada";
+    const chkAgua      = document.getElementById("chk-agua")?.checked ?? false;
+    const chkPoblacion = document.getElementById("chk-poblacion")?.checked ?? false;
+    const chkReserva   = document.getElementById("chk-reserva")?.checked ?? false;
 
-    // Calcular score
-    let score = 1; // Base
+    let score = 1;
     if (tipo === "Minería Pesada") score = 3;
     if (tipo === "Concentración de Minerales") score = 3;
     if (tipo === "Agroindustrial") score = 2;
@@ -174,81 +317,83 @@ function calcularRiesgoFormulario() {
     if (chkPoblacion) score += 2;
     if (chkReserva) score += 3;
 
-    // Clasificar riesgo
     let riesgo = "Bajo";
-    let bgCircle = "#10b981"; // Verde
+    let bgCircle = "var(--success)";
     if (score >= 4 && score <= 6) {
         riesgo = "Medio";
-        bgCircle = "#f59e0b"; // Naranja
+        bgCircle = "var(--warning)";
     } else if (score >= 7) {
         riesgo = "Alto";
-        bgCircle = "#ef4444"; // Rojo
+        bgCircle = "var(--danger)";
     }
 
-    // Actualizar vista del formulario
-    const circle = document.getElementById("riesgo-score-circ");
-    circle.innerText = score;
-    circle.style.backgroundColor = bgCircle;
+    const circle  = document.getElementById("riesgo-score-circ");
+    const detalle = document.getElementById("riesgo-detalle");
 
-    document.getElementById("riesgo-detalle").innerHTML = `Actividad: <strong>${tipo}</strong>. Puntaje final: <strong>${score} Pts</strong>. Riesgo de impacto: <strong style="color: ${bgCircle}">${riesgo}</strong>.`;
+    if (circle) {
+        circle.textContent = score;
+        circle.style.backgroundColor = bgCircle;
+    }
+
+    if (detalle) {
+        detalle.innerHTML = `Actividad: <strong>${tipo}</strong>. Puntaje acumulado: <strong>${score} Pts</strong>. Categoría: <strong style="color:${bgCircle}">${riesgo} Riesgo</strong>.`;
+    }
 
     return { score, riesgo };
 }
 
-// Registrar desde el formulario
+// ─── Registrar Nueva Licencia ─────────────────────────────────────
 function registrarNuevaLicencia(e) {
     e.preventDefault();
 
-    const operador = document.getElementById("lic-operador").value.trim();
+    const operador      = document.getElementById("lic-operador").value.trim();
     const tipoActividad = document.getElementById("lic-tipo-actividad").value;
-    const provincia = document.getElementById("lic-provincia").value;
-    
+    const provincia     = document.getElementById("lic-provincia").value;
+
     const vulnerabilidad = {
-        agua: document.getElementById("chk-agua").checked,
+        agua:      document.getElementById("chk-agua").checked,
         poblacion: document.getElementById("chk-poblacion").checked,
-        reserva: document.getElementById("chk-reserva").checked
+        reserva:   document.getElementById("chk-reserva").checked
     };
 
     const calculo = calcularRiesgoFormulario();
-
     const numCorrelativo = String(licencias.length + 1).padStart(4, "0");
     const codigo = `LIC-2026-${numCorrelativo}`;
+    const fecha = obtenerFechaHoraActual();
 
     const nueva = {
-        codigo,
-        operador,
-        tipoActividad,
-        provincia,
-        vulnerabilidad,
-        score: calculo.score,
-        riesgo: calculo.riesgo
+        codigo, operador, tipoActividad, provincia, vulnerabilidad,
+        score: calculo.score, riesgo: calculo.riesgo, fecha
     };
 
-    licencias.push(nueva);
+    licencias.unshift(nueva);
     guardarLocal();
 
-    // Resetear
     document.getElementById("form-licencia").reset();
     calcularRiesgoFormulario();
 
-    // Volver al mapa
+    mostrarToast(`Licencia ${codigo} emitida (${calculo.riesgo} Riesgo).`, "success");
     switchTab('mapa');
 }
 
-// Eliminar
+// ─── Eliminar Licencia ────────────────────────────────────────────
 function eliminarLicencia(codigo) {
-    if (confirm(`¿Eliminar la licencia ambiental permanente ${codigo}?`)) {
+    const lic = licencias.find(l => l.codigo === codigo);
+    if (!lic) return;
+
+    if (confirm(`¿Confirmar eliminación permanente de la licencia ${codigo} ("${lic.operador}")?`)) {
         licencias = licencias.filter(l => l.codigo !== codigo);
         guardarLocal();
         actualizarEstadisticas();
         actualizarColoresMapa();
-        renderTabla();
+        filtrarLicencias();
+        mostrarToast(`Licencia ${codigo} eliminada.`, "warning");
     }
 }
 
-// Inicializar eventos de interacción sobre el SVG del mapa
+// ─── Eventos del Mapa SVG Interactivo ─────────────────────────────
 function inicializarEventosMapa() {
-    const tooltip = document.getElementById("map-tooltip");
+    const tooltip    = document.getElementById("map-tooltip");
     const provincias = document.querySelectorAll(".provincia");
 
     provincias.forEach(prov => {
@@ -256,69 +401,69 @@ function inicializarEventosMapa() {
         const nombre = prov.getAttribute("data-nombre");
 
         prov.addEventListener("mouseover", (e) => {
-            // Obtener estadísticas de esta provincia
             const provLicencias = licencias.filter(l => l.provincia.toLowerCase() === id.toLowerCase());
             const total = provLicencias.length;
-            
-            let riesgoMedio = "Ninguno";
+
+            let riesgoMedio = "Sin registros";
+            let colorCode   = "var(--text-muted)";
+
             if (total > 0) {
                 const totalScore = provLicencias.reduce((sum, current) => sum + current.score, 0);
                 const avgScore = totalScore / total;
-                if (avgScore >= 7) riesgoMedio = "Alto";
-                else if (avgScore >= 4) riesgoMedio = "Medio";
-                else riesgoMedio = "Bajo";
+
+                if (avgScore >= 7)       { riesgoMedio = "Alto";  colorCode = "var(--danger)"; }
+                else if (avgScore >= 4)  { riesgoMedio = "Medio"; colorCode = "var(--warning)"; }
+                else                    { riesgoMedio = "Bajo";  colorCode = "var(--success)"; }
             }
 
-            tooltip.innerHTML = `
-                <strong>Provincia ${nombre}</strong><br>
-                Operaciones: ${total}<br>
-                Riesgo Promedio: <span style="font-weight: 800; color: ${
-                    riesgoMedio === 'Alto' ? '#ef4444' : (riesgoMedio === 'Medio' ? '#f59e0b' : '#10b981')
-                }">${riesgoMedio}</span>
-            `;
-            tooltip.style.opacity = 1;
+            if (tooltip) {
+                tooltip.innerHTML = `
+                    <strong style="color:#fff;font-size:0.85rem;">Provincia ${nombre}</strong><br>
+                    <span style="color:var(--text-muted);">Licencias registradas:</span> <strong>${total}</strong><br>
+                    <span style="color:var(--text-muted);">Riesgo Promedio:</span> <strong style="color:${colorCode}">${riesgoMedio}</strong>
+                `;
+                tooltip.style.opacity = 1;
+            }
         });
 
         prov.addEventListener("mousemove", (e) => {
-            // Posicionar tooltip relativo al contenedor del mapa
-            const rect = document.querySelector(".map-container").getBoundingClientRect();
-            tooltip.style.left = (e.clientX - rect.left + 15) + "px";
-            tooltip.style.top = (e.clientY - rect.top + 15) + "px";
+            const container = document.querySelector(".map-container");
+            if (tooltip && container) {
+                const rect = container.getBoundingClientRect();
+                tooltip.style.left = (e.clientX - rect.left + 15) + "px";
+                tooltip.style.top  = (e.clientY - rect.top + 15)  + "px";
+            }
         });
 
         prov.addEventListener("mouseout", () => {
-            tooltip.style.opacity = 0;
+            if (tooltip) tooltip.style.opacity = 0;
         });
 
         prov.addEventListener("click", () => {
-            // Toggle filtro de provincia
             if (filtroProvinciaActivo === id) {
                 resetFiltroProvincia();
             } else {
                 filtroProvinciaActivo = id;
                 provincias.forEach(p => p.classList.remove("active-filter"));
                 prov.classList.add("active-filter");
-                renderTabla();
+                filtrarLicencias();
+                mostrarToast(`Filtro aplicado: Prov. ${nombre}`, "info");
             }
         });
     });
 }
 
-// Reiniciar filtros del mapa
 function resetFiltroProvincia() {
     filtroProvinciaActivo = null;
     document.querySelectorAll(".provincia").forEach(p => p.classList.remove("active-filter"));
-    renderTabla();
+    filtrarLicencias();
 }
 
-// Pintar el mapa con el nivel de riesgo promedio de cada provincia
 function actualizarColoresMapa() {
     const provincias = document.querySelectorAll(".provincia");
-    
+
     provincias.forEach(prov => {
         const id = prov.id.replace("prov-", "");
-        
-        // Limpiar clases de riesgo
         prov.classList.remove("riesgo-bajo", "riesgo-medio", "riesgo-alto");
 
         const provLicencias = licencias.filter(l => l.provincia.toLowerCase() === id.toLowerCase());
@@ -328,13 +473,65 @@ function actualizarColoresMapa() {
             const totalScore = provLicencias.reduce((sum, curr) => sum + curr.score, 0);
             const avg = totalScore / total;
 
-            if (avg >= 7) {
-                prov.classList.add("riesgo-alto");
-            } else if (avg >= 4) {
-                prov.classList.add("riesgo-medio");
-            } else {
-                prov.classList.add("riesgo-bajo");
-            }
+            if (avg >= 7)      prov.classList.add("riesgo-alto");
+            else if (avg >= 4) prov.classList.add("riesgo-medio");
+            else               prov.classList.add("riesgo-bajo");
         }
     });
+}
+
+// ─── Exportar CSV ─────────────────────────────────────────────────
+function exportarCSV() {
+    if (licencias.length === 0) {
+        mostrarToast("No hay licencias para exportar.", "warning");
+        return;
+    }
+
+    const BOM = "\uFEFF";
+    const headers = ["CodigoLicencia", "OperadorProyecto", "TipoActividad", "Provincia", "ScoreRiesgo", "CategoriaRiesgo", "FechaRegistro"];
+    const rows = licencias.map(l => [l.codigo, l.operador, l.tipoActividad, l.provincia, l.score, l.riesgo, l.fecha || ""]);
+
+    const csvContent = BOM + [headers, ...rows]
+        .map(row => row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(","))
+        .join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url  = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `licencias_ambientales_oruro_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    mostrarToast(`Registro CSV (${licencias.length} licencias) exportado.`, "success");
+}
+
+function obtenerFechaHoraActual() {
+    const ahora = new Date();
+    const meses = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+    return `${ahora.getDate()} ${meses[ahora.getMonth()]} ${ahora.getFullYear()} - ${String(ahora.getHours()).padStart(2,"0")}:${String(ahora.getMinutes()).padStart(2,"0")}`;
+}
+
+function mostrarToast(mensaje, tipo = "info") {
+    const container = document.getElementById("toast-container");
+    if (!container) return;
+
+    const ICONS = {
+        success: `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`,
+        warning: `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+        info:    `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`,
+        error:   `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`
+    };
+
+    const toast = document.createElement("div");
+    toast.className = `toast ${tipo}`;
+    toast.innerHTML = `<div class="toast-icon-wrap">${ICONS[tipo] || ICONS.info}</div><span>${mensaje}</span>`;
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.animation = "toastOut 0.35s var(--ease-spring) forwards";
+        setTimeout(() => toast.remove(), 350);
+    }, 4000);
 }
