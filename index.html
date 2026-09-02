@@ -828,7 +828,7 @@
             <a href="./control-personerias/index.html" class="system-card"
                data-search="personerias juridicas resoluciones firmas documentos acta estatuto reglamento directorio otb comunidad sindicato">
                 <div class="card-header">
-                    <div class="card-icon-wrap">
+                    <div class="card-icon-wrap" style="background: rgba(245, 158, 11, 0.12); border-color: rgba(245, 158, 11, 0.25); color: var(--gold-400);">
                         <!-- Scale / Justice icon -->
                         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 3v18M5 21h14"/>
@@ -839,18 +839,24 @@
                             <line x1="21" y1="6" x2="17" y2="15"/>
                         </svg>
                     </div>
-                    <span class="card-arrow">↗</span>
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        <span class="live-badge" style="font-size:0.62rem;padding:3px 9px;">
+                            <span class="live-dot"></span> EN VIVO
+                        </span>
+                        <span class="card-arrow">↗</span>
+                    </div>
                 </div>
                 <div class="card-body">
                     <h2 class="card-title">Personerías Jurídicas</h2>
-                    <p class="card-desc">Registro de firmas oficiales, checklists de documentos requeridos y emisión de resoluciones administrativas listas para imprimir.</p>
+                    <p class="card-desc">Bandeja de control con borrador de resolución en vivo, validación documental interactiva 4/4 y emisión de Resoluciones A4 con Firma Digital Hash.</p>
                     <div class="card-tags">
-                        <span class="tag">Impresión A4</span>
-                        <span class="tag">Checklist</span>
-                        <span class="tag">Resoluciones</span>
+                        <span class="tag">Borrador en Vivo</span>
+                        <span class="tag">Checklist 4/4</span>
+                        <span class="tag">Resolución A4</span>
+                        <span class="tag">Firma SHA-256</span>
                     </div>
                 </div>
-                <div class="btn-launch">Abrir Módulo ↗</div>
+                <div class="btn-launch" style="background: linear-gradient(135deg, var(--gold-600), var(--gold-400)); color: #000; font-weight: 800;">Abrir Consola Jurídica ↗</div>
             </a>
 
             <!-- 2. Licencias Ambientales -->

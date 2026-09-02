@@ -30,13 +30,20 @@ El ecosistema de desarrollo consta de **7 proyectos modulares**, estructurados d
 | 4 | **[Registro de Trámites CRUD](./registro-tramites)** | Fase 2 (Básico-Medio) | Mini-sistema CRUD de correspondencia ciudadana con persistencia local permanente. | LocalStorage API, Sincronización asíncrona del DOM, Control de estados vacíos. |
 | 5 | **[Sistema de Turnos FIFO](./sistema-turnos)** | Fase 1 (Básico) | Emisor y gestor de turnos secuenciales para salas de atención al ciudadano. | Estructuras de colas en memoria, Programación de algoritmos FIFO (`.shift()`, `.push()`). |
 | 6 | **[Monitor del Dólar](./monitor-dolar)** | Herramienta Auxiliar | Dashboard de visualización del tipo de cambio e histórico del dólar en tiempo real. | ES6 Modules, Fetch API asíncrona, Control y actualización del DOM. |
-| 7 | **[MarketOruro](./oruro-marketplace-app)** | Fase 6 (Avanzado - Firebase) | Plataforma de fomento comercial directo para productores del altiplano y moderación de la Gobernación. | React, Vite, Firebase Auth (Google Sign-In), Onboarding de productores, Grilla responsiva 2-cols y bottom navigation. |
+| 8 | **[Consola Jurídica - Personerías](./control-personerias)** | Fase 6 (Avanzado - Ley 031) | Registro, validación documental 4/4 y emisión de Resoluciones A4 con borrador en vivo y Firma SHA-256. | Live Drafting, Visual Micro-Chips, Impresión A4, Firma Criptográfica SHA-256, LocalStorage. |
 
 ---
 
 ## 🛠️ Detalles de los Módulos de Software
 
-### 1. 🪙 SISREMIN - Liquidación de Regalías Mineras (`liquidacion-regalias`)
+### 1. 📜 Consola Jurídica — Personerías Jurídicas (`control-personerias`)
+Módulo desarrollado para la **Dirección General de Asuntos Jurídicos** de la Gobernación de Oruro para la fiscalización y emisión de Resoluciones Administrativas bajo la Ley N° 031 Marco de Autonomías:
+*   **Exactitud Operativa e Inducción Técnica**: Réplica exacta del proceso legal de aprobación de organizaciones civiles, juntas vecinales (OTBs), comunidades originarias y sindicatos agrarios de las 16 provincias de Oruro.
+*   **Borrador en Vivo (*Live Drafting*)**: Formulario con panel dividido que genera y actualiza en tiempo real la resolución membretada a medida que el usuario ingresa datos.
+*   **Checklist Documental 4/4**: Verificación dinámica de Acta de Fundación, Estatuto, Reglamento Interno y Acta de Posesión del Directorio con micro-chips interactivos.
+*   **Firma Digital SHA-256 y Sello de Agua**: Emisión de documentos membretados A4 con sello institucional dorado, verificación QR y código Hash de auditoría.
+
+### 2. 🪙 SISREMIN - Liquidación de Regalías Mineras (`liquidacion-regalias`)
 Módulo desarrollado para la **Dirección de Minería y Metalurgia** de la Gobernación de Oruro. Permite digitalizar y certificar las liquidaciones tributarias por explotación de minerales:
 *   **Fórmulas Metalúrgicas**: Peso Seco y Ley de Concentración Fina en función del mineral (estaño, zinc, plata, plomo, etc.) utilizando valores de la Bolsa de Metales de Londres (LME).
     *   `Peso Seco = Peso Húmedo * (1 - Humedad / 100)`
@@ -46,32 +53,32 @@ Módulo desarrollado para la **Dirección de Minería y Metalurgia** de la Gober
     *   **15%** va para el Municipio Productor de donde se extrajo el recurso natural.
 *   **Boleta de Pre-Liquidación**: Diseño con fondos translúcidos y desenfoque Gaussiano, y soporte de hojas de estilo exclusivas de impresión física (`@media print`) para generar una boleta nítida de pre-liquidación oficial (estilo Banco Unión) en formato A5/Carta a blanco y negro.
 
-### 2. 🏛️ Seguimiento de Hojas de Ruta (`sistema-correspondencia`)
+### 3. 🏛️ Seguimiento de Hojas de Ruta (`sistema-correspondencia`)
 Desarrollado para resolver la trazabilidad de documentos en la burocracia pública mediante un flujo de correspondencia departamental.
 *   **Proveídos y Derivaciones**: Permite a cada secretaría derivar el documento a otra oficina ingresando el nuevo estado y el proveído (comentario oficial).
 *   **Línea de Tiempo Dinámica**: Renderizado dinámico tipo vertical timeline que rastrea e ilustra cada paso del expediente desde Ventanilla Única, destacando el estado activo y los completados.
 
-### 📊 3. Dashboard Estadístico Departamental (`Panel-de-control`)
+### 📊 4. Dashboard Estadístico Departamental (`Panel-de-control`)
 Panel visual premium orientado a la toma de decisiones por los directores y secretarios de la Gobernación.
 *   **Big Data Local**: Filtra y acumula miles de registros en memoria usando programación funcional avanzada (`.reduce()`, `.filter()`).
 *   **Formatos Oficiales**: Renderiza e internacionaliza montos y cantidades usando el estándar oficial de localización de JavaScript `.toLocaleString()`, garantizando legibilidad en Bolivia.
 
-### 📝 4. Gestor de Trámites Ciudadanos (`registro-tramites`)
+### 📝 5. Gestor de Trámites Ciudadanos (`registro-tramites`)
 Un CRUD simplificado con persistencia local permanente para registrar solicitudes ciudadanas en Ventanilla Única sin necesidad de bases de datos centralizadas en la primera fase.
 *   **Persistencia**: Sincronización transparente con `LocalStorage`.
 *   **UI/UX**: Control de estado vacío (cuando no hay trámites en bandeja, la interfaz muestra un mensaje institucional).
 
-### 🚶 5. Sistema de Gestión de Turnos (`sistema-turnos`)
+### 🚶 6. Sistema de Gestión de Turnos (`sistema-turnos`)
 Mapea el flujo de atención al ciudadano en las oficinas centrales de la Gobernación de Oruro.
 *   **Algoritmo**: Estructura de Cola secuencial clásica (First-In, First-Out).
 *   **Diseño**: Panel de visualización de turnos para salas de espera e interfaz de control para los operarios de ventanilla.
 
-### 💵 6. Monitor del Dólar en Tiempo Real (`monitor-dolar`)
+### 💵 7. Monitor del Dólar en Tiempo Real (`monitor-dolar`)
 Un panel auxiliar que permite monitorear cotizaciones de monedas extranjeras para estimaciones presupuestarias en licitaciones internacionales.
 *   **Asincronía**: Implementación nativa de la Fetch API para llamadas no bloqueantes.
-*   **Modularidad**: Código altamente reutilizable estructurado bajo ES6 Modules (`import`/`export`).
+*   **Modularidad**: Código highly reutilizable estructurado bajo ES6 Modules (`import`/`export`).
 
-### 🌾 7. Plataforma de Fomento Comercial - MarketOruro (`oruro-marketplace-app`)
+### 🌾 8. Plataforma de Fomento Comercial - MarketOruro (`oruro-marketplace-app`)
 Portal oficial del **Gobierno Autónomo Departamental de Oruro** diseñado para incentivar el comercio solidario y directo de productores agrícolas, camélidos y artesanos del altiplano, eliminando la intermediación comercial.
 *   **Autenticación e Inicio de Sesión**: Integración real con el SDK oficial de **Firebase v10.8.0** para registro de productores locales con correo/contraseña y acceso simplificado mediante **Google Sign-In (Popups)**, con fallback transparente a almacenamiento local persistente en caso de caída de red.
 *   **Onboarding Obligatorio de Productores**: Intercepta de manera segura los accesos de nuevos productores para obligarles a registrar su Municipio de origen en el departamento de Oruro y su número de WhatsApp antes de publicar.

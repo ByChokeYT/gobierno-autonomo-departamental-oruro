@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gobernación de Oruro — Control y Emisión de Personerías Jurídicas</title>
     <meta name="description" content="Sistema de registro, validación documental y emisión de Resoluciones Administrativas para Personerías Jurídicas — Gobierno Autónomo Departamental de Oruro.">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./assets/css/styles.css">
 </head>
 <body>
-    <!-- Fondo ambiental dinámico -->
+    <!-- Fondo ambiental dinámico con partículas -->
     <div class="bg-glow-orb orb-1"></div>
     <div class="bg-glow-orb orb-2"></div>
+    <div class="bg-glow-orb orb-3"></div>
     <div class="bg-noise-overlay"></div>
 
     <div class="app-workspace">
@@ -28,7 +29,7 @@
                 </div>
             </div>
 
-            <!-- Live Clock -->
+            <!-- Live Clock Widget -->
             <div class="live-clock-widget">
                 <div class="clock-time" id="clock-time">00:00:00</div>
                 <div class="clock-date" id="clock-date">Cargando...</div>
@@ -55,12 +56,33 @@
                     <span>Nueva Solicitud</span>
                 </button>
 
-                <div class="nav-section-label" style="margin-top:12px;">ACCIONES</div>
+                <div class="nav-section-label" style="margin-top:16px;">HERRAMIENTAS DE FISCALIZACIÓN</div>
+                <button class="nav-item" onclick="abrirVerificadorDigital()">
+                    <div class="nav-icon-box">
+                        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                    </div>
+                    <span>Verificar Firma QR / Hash</span>
+                </button>
+
+                <button class="nav-item" onclick="generarReporteEjecutivo()">
+                    <div class="nav-icon-box">
+                        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    </div>
+                    <span>Reporte Ejecutivo A4</span>
+                </button>
+
                 <button class="nav-item" onclick="exportarCSV()">
                     <div class="nav-icon-box">
                         <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     </div>
                     <span>Exportar Registro CSV</span>
+                </button>
+
+                <button class="nav-item" onclick="limpiarFiltros(); switchTab('dashboard');">
+                    <div class="nav-icon-box">
+                        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                    </div>
+                    <span>Restablecer Filtros</span>
                 </button>
             </nav>
 
@@ -93,8 +115,9 @@
                     <h1 id="page-title">Bandeja de Control de Solicitudes</h1>
                 </div>
 
+                <!-- Interactive KPI Filters -->
                 <div class="top-bar-kpis">
-                    <div class="kpi-card kpi-amber">
+                    <div class="kpi-card kpi-amber active-kpi" id="kpi-total" onclick="filtrarPorEstadoKpi('')" title="Click para ver todos los trámites">
                         <div class="kpi-icon-box amber">
                             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                         </div>
@@ -104,7 +127,7 @@
                         </div>
                     </div>
 
-                    <div class="kpi-card kpi-emerald">
+                    <div class="kpi-card kpi-emerald" id="kpi-aprobados" onclick="filtrarPorEstadoKpi('Aprobado')" title="Click para filtrar solo Aprobadas">
                         <div class="kpi-icon-box emerald">
                             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                         </div>
@@ -114,7 +137,7 @@
                         </div>
                     </div>
 
-                    <div class="kpi-card kpi-cyan">
+                    <div class="kpi-card kpi-cyan" id="kpi-tramite" onclick="filtrarPorEstadoKpi('En Trámite')" title="Click para filtrar solo En Trámite">
                         <div class="kpi-icon-box cyan">
                             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                         </div>
@@ -126,6 +149,17 @@
                 </div>
             </header>
 
+            <!-- Progress Meter Bar -->
+            <div class="progress-meter-container">
+                <div class="progress-meter-header">
+                    <span class="progress-meter-title">Tasa de Emisión de Personerías Aprobadas</span>
+                    <span class="progress-meter-pct" id="meter-pct-text">0% Aprobadas</span>
+                </div>
+                <div class="progress-meter-track">
+                    <div class="progress-meter-bar" id="meter-bar-fill" style="width: 0%;"></div>
+                </div>
+            </div>
+
             <!-- ═══════ TAB: DASHBOARD ═══════ -->
             <div id="tab-dashboard" class="tab-pane active">
                 <div class="card-focus table-card">
@@ -135,6 +169,10 @@
                             <p>Supervisión y control del flujo de aprobación legal de personerías jurídicas.</p>
                         </div>
                         <div class="header-actions">
+                            <button class="btn-secondary" onclick="generarReporteEjecutivo()">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                                Reporte A4
+                            </button>
                             <button class="btn-secondary" onclick="exportarCSV()">
                                 <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                                 Exportar CSV
@@ -162,6 +200,26 @@
                             <option value="Asociación Civil">Asociación Civil</option>
                         </select>
 
+                        <!-- Filtro de Provincias de Oruro -->
+                        <select id="filtro-provincia" onchange="filtrarSolicitudes()" class="filter-select">
+                            <option value="">Todas las Provincias (16)</option>
+                            <option value="Cercado">Cercado</option>
+                            <option value="Eduardo Abaroa">Eduardo Abaroa</option>
+                            <option value="Carangas">Carangas</option>
+                            <option value="Poopó">Poopó</option>
+                            <option value="Sajama">Sajama</option>
+                            <option value="Sabaya">Sabaya</option>
+                            <option value="Pantaleón Dalence">Pantaleón Dalence</option>
+                            <option value="Ladislao Cabrera">Ladislao Cabrera</option>
+                            <option value="Sebastián Pagador">Sebastián Pagador</option>
+                            <option value="Saucarí">Saucarí</option>
+                            <option value="Nor Carangas">Nor Carangas</option>
+                            <option value="San Pedro de Totora">San Pedro de Totora</option>
+                            <option value="Tomas Barrón">Tomas Barrón</option>
+                            <option value="Sur Carangas">Sur Carangas</option>
+                            <option value="Puerto de Mejillones">Puerto de Mejillones</option>
+                        </select>
+
                         <select id="filtro-estado" onchange="filtrarSolicitudes()" class="filter-select">
                             <option value="">Todos los Estados</option>
                             <option value="Aprobado">Aprobado</option>
@@ -171,17 +229,27 @@
                         <div class="filter-result-badge" id="filter-result-badge">0 resultados</div>
                     </div>
 
+                    <!-- Quick Filter Chips -->
+                    <div class="quick-chips-bar">
+                        <span class="chip-label">Filtros Rápidos:</span>
+                        <button class="chip-btn active" onclick="filtrarPorTipoChip('')">Todos</button>
+                        <button class="chip-btn" onclick="filtrarPorTipoChip('OTB')">OTB / Juntas Vecinales</button>
+                        <button class="chip-btn" onclick="filtrarPorTipoChip('Comunidad Indígena')">Comunidades Originarias</button>
+                        <button class="chip-btn" onclick="filtrarPorTipoChip('Sindicato Agrario')">Sindicatos Agrarios</button>
+                        <button class="chip-btn" onclick="filtrarPorTipoChip('Asociación Civil')">Asociaciones Civiles</button>
+                    </div>
+
                     <div class="table-responsive">
                         <table>
                             <thead>
                                 <tr>
                                     <th onclick="ordenarPor('codigo')" class="th-sortable">Código Resolución <span class="sort-icon">↕</span></th>
                                     <th onclick="ordenarPor('nombre')" class="th-sortable">Organización Civil <span class="sort-icon">↕</span></th>
-                                    <th>Tipo</th>
+                                    <th>Tipo Entidad</th>
                                     <th onclick="ordenarPor('provincia')" class="th-sortable">Provincia <span class="sort-icon">↕</span></th>
-                                    <th>Requisitos Legales</th>
+                                    <th>Requisitos Documentales</th>
                                     <th onclick="ordenarPor('estado')" class="th-sortable">Estado <span class="sort-icon">↕</span></th>
-                                    <th>Acciones</th>
+                                    <th>Acciones Rápidas</th>
                                 </tr>
                             </thead>
                             <tbody id="tabla-solicitudes">
@@ -192,11 +260,14 @@
                         <!-- Empty State -->
                         <div id="estado-vacio" class="empty-state" style="display:none;">
                             <div class="empty-icon-wrap">
-                                <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" opacity="0.4"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                                <svg width="52" height="52" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" opacity="0.4"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
                             </div>
                             <h3>Sin Solicitudes Registradas</h3>
-                            <p>No se encontraron personerías jurídicas con los criterios aplicados.</p>
-                            <button class="btn-secondary" onclick="limpiarFiltros()" style="margin-top:16px;">Limpiar Filtros</button>
+                            <p>No se encontraron personerías jurídicas con los criterios de búsqueda aplicados.</p>
+                            <div style="display:flex;gap:10px;margin-top:16px;">
+                                <button class="btn-secondary" onclick="limpiarFiltros()">Limpiar Filtros</button>
+                                <button class="btn-primary" onclick="switchTab('registro')">Crear Nueva Solicitud</button>
+                            </div>
                         </div>
                     </div>
 
@@ -208,112 +279,164 @@
                 </div>
             </div>
 
-            <!-- ═══════ TAB: REGISTRO ═══════ -->
+            <!-- ═══════ TAB: REGISTRO CON LIVE DRAFTING PREVIEW ═══════ -->
             <div id="tab-registro" class="tab-pane">
-                <div class="card-focus centered-card">
-                    <div class="card-header">
-                        <div class="card-header-icon">
-                            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                <div class="split-wizard-grid">
+                    <!-- Form Control Left -->
+                    <div class="card-focus form-wizard-card">
+                        <div class="card-header">
+                            <div class="card-header-icon">
+                                <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                            </div>
+                            <h2>Registrar Nueva Solicitud de Personería</h2>
+                            <p>Ingrese los datos de la organización civil o comunidad y valide su checklist legal.</p>
                         </div>
-                        <h2>Registrar Nueva Solicitud de Personería</h2>
-                        <p>Ingrese los datos de la organización civil o comunidad y valide su checklist de requisitos legales.</p>
+
+                        <form id="form-solicitud" onsubmit="registrarNuevaSolicitud(event)">
+                            <div class="form-group full-width">
+                                <label for="org-nombre">
+                                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                                    Nombre Oficial de la Organización Civil
+                                </label>
+                                <input type="text" id="org-nombre" placeholder="Ej. Junta Vecinal Oruro Moderno - Sector Este" required oninput="actualizarDraftEnVivo()">
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="org-tipo">
+                                        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
+                                        Tipo de Entidad
+                                    </label>
+                                    <select id="org-tipo" required onchange="actualizarDraftEnVivo()">
+                                        <option value="OTB">Junta Vecinal (OTB)</option>
+                                        <option value="Comunidad Indígena">Comunidad Originaria</option>
+                                        <option value="Sindicato Agrario">Sindicato Agrario</option>
+                                        <option value="Asociación Civil">Asociación Civil sin Fines de Lucro</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="org-provincia">
+                                        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                        Provincia del Departamento
+                                    </label>
+                                    <select id="org-provincia" required onchange="actualizarDraftEnVivo()">
+                                        <option value="Cercado">Cercado</option>
+                                        <option value="Eduardo Abaroa">Eduardo Abaroa</option>
+                                        <option value="Carangas">Carangas</option>
+                                        <option value="Poopó">Poopó</option>
+                                        <option value="Sajama">Sajama</option>
+                                        <option value="Sabaya">Sabaya</option>
+                                        <option value="Pantaleón Dalence">Pantaleón Dalence</option>
+                                        <option value="Ladislao Cabrera">Ladislao Cabrera</option>
+                                        <option value="Sebastián Pagador">Sebastián Pagador</option>
+                                        <option value="Saucarí">Saucarí</option>
+                                        <option value="Nor Carangas">Nor Carangas</option>
+                                        <option value="San Pedro de Totora">San Pedro de Totora</option>
+                                        <option value="Tomas Barrón">Tomas Barrón</option>
+                                        <option value="Sur Carangas">Sur Carangas</option>
+                                        <option value="Puerto de Mejillones">Puerto de Mejillones</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="org-representante">
+                                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    Representante Legal Acreditado
+                                </label>
+                                <input type="text" id="org-representante" placeholder="Nombre completo del presidente o autoridad originaria" required oninput="actualizarDraftEnVivo()">
+                            </div>
+
+                            <div class="form-group full-width">
+                                <div class="checklist-header-row">
+                                    <label>Checklist de Requisitos Documentales Obligatorios</label>
+                                    <span class="checklist-pct-badge" id="form-checklist-pct">0% Completado</span>
+                                </div>
+
+                                <div class="form-progress-bar-track">
+                                    <div class="form-progress-bar-fill" id="form-progress-fill" style="width: 0%;"></div>
+                                </div>
+
+                                <div class="checklist-container" style="margin-top:12px;">
+                                    <label class="checklist-item">
+                                        <input type="checkbox" id="chk-acta" onchange="verificarDocumentacion(); actualizarDraftEnVivo();">
+                                        <span class="chk-custom-box"></span>
+                                        <span>Acta de Fundación / Constitución Legal</span>
+                                    </label>
+                                    <label class="checklist-item">
+                                        <input type="checkbox" id="chk-estatuto" onchange="verificarDocumentacion(); actualizarDraftEnVivo();">
+                                        <span class="chk-custom-box"></span>
+                                        <span>Estatuto Orgánico Institucional</span>
+                                    </label>
+                                    <label class="checklist-item">
+                                        <input type="checkbox" id="chk-reglamento" onchange="verificarDocumentacion(); actualizarDraftEnVivo();">
+                                        <span class="chk-custom-box"></span>
+                                        <span>Reglamento Interno Aprobado</span>
+                                    </label>
+                                    <label class="checklist-item">
+                                        <input type="checkbox" id="chk-directorio" onchange="verificarDocumentacion(); actualizarDraftEnVivo();">
+                                        <span class="chk-custom-box"></span>
+                                        <span>Acta de Elección y Posesión del Directorio</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="info-aviso" id="aviso-estado">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                <span>Estado inicial: <strong>En Trámite</strong> (Falta documentación obligatoria).</span>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn-secondary" onclick="switchTab('dashboard')">Cancelar</button>
+                                <button type="submit" class="btn-glow">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                    Registrar y Procesar Trámite
+                                </button>
+                            </div>
+                        </form>
                     </div>
 
-                    <form id="form-solicitud" onsubmit="registrarNuevaSolicitud(event)">
-                        <div class="form-group full-width">
-                            <label for="org-nombre">
-                                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-                                Nombre Oficial de la Organización
-                            </label>
-                            <input type="text" id="org-nombre" placeholder="Ej. Junta Vecinal Oruro Moderno - Sector Este" required>
+                    <!-- Live Draft Document Right -->
+                    <div class="card-focus draft-preview-card">
+                        <div class="draft-header">
+                            <span class="live-indicator-dot"></span>
+                            <span class="draft-title-text">Borrador en Vivo · Resolución Administrativa</span>
+                            <span class="draft-badge" id="draft-badge-status">Borrador Inicial</span>
                         </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="org-tipo">
-                                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
-                                    Tipo de Entidad
-                                </label>
-                                <select id="org-tipo" required>
-                                    <option value="OTB">Junta Vecinal (OTB)</option>
-                                    <option value="Comunidad Indígena">Comunidad Originaria</option>
-                                    <option value="Sindicato Agrario">Sindicato Agrario</option>
-                                    <option value="Asociación Civil">Asociación Civil sin Fines de Lucro</option>
-                                </select>
+                        <div class="draft-mini-paper">
+                            <div class="draft-watermark"></div>
+                            <div class="draft-paper-header">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo" class="draft-paper-logo">
+                                <div>
+                                    <h4>GOBIERNO AUTÓNOMO DEPARTAMENTAL DE ORURO</h4>
+                                    <h5>DIRECCIÓN GENERAL DE ASUNTOS JURÍDICOS</h5>
+                                    <p class="draft-doc-num" id="draft-code-preview">RD-OR-2026-XXXX</p>
+                                </div>
                             </div>
-
-                            <div class="form-group">
-                                <label for="org-provincia">
-                                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                                    Provincia del Departamento
-                                </label>
-                                <select id="org-provincia" required>
-                                    <option value="Cercado">Cercado</option>
-                                    <option value="Eduardo Abaroa">Eduardo Abaroa</option>
-                                    <option value="Carangas">Carangas</option>
-                                    <option value="Poopó">Poopó</option>
-                                    <option value="Sajama">Sajama</option>
-                                    <option value="Sabaya">Sabaya</option>
-                                    <option value="Pantaleón Dalence">Pantaleón Dalence</option>
-                                    <option value="Ladislao Cabrera">Ladislao Cabrera</option>
-                                    <option value="Sebastián Pagador">Sebastián Pagador</option>
-                                </select>
+                            <div class="draft-paper-body">
+                                <p><strong>VISTOS:</strong> La solicitud presentada por <span class="highlight-draft" id="draft-rep">[Representante Legal]</span> para la otorgación de personería jurídica en favor de "<span class="highlight-draft" id="draft-org">[Nombre de la Organización]</span>", en la provincia de <span class="highlight-draft" id="draft-prov">[Provincia]</span>.</p>
+                                <p><strong>ESTADO DE REQUISITOS:</strong> <span class="highlight-draft" id="draft-req-status">0/4 requisitos documentales verificados</span>.</p>
+                                <p><strong>DICTAMEN JURÍDICO PRELIMINAR:</strong> <span id="draft-dictamen">Documentación pendiente. Estado asignado: EN TRÁMITE.</span></p>
+                            </div>
+                            <div class="draft-footer-stamp">
+                                <div class="gold-stamp-circle">
+                                    <span>SELLO</span>
+                                    <span>OFICIAL</span>
+                                </div>
+                                <div class="hash-preview">
+                                    <small>Firma Digital Hash SHA-256:</small>
+                                    <code id="draft-hash-code">e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</code>
+                                </div>
                             </div>
                         </div>
-
-                        <div class="form-group full-width">
-                            <label for="org-representante">
-                                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                                Representante Legal Acreditado
-                            </label>
-                            <input type="text" id="org-representante" placeholder="Nombre completo del presidente o autoridad originaria" required>
-                        </div>
-
-                        <div class="form-group full-width">
-                            <label>Checklist de Requisitos Documentales Obligatorios</label>
-                            <div class="checklist-container">
-                                <label class="checklist-item">
-                                    <input type="checkbox" id="chk-acta" onchange="verificarDocumentacion()">
-                                    <span class="chk-custom-box"></span>
-                                    <span>Acta de Fundación / Constitución Legal</span>
-                                </label>
-                                <label class="checklist-item">
-                                    <input type="checkbox" id="chk-estatuto" onchange="verificarDocumentacion()">
-                                    <span class="chk-custom-box"></span>
-                                    <span>Estatuto Orgánico Institucional</span>
-                                </label>
-                                <label class="checklist-item">
-                                    <input type="checkbox" id="chk-reglamento" onchange="verificarDocumentacion()">
-                                    <span class="chk-custom-box"></span>
-                                    <span>Reglamento Interno Aprobado</span>
-                                </label>
-                                <label class="checklist-item">
-                                    <input type="checkbox" id="chk-directorio" onchange="verificarDocumentacion()">
-                                    <span class="chk-custom-box"></span>
-                                    <span>Acta de Elección y Posesión del Directorio</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="info-aviso" id="aviso-estado">
-                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                            <span>Estado inicial: <strong>En Trámite</strong> (Falta documentación obligatoria).</span>
-                        </div>
-
-                        <div class="form-actions">
-                            <button type="button" class="btn-secondary" onclick="switchTab('dashboard')">Cancelar</button>
-                            <button type="submit" class="btn-glow">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                                Registrar y Procesar Trámite
-                            </button>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- ═══════ MODAL: Resolución Administrativa Departamental ═══════ -->
+    <!-- ═══════ MODAL: Resolución Administrativa Departamental Official ═══════ -->
     <div id="modal-resolucion" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-actions-bar">
@@ -330,12 +453,12 @@
                     <button class="btn-secondary" onclick="cerrarResolucion()">Cerrar</button>
                     <button class="btn-primary" onclick="imprimirResolucion()">
                         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-                        Imprimir Resolución
+                        Imprimir Resolución A4
                     </button>
                 </div>
             </div>
 
-            <!-- Documento Imprimible Membretado -->
+            <!-- Documento Imprimible Membretado Oficial -->
             <div class="documento-resolucion" id="area-impresion">
                 <div class="escudo-agua"></div>
 
@@ -343,8 +466,13 @@
                     <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo de Oruro" class="res-escudo">
                     <div class="res-header-text">
                         <h3>GOBIERNO AUTÓNOMO DEPARTAMENTAL DE ORURO</h3>
-                        <h5>DIRECCIÓN GENERAL DE ASUNTOS JURÍDICOS</h5>
+                        <h5>DIRECCIÓN GENERAL DE ASUNTOS JURÍDICOS · LEY N° 031</h5>
                         <h4 id="res-codigo">RESOLUCIÓN ADMINISTRATIVA DEPARTAMENTAL N° RD-OR-2026-XXXX</h4>
+                    </div>
+                    <div class="seal-top-right">
+                        <div class="gold-official-seal">
+                            <span class="seal-inner-text">GAD-ORU<br>OFICIAL</span>
+                        </div>
                     </div>
                 </div>
 
@@ -364,7 +492,7 @@
 
                     <p class="por-tanto">RESUELVE:</p>
 
-                    <p><strong>PRIMERO.-</strong> Otorgar la **PERSONERÍA JURÍDICA** a la organización: 
+                    <p><strong>PRIMERO.-</strong> Otorgar la <strong>PERSONERÍA JURÍDICA</strong> a la organización: 
                     <strong>"<span id="res-nombre-cuerpo">Organización</span>"</strong>, bajo la clasificación de 
                     <strong><span id="res-tipo">Tipo</span></strong>, asentada en la provincia 
                     <strong><span id="res-provincia-cuerpo">Provincia</span></strong>, ordenando su inscripción formal en el Registro Departamental de Personerías Jurídicas.</p>
@@ -372,6 +500,20 @@
                     <p><strong>SEGUNDO.-</strong> Notificar a los interesados y archivar copia de respaldo en los registros de la Gobernación de Oruro.</p>
 
                     <p>Regístrese, comuníquese y archívese.</p>
+                </div>
+
+                <div class="resolucion-verification-row">
+                    <div class="qr-box-simulated">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M2 2h8v8H2V2zm2 2v4h4V4H4zm8-2h8v8h-8V2zm2 2v4h4V4h-4zM2 14h8v8H2v-8zm2 2v4h4v-4H4zm13-2h3v3h-3v-3zm0 5h3v3h-3v-3zm-5-5h3v3h-3v-3zm0 5h3v3h-3v-3z"/>
+                        </svg>
+                        <span>Verificación Digital QR</span>
+                    </div>
+
+                    <div class="security-hash-block">
+                        <small>CÓDIGO DE AUDITORÍA DIGITAL Y VALIDEZ INSTITUCIONAL:</small>
+                        <code id="res-hash-val">SHA256: 4f89a2b1c90d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f</code>
+                    </div>
                 </div>
 
                 <div class="resolucion-firmas">
@@ -388,6 +530,177 @@
                         <p>Gobierno Autónomo Departamental de Oruro</p>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════ MODAL: Quick Checklist Editor ═══════ -->
+    <div id="modal-checklist-editor" class="modal-overlay">
+        <div class="modal-content" style="max-width:540px;">
+            <div class="modal-actions-bar">
+                <div class="modal-title-group">
+                    <div class="modal-title-icon emerald">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                    </div>
+                    <div>
+                        <h3>Verificar Requisitos Documentales</h3>
+                        <p class="modal-subtitle" id="edit-modal-subtitle">Trámite RD-OR-2026-XXXX</p>
+                    </div>
+                </div>
+                <button class="btn-secondary" onclick="cerrarChecklistEditor()">✕</button>
+            </div>
+            <div style="padding:24px;">
+                <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:16px;">Marque o desmarque los documentos verificados por la Dirección Jurídica para este expediente:</p>
+                
+                <div class="checklist-container">
+                    <label class="checklist-item">
+                        <input type="checkbox" id="edit-chk-acta">
+                        <span class="chk-custom-box"></span>
+                        <span>Acta de Fundación / Constitución Legal</span>
+                    </label>
+                    <label class="checklist-item">
+                        <input type="checkbox" id="edit-chk-estatuto">
+                        <span class="chk-custom-box"></span>
+                        <span>Estatuto Orgánico Institucional</span>
+                    </label>
+                    <label class="checklist-item">
+                        <input type="checkbox" id="edit-chk-reglamento">
+                        <span class="chk-custom-box"></span>
+                        <span>Reglamento Interno Aprobado</span>
+                    </label>
+                    <label class="checklist-item">
+                        <input type="checkbox" id="edit-chk-directorio">
+                        <span class="chk-custom-box"></span>
+                        <span>Acta de Elección y Posesión del Directorio</span>
+                    </label>
+                </div>
+
+                <div class="form-actions" style="margin-top:24px;">
+                    <button type="button" class="btn-secondary" onclick="cerrarChecklistEditor()">Cancelar</button>
+                    <button type="button" class="btn-primary" onclick="guardarChecklistEditado()">Guardar Cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════ MODAL: Historial / Timeline Audit del Expediente (Feature 1) ═══════ -->
+    <div id="modal-timeline" class="modal-overlay">
+        <div class="modal-content" style="max-width:680px;">
+            <div class="modal-actions-bar">
+                <div class="modal-title-group">
+                    <div class="modal-title-icon cyan">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <div>
+                        <h3>Línea de Tiempo de Auditoría Legal</h3>
+                        <p class="modal-subtitle" id="timeline-subtitle">Trazabilidad SAFCO Ley 1178</p>
+                    </div>
+                </div>
+                <button class="btn-secondary" onclick="cerrarTimelineModal()">✕</button>
+            </div>
+
+            <div style="padding:28px;" id="timeline-content-body">
+                <!-- Timeline dinámica -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════ MODAL: Verificador Digital QR / Hash SHA-256 (Feature 3) ═══════ -->
+    <div id="modal-verificador" class="modal-overlay">
+        <div class="modal-content" style="max-width:620px;">
+            <div class="modal-actions-bar">
+                <div class="modal-title-group">
+                    <div class="modal-title-icon emerald">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                    </div>
+                    <div>
+                        <h3>Verificador de Autenticidad Digital</h3>
+                        <p class="modal-subtitle">Validación Criptográfica GAD-ORU · Ley 031</p>
+                    </div>
+                </div>
+                <button class="btn-secondary" onclick="cerrarVerificadorDigital()">✕</button>
+            </div>
+
+            <div style="padding:28px;">
+                <p style="font-size:0.86rem;color:var(--text-secondary);margin-bottom:16px;">Ingrese el Código de Resolución (ej. <code>RD-OR-2026-0001</code>) o el Hash Criptográfico SHA-256 para auditar la validez del documento legal:</p>
+
+                <div class="form-group" style="margin-bottom:20px;">
+                    <div style="display:flex;gap:10px;">
+                        <input type="text" id="input-hash-verify" placeholder="Ingrese RD-OR-2026-XXXX o Hash SHA-256..." style="flex:1;">
+                        <button class="btn-primary" onclick="ejecutarVerificacionDigital()">Verificar Ahora</button>
+                    </div>
+                </div>
+
+                <div id="verification-result-box" style="display:none;">
+                    <!-- Resultado dinámico de verificación -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════ IMPRESIÓN REPORTE EJECUTIVO A4 (Feature 4) ═══════ -->
+    <div id="area-impresion-reporte" class="documento-resolucion" style="display:none;">
+        <div class="resolucion-header">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo" class="res-escudo">
+            <div class="res-header-text">
+                <h3>GOBIERNO AUTÓNOMO DEPARTAMENTAL DE ORURO</h3>
+                <h5>DIRECCIÓN GENERAL DE ASUNTOS JURÍDICOS · CONTROL DE GESTIÓN</h5>
+                <h4>INFORME EJECUTIVO Y AUDITORÍA DE PERSONERÍAS JURÍDICAS</h4>
+            </div>
+            <div class="gold-official-seal">
+                <span>AUDITORÍA<br>SAFCO</span>
+            </div>
+        </div>
+
+        <div class="resolucion-body">
+            <p class="fecha-emision">Oruro, <span id="reporte-fecha">02 de Septiembre de 2026</span></p>
+
+            <p><strong>REPORTE INSTITUCIONAL:</strong> Se presenta el consolidado oficial de trámites de fiscalización y emisión de Personerías Jurídicas correspondiente al departamento de Oruro, procesado bajo la Ley N° 031 Marco de Autonomías y Descentralización.</p>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin:24px 0;text-align:center;border:1px solid #cbd5e1;padding:16px;border-radius:8px;background:#f8fafc;">
+                <div>
+                    <h5 style="color:#64748b;font-size:0.7rem;">TOTAL SOLICITUDES</h5>
+                    <h3 style="font-size:1.6rem;color:#0f172a;" id="reporte-stat-total">0</h3>
+                </div>
+                <div>
+                    <h5 style="color:#059669;font-size:0.7rem;">APROBADAS Y EMITIDAS</h5>
+                    <h3 style="font-size:1.6rem;color:#059669;" id="reporte-stat-aprobados">0</h3>
+                </div>
+                <div>
+                    <h5 style="color:#d97706;font-size:0.7rem;">EN TRÁMITE</h5>
+                    <h3 style="font-size:1.6rem;color:#d97706;" id="reporte-stat-tramite">0</h3>
+                </div>
+            </div>
+
+            <table style="width:100%;border-collapse:collapse;margin-top:20px;font-size:0.82rem;color:#000;" border="1" cellpadding="6">
+                <thead>
+                    <tr style="background:#e2e8f0;">
+                        <th>Código</th>
+                        <th>Organización Civil</th>
+                        <th>Tipo</th>
+                        <th>Provincia</th>
+                        <th>Requisitos</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="reporte-tabla-body">
+                    <!-- Dinámico -->
+                </tbody>
+            </table>
+
+            <p style="margin-top:30px;"><strong>CERTIFICACIÓN DE TRANSPARENCIA:</strong> La presente lista consolidada cuenta con respaldo de firmas digitales y control documental auditado por la Dirección General de Asuntos Jurídicos.</p>
+        </div>
+
+        <div class="resolucion-firmas">
+            <div class="firma-block">
+                <div class="linea-firma"></div>
+                <p><strong>Dirección General de Asuntos Jurídicos</strong></p>
+                <p>GAD-ORURO</p>
+            </div>
+            <div class="firma-block">
+                <div class="linea-firma"></div>
+                <p><strong>Auditoría Interna SAFCO</strong></p>
+                <p>Gobierno Autónomo Departamental de Oruro</p>
             </div>
         </div>
     </div>
