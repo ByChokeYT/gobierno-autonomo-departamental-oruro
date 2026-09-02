@@ -861,34 +861,40 @@
 
             <!-- 2. Licencias Ambientales -->
             <a href="./licencias-ambientales/index.html" class="system-card"
-               data-search="licencias ambientales mapa provincias riesgo ecologico ficha manifiesto lago poopo gis">
+               data-search="licencias ambientales mapa provincias riesgo ecologico ficha manifiesto lago poopo dia pasa ley 1333 sha256">
                 <div class="card-header">
-                    <div class="card-icon-wrap">
+                    <div class="card-icon-wrap" style="background: rgba(52, 211, 153, 0.12); border-color: rgba(52, 211, 153, 0.25); color: #34d399;">
                         <!-- Leaf / Environment icon -->
                         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path d="M2 22c1-4 4.5-8 10-9.5S20 11 21 7c0 0-2 7-8 9s-10 .5-11 6z"/>
                             <path d="M7 22C7 17 11 13 16 12"/>
                         </svg>
                     </div>
-                    <span class="card-arrow">↗</span>
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        <span class="live-badge" style="font-size:0.62rem;padding:3px 9px;background:rgba(52,211,153,0.15);color:#34d399;border-color:rgba(52,211,153,0.3);">
+                            <span class="live-dot" style="background:#34d399;box-shadow:0 0 8px #34d399;"></span> EN VIVO
+                        </span>
+                        <span class="card-arrow">↗</span>
+                    </div>
                 </div>
                 <div class="card-body">
                     <h2 class="card-title">Licencias Ambientales</h2>
-                    <p class="card-desc">Monitoreo ecológico departamental mediante mapa interactivo de las 16 provincias y calculadora de riesgo ambiental de industrias.</p>
+                    <p class="card-desc">Monitoreo ecológico de las 16 provincias con mapa SVG interactivo, matriz de categorización Ley N° 1333, Declaratoria D.I.A. A4 y Firma SHA-256.</p>
                     <div class="card-tags">
                         <span class="tag">Mapa SVG</span>
-                        <span class="tag">Fórmula Riesgo</span>
-                        <span class="tag">Ecología</span>
+                        <span class="tag">Categorización Ley 1333</span>
+                        <span class="tag">Declaratoria D.I.A. A4</span>
+                        <span class="tag">Firma SHA-256</span>
                     </div>
                 </div>
-                <div class="btn-launch">Abrir Módulo ↗</div>
+                <div class="btn-launch" style="background: linear-gradient(135deg, #059669, #34d399); color: #000; font-weight: 800;">Abrir Módulo Ambiental ↗</div>
             </a>
 
             <!-- 3. Control de Activos -->
             <a href="./control-activos/index.html" class="system-card"
-               data-search="activos fijos inventario qr codigo escaner bienes parque automotor inventario equipos">
+               data-search="activos fijos inventario qr codigo escaner bienes parque automotor inventario equipos safco ley 1178 sha256">
                 <div class="card-header">
-                    <div class="card-icon-wrap">
+                    <div class="card-icon-wrap" style="background: rgba(245, 158, 11, 0.12); border-color: rgba(245, 158, 11, 0.25); color: var(--gold-400);">
                         <!-- QR / Asset icon -->
                         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <rect x="3" y="3" width="7" height="7" rx="1"/>
@@ -897,18 +903,24 @@
                             <path d="M14 14h2v2h-2zM18 14h3M14 18h2M18 18h3M14 22h3M20 18v4"/>
                         </svg>
                     </div>
-                    <span class="card-arrow">↗</span>
-                </div>
-                <div class="card-body">
-                    <h2 class="card-title">Control de Activos</h2>
-                    <p class="card-desc">Inventario de activos fijos gubernamentales con generador nativo de códigos QR en Canvas 2D y simulador de escaneo offline.</p>
-                    <div class="card-tags">
-                        <span class="tag">QR Canvas</span>
-                        <span class="tag">Escáner HUD</span>
-                        <span class="tag">Hash</span>
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        <span class="live-badge" style="font-size:0.62rem;padding:3px 9px;">
+                            <span class="live-dot"></span> EN VIVO
+                        </span>
+                        <span class="card-arrow">↗</span>
                     </div>
                 </div>
-                <div class="btn-launch">Abrir Módulo ↗</div>
+                <div class="card-body">
+                    <h2 class="card-title">Control de Activos Fijos</h2>
+                    <p class="card-desc">Inventario patrimonial SAFCO (Ley N° 1178), asignación a custodios, etiquetas autoadhesivas QR, Acta de Entrega A4 y Firma SHA-256.</p>
+                    <div class="card-tags">
+                        <span class="tag">Generador QR</span>
+                        <span class="tag">Acta A4 SAFCO</span>
+                        <span class="tag">Trazabilidad Custodio</span>
+                        <span class="tag">Firma SHA-256</span>
+                    </div>
+                </div>
+                <div class="btn-launch" style="background: linear-gradient(135deg, var(--gold-600), var(--gold-400)); color: #000; font-weight: 800;">Abrir Módulo Activos ↗</div>
             </a>
 
             <!-- 4. Seguimiento de Obras -->

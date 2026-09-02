@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gobernación de Oruro — Control de Licencias Ambientales & Mapa de Riesgo</title>
     <meta name="description" content="Sistema de fiscalización territorial, evaluación de impacto y registro de Licencias Ambientales FA/MA — Secretaría Departamental de Medio Ambiente y Agua de Oruro.">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./assets/css/styles.css">
 </head>
 <body>
     <!-- Fondo ambiental dinámico -->
     <div class="bg-glow-orb orb-1"></div>
     <div class="bg-glow-orb orb-2"></div>
+    <div class="bg-glow-orb orb-3"></div>
     <div class="bg-noise-overlay"></div>
 
     <div class="app-workspace">
@@ -24,7 +25,7 @@
                 </div>
                 <div>
                     <h2>GOBIERNO DE ORURO</h2>
-                    <p class="brand-sub">MEDIO AMBIENTE · SAFCO</p>
+                    <p class="brand-sub">MEDIO AMBIENTE · LEY 1333</p>
                 </div>
             </div>
 
@@ -52,10 +53,24 @@
                     <div class="nav-icon-box">
                         <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
                     </div>
-                    <span>Registrar Licencia</span>
+                    <span>Nueva Licencia D.I.A.</span>
                 </button>
 
-                <div class="nav-section-label" style="margin-top:12px;">ACCIONES</div>
+                <div class="nav-section-label" style="margin-top:16px;">HERRAMIENTAS DE AUDITORÍA</div>
+                <button class="nav-item" onclick="abrirVerificadorAmbiental()">
+                    <div class="nav-icon-box">
+                        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                    </div>
+                    <span>Verificar Licencia QR / Hash</span>
+                </button>
+
+                <button class="nav-item" onclick="generarReporteEjecutivoAmbiental()">
+                    <div class="nav-icon-box">
+                        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                    </div>
+                    <span>Reporte Ejecutivo A4</span>
+                </button>
+
                 <button class="nav-item" onclick="exportarCSV()">
                     <div class="nav-icon-box">
                         <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -68,8 +83,8 @@
                 <div class="user-operator-pill">
                     <div class="operator-avatar">MA</div>
                     <div class="operator-info">
-                        <span class="operator-name">Auditor Ambiental</span>
-                        <span class="operator-role">Secretaría de Medio Ambiente</span>
+                        <span class="operator-name">Auditor Ambiental Principal</span>
+                        <span class="operator-role">Secretaría de Medio Ambiente y Agua</span>
                     </div>
                     <div class="operator-status"></div>
                 </div>
@@ -88,39 +103,39 @@
                 <div class="top-bar-left">
                     <div class="badge-institutional">
                         <span class="badge-dot"></span>
-                        PROTECCIÓN AMBIENTAL · LEY N° 1333 · FASE 7
+                        PROTECCIÓN AMBIENTAL · LEY N° 1333 · MEDIO AMBIENTE Y AGUA
                     </div>
-                    <h1 id="page-title">Mapa de Riesgo Ambiental Departamental</h1>
+                    <h1 id="page-title">Mapa & Monitoreo de Licencias Ambientales</h1>
                 </div>
 
                 <div class="top-bar-kpis">
-                    <div class="kpi-card kpi-emerald">
+                    <div class="kpi-card kpi-emerald" onclick="filtrarPorRiesgoKpi('')" title="Ver todas las licencias">
                         <div class="kpi-icon-box emerald">
                             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                         </div>
                         <div class="kpi-data">
-                            <span class="kpi-value" id="stat-total">0</span>
+                            <span class="kpi-value" id="kpi-total-val">0</span>
                             <span class="kpi-label">Licencias FA/MA</span>
                         </div>
                     </div>
 
-                    <div class="kpi-card kpi-rose">
+                    <div class="kpi-card kpi-rose" onclick="filtrarPorRiesgoKpi('Alto')" title="Filtrar proyectos de Alto Riesgo Impacto">
                         <div class="kpi-icon-box rose">
-                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                         </div>
                         <div class="kpi-data">
-                            <span class="kpi-value" id="stat-critico">0</span>
-                            <span class="kpi-label">Riesgo Alto</span>
+                            <span class="kpi-value" id="kpi-alto-val">0</span>
+                            <span class="kpi-label">Riesgo Alto (7-11 pts)</span>
                         </div>
                     </div>
 
-                    <div class="kpi-card kpi-amber">
+                    <div class="kpi-card kpi-amber" onclick="filtrarPorRiesgoKpi('Medio')" title="Filtrar Proyectos Mineros y Agroindustriales">
                         <div class="kpi-icon-box amber">
                             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                         </div>
                         <div class="kpi-data">
-                            <span class="kpi-value" id="stat-minerias">0</span>
-                            <span class="kpi-label">Mineras Activas</span>
+                            <span class="kpi-value" id="kpi-mineras-val">0</span>
+                            <span class="kpi-label">Minería Pesada</span>
                         </div>
                     </div>
                 </div>
@@ -128,73 +143,64 @@
 
             <!-- ═══════ TAB: MAPA & MONITOREO ═══════ -->
             <div id="tab-mapa" class="tab-pane active">
-                <div class="map-and-table-layout">
-                    <!-- Panel Mapa SVG -->
+                <div class="dashboard-split-grid">
+                    <!-- Mapa SVG Interactivo a la Izquierda -->
                     <div class="card-focus map-card">
                         <div class="card-header flex-header">
                             <div>
                                 <h2>Mapa Interactivo de Provincias de Oruro</h2>
                                 <p>Pasa el cursor por las provincias para ver su nivel de riesgo o haz clic para filtrar.</p>
                             </div>
-                            <button class="btn-secondary" onclick="resetFiltroProvincia()">Mostrar Todo</button>
+                            <button class="btn-secondary btn-sm" id="btn-limpiar-provincia" onclick="desseleccionarProvincia()" style="display:none;">
+                                Mostrar Todo
+                            </button>
                         </div>
 
                         <div class="map-container">
-                            <svg id="mapa-oruro" viewBox="0 0 500 550" class="mapa-svg">
-                                <!-- Sajama (NW) -->
-                                <path d="M 50 100 L 150 70 L 170 150 L 80 180 Z" id="prov-Sajama" class="provincia" data-nombre="Sajama" />
-                                <!-- San Pedro de Totora (N) -->
-                                <path d="M 150 70 L 220 50 L 240 120 L 170 150 Z" id="prov-Totora" class="provincia" data-nombre="San Pedro de Totora" />
-                                <!-- Carangas -->
-                                <path d="M 170 150 L 240 120 L 250 200 L 180 210 Z" id="prov-Carangas" class="provincia" data-nombre="Carangas" />
-                                <!-- Nor Carangas -->
-                                <path d="M 220 50 L 300 40 L 310 110 L 240 120 Z" id="prov-NorCarangas" class="provincia" data-nombre="Nor Carangas" />
-                                <!-- Cercado (NE) -->
-                                <path d="M 300 40 L 390 60 L 360 160 L 310 110 Z" id="prov-Cercado" class="provincia" data-nombre="Cercado" />
-                                <!-- Tomás Barrón -->
-                                <path d="M 390 60 L 440 80 L 420 130 L 360 160 Z" id="prov-TomasBarron" class="provincia" data-nombre="Tomás Barrón" />
-                                <!-- Pantaleón Dalence -->
-                                <path d="M 360 160 L 420 130 L 430 200 L 370 210 Z" id="prov-Dalence" class="provincia" data-nombre="Pantaleón Dalence" />
-                                <!-- Saucarí -->
-                                <path d="M 240 120 L 310 110 L 320 180 L 250 200 Z" id="prov-Saucari" class="provincia" data-nombre="Saucarí" />
-                                <!-- Poopó -->
-                                <path d="M 320 180 L 370 210 L 350 290 L 300 270 Z" id="prov-Poopo" class="provincia" data-nombre="Poopó" />
-                                <!-- Eduardo Abaroa -->
-                                <path d="M 350 290 L 410 320 L 380 400 L 320 380 Z" id="prov-Abaroa" class="provincia" data-nombre="Eduardo Abaroa" />
-                                <!-- Sebastián Pagador -->
-                                <path d="M 380 400 L 430 420 L 410 490 L 350 470 Z" id="prov-Pagador" class="provincia" data-nombre="Sebastián Pagador" />
-                                <!-- Sur Carangas -->
-                                <path d="M 180 210 L 250 200 L 260 280 L 190 290 Z" id="prov-SurCarangas" class="provincia" data-nombre="Sur Carangas" />
-                                <!-- Litoral -->
-                                <path d="M 80 180 L 180 210 L 190 290 L 90 270 Z" id="prov-Litoral" class="provincia" data-nombre="Litoral" />
-                                <!-- Sabaya -->
-                                <path d="M 90 270 L 190 290 L 200 400 L 100 390 Z" id="prov-Sabaya" class="provincia" data-nombre="Sabaya" />
-                                <!-- Ladislao Cabrera (S) -->
-                                <path d="M 200 400 L 320 380 L 300 500 L 180 480 Z" id="prov-Cabrera" class="provincia" data-nombre="Ladislao Cabrera" />
-                                <!-- Mejillones (W) -->
-                                <path d="M 40 280 L 90 270 L 100 390 L 50 370 Z" id="prov-Mejillones" class="provincia" data-nombre="Mejillones" />
+                            <svg viewBox="0 0 400 450" class="oruro-svg-map" id="mapa-oruro-svg">
+                                <!-- Provincias (Polígonos vectoriales representativos de Oruro) -->
+                                <path id="prov-Cercado" class="prov-polygon" d="M 210,180 L 260,165 L 295,200 L 260,230 L 210,210 Z" data-provincia="Cercado"></path>
+                                <path id="prov-Dalence" class="prov-polygon" d="M 260,165 L 310,140 L 330,175 L 295,200 Z" data-provincia="Dalence"></path>
+                                <path id="prov-Poopo" class="prov-polygon" d="M 260,230 L 295,200 L 330,225 L 305,275 L 250,260 Z" data-provincia="Poopo"></path>
+                                <path id="prov-Abaroa" class="prov-polygon" d="M 250,260 L 305,275 L 320,335 L 250,345 L 230,300 Z" data-provincia="Abaroa"></path>
+                                <path id="prov-Pagador" class="prov-polygon" d="M 305,275 L 355,260 L 370,320 L 320,335 Z" data-provincia="Pagador"></path>
+                                <path id="prov-LadislaoCabrera" class="prov-polygon" d="M 230,300 L 250,345 L 280,410 L 200,420 L 180,360 Z" data-provincia="LadislaoCabrera"></path>
+                                <path id="prov-Sajama" class="prov-polygon" d="M 80,140 L 150,110 L 180,170 L 120,200 Z" data-provincia="Sajama"></path>
+                                <path id="prov-Sabaya" class="prov-polygon" d="M 120,200 L 180,170 L 210,210 L 180,270 L 110,250 Z" data-provincia="Sabaya"></path>
+                                <path id="prov-Litoral" class="prov-polygon" d="M 180,270 L 230,300 L 180,360 L 130,320 Z" data-provincia="Litoral"></path>
+                                <path id="prov-Mejillones" class="prov-polygon" d="M 70,250 L 110,250 L 130,320 L 70,300 Z" data-provincia="Mejillones"></path>
+                                <path id="prov-Carangas" class="prov-polygon" d="M 150,110 L 210,90 L 230,140 L 180,170 Z" data-provincia="Carangas"></path>
+                                <path id="prov-NorCarangas" class="prov-polygon" d="M 210,90 L 260,80 L 270,130 L 230,140 Z" data-provincia="NorCarangas"></path>
+                                <path id="prov-Totora" class="prov-polygon" d="M 140,60 L 210,40 L 210,90 L 150,110 Z" data-provincia="Totora"></path>
+                                <path id="prov-TomasBarron" class="prov-polygon" d="M 260,80 L 310,70 L 320,120 L 270,130 Z" data-provincia="TomasBarron"></path>
+                                <path id="prov-Saucari" class="prov-polygon" d="M 180,170 L 230,140 L 260,165 L 210,210 Z" data-provincia="Saucari"></path>
+                                <path id="prov-SurCarangas" class="prov-polygon" d="M 180,210 L 210,210 L 230,260 L 180,270 Z" data-provincia="SurCarangas"></path>
                             </svg>
-                            <div id="map-tooltip" class="map-tooltip"></div>
+
+                            <!-- Tooltip Flotante de Provincia -->
+                            <div id="map-tooltip" class="map-tooltip" style="display:none;"></div>
                         </div>
 
+                        <!-- Leyenda de Riesgo -->
                         <div class="map-legend">
-                            <div class="legend-item"><span class="legend-dot bajo"></span> Riesgo Bajo (1-3 Pts)</div>
-                            <div class="legend-item"><span class="legend-dot medio"></span> Riesgo Medio (4-6 Pts)</div>
-                            <div class="legend-item"><span class="legend-dot alto"></span> Riesgo Alto (7-11 Pts)</div>
+                            <div class="legend-item"><span class="legend-color bajo"></span> Riesgo Bajo (1-3 Pts)</div>
+                            <div class="legend-item"><span class="legend-color medio"></span> Riesgo Medio (4-6 Pts)</div>
+                            <div class="legend-item"><span class="legend-color alto"></span> Riesgo Alto (7-11 Pts)</div>
                         </div>
                     </div>
 
-                    <!-- Tabla de Licencias -->
+                    <!-- Tabla Registros Ambientales a la Derecha -->
                     <div class="card-focus table-card">
                         <div class="card-header flex-header">
                             <div>
                                 <h2 id="table-title">Registros Ambientales (Todos)</h2>
                                 <p>Bandeja de fiscalización oficial de operadoras registradas.</p>
                             </div>
-                            <button class="btn-secondary" onclick="exportarCSV()">
-                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                                Exportar CSV
-                            </button>
+                            <div class="header-actions">
+                                <button class="btn-secondary" onclick="generarReporteEjecutivoAmbiental()">Reporte A4</button>
+                                <button class="btn-secondary" onclick="exportarCSV()">Exportar CSV</button>
+                                <button class="btn-primary" onclick="switchTab('registro')">Nueva Licencia</button>
+                            </div>
                         </div>
 
                         <!-- Toolbar Filtros -->
@@ -208,16 +214,16 @@
                             <select id="filtro-actividad" onchange="filtrarLicencias()" class="filter-select">
                                 <option value="">Todas las Actividades</option>
                                 <option value="Minería Pesada">Minería Pesada</option>
-                                <option value="Concentración de Minerales">Planta Concentradora / Dique</option>
+                                <option value="Concentración de Minerales">Concentración de Minerales</option>
                                 <option value="Agroindustrial">Agroindustrial</option>
-                                <option value="Servicios/Infraestructura">Servicios / Obras</option>
+                                <option value="Servicios/Infraestructura">Servicios e Infraestructura</option>
                             </select>
 
                             <select id="filtro-riesgo" onchange="filtrarLicencias()" class="filter-select">
                                 <option value="">Todos los Riesgos</option>
-                                <option value="Bajo">Riesgo Bajo</option>
-                                <option value="Medio">Riesgo Medio</option>
-                                <option value="Alto">Riesgo Alto</option>
+                                <option value="Alto">Riesgo Alto (7-11 pts)</option>
+                                <option value="Medio">Riesgo Medio (4-6 pts)</option>
+                                <option value="Bajo">Riesgo Bajo (1-3 pts)</option>
                             </select>
 
                             <div class="filter-result-badge" id="filter-result-badge">0 resultados</div>
@@ -233,7 +239,7 @@
                                         <th>Tipo Actividad</th>
                                         <th onclick="ordenarPor('score')" class="th-sortable">Puntaje <span class="sort-icon">↕</span></th>
                                         <th onclick="ordenarPor('riesgo')" class="th-sortable">Riesgo <span class="sort-icon">↕</span></th>
-                                        <th>Acciones</th>
+                                        <th>Acciones Rápidas</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tabla-licencias">
@@ -241,124 +247,349 @@
                                 </tbody>
                             </table>
 
-                            <!-- Empty State -->
-                            <div id="estado-vacio-licencias" class="empty-state" style="display: none;">
-                                <div class="empty-icon-wrap">
-                                    <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" opacity="0.4"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
-                                </div>
-                                <h3>Sin Licencias en la Selección</h3>
-                                <p>No existen registros ambientales para los parámetros seleccionados.</p>
-                                <button class="btn-secondary" onclick="resetFiltroProvincia(); limpiarFiltros();" style="margin-top:16px;">Limpiar Filtros</button>
+                            <div id="estado-vacio" class="empty-state" style="display:none;">
+                                <h3>Sin Licencias Ambientales Registradas</h3>
+                                <p>No se encontraron proyectos con los criterios de búsqueda seleccionados.</p>
                             </div>
                         </div>
 
-                        <!-- Footer Totales -->
                         <div class="table-footer" id="table-footer">
-                            <span id="table-total-count">0 licencias registradas</span>
-                            <span id="table-total-riesgo" class="table-total-valor">0% Riesgo Alto</span>
+                            <span id="table-total-count">0 licencias</span>
+                            <span id="table-pct-alto" class="table-total-valor">0% Riesgo Alto</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ═══════ TAB: REGISTRO ═══════ -->
+            <!-- ═══════ TAB: REGISTRO DE NUEVA LICENCIA & CALCULADORA LEY 1333 ═══════ -->
             <div id="tab-registro" class="tab-pane">
-                <div class="card-focus centered-card">
-                    <div class="card-header">
-                        <div class="card-header-icon">
-                            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                <div class="split-wizard-grid">
+                    <div class="card-focus form-wizard-card">
+                        <div class="card-header">
+                            <div class="card-header-icon">
+                                <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                            </div>
+                            <h2>Registrar Nueva Licencia Ambiental FA / MA</h2>
+                            <p>Evaluación de Impacto Ambiental Ley N° 1333 y asignación automática de categoría.</p>
                         </div>
-                        <h2>Registrar Nueva Licencia Ambiental (FA / MA)</h2>
-                        <p>Ingrese los datos técnicos de la operadora y la ubicación para calcular de forma automatizada su nivel de impacto y riesgo ambiental.</p>
+
+                        <form id="form-licencia" onsubmit="registrarNuevaLicencia(event)">
+                            <div class="form-group full-width">
+                                <label for="op-nombre">Nombre de la Operadora o Proyecto</label>
+                                <input type="text" id="op-nombre" placeholder="Ej. Cooperativa Minera San José R.L." required oninput="actualizarDraftEnVivo()">
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="op-actividad">Tipo de Actividad (Sector)</label>
+                                    <select id="op-actividad" required onchange="actualizarDraftEnVivo(); calcularRiesgoFormulario();">
+                                        <option value="Minería Pesada">Minería Pesada (Extracción/Concentración)</option>
+                                        <option value="Concentración de Minerales">Concentración de Minerales / Diques</option>
+                                        <option value="Agroindustrial">Agroindustrial y Procesamiento</option>
+                                        <option value="Servicios/Infraestructura">Servicios e Infraestructura Pública</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="op-provincia">Provincia del Departamento</label>
+                                    <select id="op-provincia" required onchange="actualizarDraftEnVivo()">
+                                        <option value="Cercado">Cercado</option>
+                                        <option value="Abaroa">Eduardo Abaroa</option>
+                                        <option value="Carangas">Carangas</option>
+                                        <option value="Poopo">Poopó</option>
+                                        <option value="Sajama">Sajama</option>
+                                        <option value="Sabaya">Sabaya</option>
+                                        <option value="Dalence">Pantaleón Dalence</option>
+                                        <option value="LadislaoCabrera">Ladislao Cabrera</option>
+                                        <option value="Pagador">Sebastián Pagador</option>
+                                        <option value="Saucari">Saucarí</option>
+                                        <option value="NorCarangas">Nor Carangas</option>
+                                        <option value="Totora">San Pedro de Totora</option>
+                                        <option value="TomasBarron">Tomas Barrón</option>
+                                        <option value="SurCarangas">Sur Carangas</option>
+                                        <option value="Mejillones">Puerto de Mejillones</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Matriz de Vulnerabilidad Ambiental -->
+                            <div class="form-group full-width">
+                                <label>Matriz de Factores de Impacto &amp; Vulnerabilidad Territorial</label>
+                                <div class="checklist-container" style="margin-top:8px;">
+                                    <label class="checklist-item">
+                                        <input type="checkbox" id="chk-agua" onchange="calcularRiesgoFormulario(); actualizarDraftEnVivo();">
+                                        <span class="chk-custom-box"></span>
+                                        <span>Proximidad a Fuentes de Agua o Cuencas Hidrográficas (+3 Pts)</span>
+                                    </label>
+                                    <label class="checklist-item">
+                                        <input type="checkbox" id="chk-poblacion" onchange="calcularRiesgoFormulario(); actualizarDraftEnVivo();">
+                                        <span class="chk-custom-box"></span>
+                                        <span>Cercanía a Centros Poblados o Áreas Urbanas (+2 Pts)</span>
+                                    </label>
+                                    <label class="checklist-item">
+                                        <input type="checkbox" id="chk-reserva" onchange="calcularRiesgoFormulario(); actualizarDraftEnVivo();">
+                                        <span class="chk-custom-box"></span>
+                                        <span>Área Protegida / Reserva Ecológica o Ecosistema Frágil (+4 Pts)</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Score Card Dinámico en Formulario -->
+                            <div class="score-preview-box" id="score-preview-box">
+                                <div class="score-big-number" id="form-score-val">3</div>
+                                <div>
+                                    <h4 id="form-riesgo-label">Riesgo Bajo (Categoría IV)</h4>
+                                    <p id="form-riesgo-desc">Proyecto con impacto ambiental insignificante. Ficha Ambiental simplificada.</p>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn-secondary" onclick="switchTab('mapa')">Cancelar</button>
+                                <button type="submit" class="btn-glow">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                    Emitir Licencia D.I.A. &amp; Guardar
+                                </button>
+                            </div>
+                        </form>
                     </div>
 
-                    <form id="form-licencia" onsubmit="registrarNuevaLicencia(event)">
-                        <div class="form-group full-width">
-                            <label for="lic-operador">
-                                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-                                Operador / Nombre del Proyecto Ambiental
-                            </label>
-                            <input type="text" id="lic-operador" placeholder="Ej. Cooperativa Minera San José R.L. / Planta Huanuni" required>
+                    <!-- Live Draft Preview Card -->
+                    <div class="card-focus draft-preview-card">
+                        <div class="draft-header">
+                            <span class="live-indicator-dot"></span>
+                            <span class="draft-title-text">Borrador Certificado D.I.A. · Ley 1333</span>
+                            <span class="draft-badge" id="draft-badge-status">Categoría IV</span>
                         </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="lic-tipo-actividad">
-                                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
-                                    Tipo de Actividad Industrial
-                                </label>
-                                <select id="lic-tipo-actividad" onchange="calcularRiesgoFormulario()" required>
-                                    <option value="Minería Pesada">Explotación Minera Pesada</option>
-                                    <option value="Concentración de Minerales">Planta Concentradora / Dique de Colas</option>
-                                    <option value="Agroindustrial">Industria Alimenticia / Agroindustrial</option>
-                                    <option value="Servicios/Infraestructura">Obras Públicas / Servicios</option>
-                                </select>
+                        <div class="draft-mini-paper">
+                            <div class="draft-watermark"></div>
+                            <div class="draft-paper-header">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo" class="draft-paper-logo">
+                                <div>
+                                    <h4>GOBIERNO AUTÓNOMO DEPARTAMENTAL DE ORURO</h4>
+                                    <h5>SECRETARÍA DE MEDIO AMBIENTE Y AGUA</h5>
+                                    <p class="draft-doc-num" id="draft-code-preview">LIC-2026-XXXX</p>
+                                </div>
                             </div>
-
-                            <div class="form-group">
-                                <label for="lic-provincia">
-                                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                                    Provincia de Operación
-                                </label>
-                                <select id="lic-provincia" required>
-                                    <option value="Cercado">Cercado</option>
-                                    <option value="Sajama">Sajama</option>
-                                    <option value="Totora">San Pedro de Totora</option>
-                                    <option value="Carangas">Carangas</option>
-                                    <option value="NorCarangas">Nor Carangas</option>
-                                    <option value="TomasBarron">Tomás Barrón</option>
-                                    <option value="Dalence">Pantaleón Dalence</option>
-                                    <option value="Saucari">Saucarí</option>
-                                    <option value="Poopo">Poopó</option>
-                                    <option value="Abaroa">Eduardo Abaroa</option>
-                                    <option value="Pagador">Sebastián Pagador</option>
-                                    <option value="SurCarangas">Sur Carangas</option>
-                                    <option value="Litoral">Litoral</option>
-                                    <option value="Sabaya">Sabaya</option>
-                                    <option value="Cabrera">Ladislao Cabrera</option>
-                                    <option value="Mejillones">Mejillones</option>
-                                </select>
+                            <div class="draft-paper-body">
+                                <p><strong>DECLARATORIA DE IMPACTO AMBIENTAL (D.I.A.):</strong> Otorgada al operador <span class="highlight-draft" id="draft-op">[Operador]</span> para actividades de <span class="highlight-draft" id="draft-act">[Actividad]</span> en la provincia de <span class="highlight-draft" id="draft-prov">[Provincia]</span>.</p>
+                                <p><strong>EVALUACIÓN DE IMPACTO AMBIENTAL:</strong> Puntaje obtenido: <span class="highlight-draft" id="draft-score">3 Pts</span>. Clasificación de Riesgo: <span id="draft-riesgo-text">Riesgo Bajo</span>.</p>
+                            </div>
+                            <div class="draft-footer-stamp">
+                                <div class="gold-stamp-circle">
+                                    <span>LICENCIA</span>
+                                    <span>D.I.A.</span>
+                                </div>
+                                <div class="hash-preview">
+                                    <small>Firma Digital Hash SHA-256:</small>
+                                    <code id="draft-hash-code">e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</code>
+                                </div>
                             </div>
                         </div>
-
-                        <div class="form-group full-width">
-                            <label>Criterios Geográficos de Vulnerabilidad Ambiental</label>
-                            <div class="checklist-container">
-                                <label class="checklist-item">
-                                    <input type="checkbox" id="chk-agua" onchange="calcularRiesgoFormulario()">
-                                    <span>¿Operación cercana a cuencas hídricas, ríos o lagos (ej. Lago Poopó)? (+3 Pts)</span>
-                                </label>
-                                <label class="checklist-item">
-                                    <input type="checkbox" id="chk-poblacion" onchange="calcularRiesgoFormulario()">
-                                    <span>¿Proximidad a centros poblados o comunidades originarias? (+2 Pts)</span>
-                                </label>
-                                <label class="checklist-item">
-                                    <input type="checkbox" id="chk-reserva" onchange="calcularRiesgoFormulario()">
-                                    <span>¿Ubicada en áreas protegidas o reservas ecológicas? (+3 Pts)</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Panel de Riesgo Calculado -->
-                        <div class="riesgo-calculador-box" id="riesgo-box">
-                            <div class="riesgo-score-circle" id="riesgo-score-circ">3</div>
-                            <div>
-                                <h4>Clasificación de Riesgo Estimado</h4>
-                                <p id="riesgo-detalle">Puntaje base por Actividad Minera: 3. Riesgo de impacto <strong>Bajo</strong>.</p>
-                            </div>
-                        </div>
-
-                        <div class="form-actions">
-                            <button type="button" class="btn-secondary" onclick="switchTab('mapa')">Cancelar</button>
-                            <button type="submit" class="btn-glow">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                                Emitir Licencia Ambiental
-                            </button>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- ═══════ MODAL: Certificado Oficial D.I.A. Membretado ═══════ -->
+    <div id="modal-certificado-dia" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-actions-bar">
+                <div class="modal-title-group">
+                    <div class="modal-title-icon emerald">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </div>
+                    <div>
+                        <h3>Declaratoria de Impacto Ambiental (D.I.A.)</h3>
+                        <p class="modal-subtitle" id="cert-subtitle">Documento Oficial Membretado · Ley N° 1333</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-secondary" onclick="cerrarCertificadoDIA()">Cerrar</button>
+                    <button class="btn-primary" onclick="imprimirCertificadoDIA()">Imprimir Certificado A4</button>
+                </div>
+            </div>
+
+            <!-- Documento Imprimible A4 -->
+            <div class="documento-resolucion" id="area-impresion-licencia">
+                <div class="escudo-agua"></div>
+
+                <div class="resolucion-header">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo de Oruro" class="res-escudo">
+                    <div class="res-header-text">
+                        <h3>GOBIERNO AUTÓNOMO DEPARTAMENTAL DE ORURO</h3>
+                        <h5>SECRETARÍA DE MEDIO AMBIENTE Y AGUA · LEY N° 1333</h5>
+                        <h4 id="cert-codigo">DECLARATORIA DE IMPACTO AMBIENTAL N° LIC-2026-XXXX</h4>
+                    </div>
+                    <div class="seal-top-right">
+                        <div class="gold-official-seal">
+                            <span class="seal-inner-text">D.I.A.<br>OFICIAL</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resolucion-body">
+                    <p class="fecha-emision">Oruro, <span id="cert-fecha">02 de Septiembre de 2026</span></p>
+
+                    <p><strong>VISTOS:</strong> La Ficha Ambiental / Manifiesto Ambiental presentado por la empresa operadora 
+                    <strong>"<span id="cert-operador">Operador</span>"</strong>, para la ejecución del proyecto de 
+                    <strong><span id="cert-actividad">Actividad</span></strong>, ubicado en la provincia 
+                    <strong><span id="cert-provincia">Provincia</span></strong> del Departamento de Oruro; y</p>
+
+                    <p><strong>CONSIDERANDO:</strong> Que la Autoridad Ambiental Competente Departamental (AACD) ha evaluado el estudio de impacto ambiental determinando un puntaje de riesgo de <strong><span id="cert-score">0 Pts</span></strong> (<span id="cert-riesgo">Riesgo</span>), aprobando las medidas de mitigación y el Plan de Aplicación y Seguimiento Ambiental (PASA).</p>
+
+                    <p class="por-tanto">SE RESUELVE:</p>
+
+                    <p><strong>OTORGAR:</strong> La <strong>DECLARATORIA DE IMPACTO AMBIENTAL (D.I.A.)</strong> a favor del operador 
+                    <strong>"<span id="cert-operador-cuerpo">Operador</span>"</strong>, autorizando el inicio y continuidad de actividades sujeto al cumplimiento estricto del PASA y la fiscalización periódica de la Gobernación de Oruro.</p>
+
+                    <p>Regístrese, comuníquese y archívese.</p>
+                </div>
+
+                <div class="resolucion-verification-row">
+                    <div class="qr-box-simulated">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M2 2h8v8H2V2zm2 2v4h4V4H4zm8-2h8v8h-8V2zm2 2v4h4V4h-4zM2 14h8v8H2v-8zm2 2v4h4v-4H4zm13-2h3v3h-3v-3zm0 5h3v3h-3v-3zm-5-5h3v3h-3v-3zm0 5h3v3h-3v-3z"/>
+                        </svg>
+                        <span>Verificación Criptográfica QR</span>
+                    </div>
+
+                    <div class="security-hash-block">
+                        <small>CÓDIGO HASH DE AUDITORÍA AMBIENTAL LEY 1333:</small>
+                        <code id="cert-hash-val">SHA256: 8f9a2b1c90d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f</code>
+                    </div>
+                </div>
+
+                <div class="resolucion-firmas">
+                    <div class="firma-block">
+                        <div class="linea-firma"></div>
+                        <p><strong>Auditor Fiscal Ambiental Principal</strong></p>
+                        <p>Secretaría Departamental de Medio Ambiente y Agua</p>
+                        <p>GAD-ORURO</p>
+                    </div>
+                    <div class="firma-block">
+                        <div class="linea-firma"></div>
+                        <p><strong>Secretario Departamental de Medio Ambiente</strong></p>
+                        <p>Autoridad Ambiental Competente Departamental (AACD)</p>
+                        <p>Gobierno Autónomo Departamental de Oruro</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════ MODAL: Timeline de Fiscalización Ambiental ═══════ -->
+    <div id="modal-timeline-ambiental" class="modal-overlay">
+        <div class="modal-content" style="max-width:680px;">
+            <div class="modal-actions-bar">
+                <div class="modal-title-group">
+                    <div class="modal-title-icon emerald">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <div>
+                        <h3>Línea de Tiempo de Fiscalización Ambiental</h3>
+                        <p class="modal-subtitle" id="timeline-ambient-subtitle">Auditoría Ley 1333</p>
+                    </div>
+                </div>
+                <button class="btn-secondary" onclick="cerrarTimelineAmbiental()">✕</button>
+            </div>
+            <div style="padding:28px;" id="timeline-ambient-body">
+                <!-- Timeline dinámica -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════ MODAL: Verificador Criptográfico Ambiental ═══════ -->
+    <div id="modal-verificador-ambiental" class="modal-overlay">
+        <div class="modal-content" style="max-width:620px;">
+            <div class="modal-actions-bar">
+                <div class="modal-title-group">
+                    <div class="modal-title-icon emerald">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                    </div>
+                    <div>
+                        <h3>Verificador de Licencia Ambiental</h3>
+                        <p class="modal-subtitle">Validación Criptográfica GAD-ORU · Ley 1333</p>
+                    </div>
+                </div>
+                <button class="btn-secondary" onclick="cerrarVerificadorAmbiental()">✕</button>
+            </div>
+            <div style="padding:28px;">
+                <p style="font-size:0.86rem;color:var(--text-secondary);margin-bottom:16px;">Ingrese el Código de Licencia (ej. <code>LIC-2026-0001</code>) o Hash SHA-256 para consultar la validez ambiental:</p>
+                <div class="form-group" style="margin-bottom:20px;">
+                    <div style="display:flex;gap:10px;">
+                        <input type="text" id="input-hash-verify-ambient" placeholder="Ingrese LIC-2026-XXXX o Hash..." style="flex:1;">
+                        <button class="btn-primary" onclick="ejecutarVerificacionAmbiental()">Verificar Licencia</button>
+                    </div>
+                </div>
+                <div id="verification-ambient-result-box" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════ IMPRESIÓN REPORTE EJECUTIVO AMBIENTAL A4 ═══════ -->
+    <div id="area-impresion-reporte-ambiental" class="documento-resolucion" style="display:none;">
+        <div class="resolucion-header">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo" class="res-escudo">
+            <div class="res-header-text">
+                <h3>GOBIERNO AUTÓNOMO DEPARTAMENTAL DE ORURO</h3>
+                <h5>SECRETARÍA DE MEDIO AMBIENTE Y AGUA · FISCALIZACIÓN TERRITORIAL</h5>
+                <h4>INFORME CONSOLIDADO DE LICENCIAS Y MONITOREO AMBIENTAL</h4>
+            </div>
+            <div class="gold-official-seal">
+                <span>AUDITORÍA<br>LEY 1333</span>
+            </div>
+        </div>
+
+        <div class="resolucion-body">
+            <p class="fecha-emision">Oruro, <span id="reporte-ambient-fecha">02 de Septiembre de 2026</span></p>
+
+            <p><strong>INFORME INSTITUCIONAL:</strong> Se presenta el consolidado oficial de fiscalización territorial y monitoreo de licencias ambientales (D.I.A. / D.A.A.) emitidas para las 16 provincias del departamento de Oruro.</p>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin:24px 0;text-align:center;border:1px solid #cbd5e1;padding:16px;border-radius:8px;background:#f8fafc;">
+                <div>
+                    <h5 style="color:#64748b;font-size:0.7rem;">TOTAL LICENCIAS</h5>
+                    <h3 style="font-size:1.6rem;color:#0f172a;" id="rep-amb-total">0</h3>
+                </div>
+                <div>
+                    <h5 style="color:#e11d48;font-size:0.7rem;">RIESGO ALTO (7-11 PTS)</h5>
+                    <h3 style="font-size:1.6rem;color:#e11d48;" id="rep-amb-alto">0</h3>
+                </div>
+                <div>
+                    <h5 style="color:#d97706;font-size:0.7rem;">MINERÍA PESADA</h5>
+                    <h3 style="font-size:1.6rem;color:#d97706;" id="rep-amb-mineras">0</h3>
+                </div>
+            </div>
+
+            <table style="width:100%;border-collapse:collapse;margin-top:20px;font-size:0.82rem;color:#000;" border="1" cellpadding="6">
+                <thead>
+                    <tr style="background:#e2e8f0;">
+                        <th>Código</th>
+                        <th>Operador / Proyecto</th>
+                        <th>Provincia</th>
+                        <th>Actividad</th>
+                        <th>Puntaje Impacto</th>
+                        <th>Riesgo</th>
+                    </tr>
+                </thead>
+                <tbody id="reporte-ambient-tabla-body">
+                    <!-- Dinámico -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="resolucion-firmas">
+            <div class="firma-block">
+                <div class="linea-firma"></div>
+                <p><strong>Secretaría Departamental de Medio Ambiente y Agua</strong></p>
+                <p>GAD-ORURO</p>
+            </div>
+            <div class="firma-block">
+                <div class="linea-firma"></div>
+                <p><strong>Auditoría de Control Ambiental SAFCO</strong></p>
+                <p>Gobierno Autónomo Departamental de Oruro</p>
+            </div>
+        </div>
     </div>
 
     <!-- Toast Container -->

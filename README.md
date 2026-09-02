@@ -30,14 +30,39 @@ El ecosistema de desarrollo consta de **7 proyectos modulares**, estructurados d
 | 4 | **[Registro de Trámites CRUD](./registro-tramites)** | Fase 2 (Básico-Medio) | Mini-sistema CRUD de correspondencia ciudadana con persistencia local permanente. | LocalStorage API, Sincronización asíncrona del DOM, Control de estados vacíos. |
 | 5 | **[Sistema de Turnos FIFO](./sistema-turnos)** | Fase 1 (Básico) | Emisor y gestor de turnos secuenciales para salas de atención al ciudadano. | Estructuras de colas en memoria, Programación de algoritmos FIFO (`.shift()`, `.push()`). |
 | 6 | **[Monitor del Dólar](./monitor-dolar)** | Herramienta Auxiliar | Dashboard de visualización del tipo de cambio e histórico del dólar en tiempo real. | ES6 Modules, Fetch API asíncrona, Control y actualización del DOM. |
+| 7 | **[Licencias Ambientales](./licencias-ambientales)** | Fase 7 (Avanzado - Ley 1333) | Fiscalización territorial, mapa SVG interactivo de provincias, categorización Ley N° 1333 y emisión de D.I.A. A4. | Mapa SVG Interactivo, Risk Score (1-11 Pts), Declaratoria D.I.A. A4, Firma Digital SHA-256. |
 | 8 | **[Consola Jurídica - Personerías](./control-personerias)** | Fase 6 (Avanzado - Ley 031) | Registro, validación documental 4/4 y emisión de Resoluciones A4 con borrador en vivo y Firma SHA-256. | Live Drafting, Visual Micro-Chips, Impresión A4, Firma Criptográfica SHA-256, LocalStorage. |
+| 9 | **[Control de Activos Fijos](./control-activos)** | Fase 8 (Avanzado - Ley 1178) | Inventario patrimonial SAFCO, asignación a custodios, etiquetas autoadhesivas QR, Acta A4 y Firma SHA-256. | Generador QR, Acta de Entrega A4, Trazabilidad Custodia, Analítica Patrimonial, LocalStorage. |
 
 ---
 
 ## 🛠️ Detalles de los Módulos de Software
 
-### 1. 📜 Consola Jurídica — Personerías Jurídicas (`control-personerias`)
+### 1. 📦 Control de Activos Fijos (`control-activos`)
+Módulo desarrollado para la **Unidad de Bienes y Servicios** de la Gobernación de Oruro para el inventario, control patrimonial e imposición de responsabilidad a custodios bajo la Ley N° 1178 (SAFCO):
+
+![Control de Activos Fijos - Gobernación Autónoma Departamental de Oruro](./control-activos/assets/banner.png)
+
+*   **Acta de Asignación y Entrega A4 Membretada**: Generación e impresión oficial de Actas A4 con visto, valor fiscal en Bolivianos (Bs.), firma del custodio y código Hash de 256 bits.
+*   **Generador & Escáner de Etiquetas Autoadhesivas QR**: Herramienta integrada para generar e imprimir pegatinas QR autoadhesivas de activos fijos.
+*   **Trazabilidad & Historial de Custodia**: Timeline interactivo que registra altas, reasignaciones de oficina y mantenimientos técnicos.
+*   **Analítica Patrimonial**: Consolidado dinámico de valor fiscal e inventario físico clasificado por categoría SAFCO.
+
+### 2. 🌿 Licencias Ambientales & Mapa de Riesgo (`licencias-ambientales`)
+Módulo desarrollado para la **Secretaría Departamental de Medio Ambiente y Agua** del Gobierno Autónomo Departamental de Oruro para la evaluación y fiscalización ambiental bajo la Ley N° 1333 de Medio Ambiente:
+
+![Licencias Ambientales & Mapa de Riesgo - Gobernación Autónoma Departamental de Oruro](./licencias-ambientales/assets/banner.png)
+
+*   **Mapa SVG Interactivo de Riesgo Territorial**: Mapa vectorial interactivo de las 16 provincias del Departamento de Oruro con código de colores según nivel de impacto ambiental (*Riesgo Bajo 1-3 Pts*, *Medio 4-6 Pts*, *Alto 7-11 Pts*).
+*   **Calculadora Ley N° 1333 (Categorías I, II, III, IV)**: Matriz de evaluación en tiempo real basada en vulnerabilidad a fuentes de agua, centros poblados y áreas protegidas.
+*   **Declaratoria de Impacto Ambiental (D.I.A.) A4 Membretada**: Emisión e impresión oficial de certificados A4 con sello institucional, visto, considerandos y firma de la AACD.
+*   **Trazabilidad & Verificador Criptográfico SHA-256**: Herramienta de auditoría para verificar autenticidad de licencias con Hash de 256 bits y código QR.
+
+### 3. 📜 Consola Jurídica — Personerías Jurídicas (`control-personerias`)
 Módulo desarrollado para la **Dirección General de Asuntos Jurídicos** de la Gobernación de Oruro para la fiscalización y emisión de Resoluciones Administrativas bajo la Ley N° 031 Marco de Autonomías:
+
+![Consola Jurídica - Gobernación Autónoma Departamental de Oruro](./control-personerias/assets/banner.png)
+
 *   **Exactitud Operativa e Inducción Técnica**: Réplica exacta del proceso legal de aprobación de organizaciones civiles, juntas vecinales (OTBs), comunidades originarias y sindicatos agrarios de las 16 provincias de Oruro.
 *   **Borrador en Vivo (*Live Drafting*)**: Formulario con panel dividido que genera y actualiza en tiempo real la resolución membretada a medida que el usuario ingresa datos.
 *   **Checklist Documental 4/4**: Verificación dinámica de Acta de Fundación, Estatuto, Reglamento Interno y Acta de Posesión del Directorio con micro-chips interactivos.
