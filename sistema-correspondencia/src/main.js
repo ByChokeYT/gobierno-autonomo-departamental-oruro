@@ -1,399 +1,336 @@
-// ------------------------------------------------------------------
-// GOBERNACIÓN AUTÓNOMA DEPARTAMENTAL DE ORURO
-// FASE 4: Sistema de Hojas de Ruta y Correspondencia (SISCO v2.5)
-// ------------------------------------------------------------------
+// ════════════════════════════════════════════════════════════════
+// SISCO — SISTEMA DE CORRESPONDENCIA Y HOJAS DE RUTA (SAFCO)
+// Secretaría General · Gobernación Autónoma Departamental de Oruro
+// Senior Principal Software Architect Level
+// ════════════════════════════════════════════════════════════════
 
-// 1. Estado de la Aplicación (Carga inicial desde LocalStorage)
-let hojasDeRuta = JSON.parse(localStorage.getItem('hojasDeRuta')) || [];
+'use strict';
 
-// 2. Referencias del DOM (Navegación del Workspace)
-const navItems = document.querySelectorAll('.nav-item');
-const tabPanes = document.querySelectorAll('.tab-pane');
-const pageCurrentTitle = document.getElementById('page-current-title');
+let hojasRuta = [];
+let hojasRutaFiltradas = [];
+let idSeleccionadoDerivacion = null;
 
-// Referencias del DOM (Ventanilla Única)
-const formCorrespondencia = document.getElementById('form-correspondencia');
-const inputRemitente = document.getElementById('input-remitente');
-const inputCI = document.getElementById('input-ci');
-const inputAsunto = document.getElementById('input-asunto');
-const selectDestinoInicial = document.getElementById('select-destino-inicial');
-const contadorTramites = document.getElementById('contador-tramites');
-
-// Referencias del DOM (Bandeja Interna)
-const tbodyHojasRuta = document.getElementById('tbody-hojas-ruta');
-const tablaVacia = document.getElementById('tabla-vacía');
-const tablaHojasRuta = document.getElementById('tabla-hojas-ruta');
-
-// Referencias del DOM (Buscador y Rastreador)
-const inputBuscarCodigo = document.getElementById('input-buscar-codigo');
-const btnBuscar = document.getElementById('btn-buscar');
-const seguimientoVacio = document.getElementById('seguimiento-vacio');
-const infoTramiteBuscado = document.getElementById('info-tramite-buscado');
-const timelineDerivaciones = document.getElementById('timeline-derivaciones');
-
-// Referencias de campos de visualización en la Consulta
-const infoCodigo = document.getElementById('info-codigo');
-const infoEstado = document.getElementById('info-estado');
-const infoRemitente = document.getElementById('info-remitente');
-const infoAsunto = document.getElementById('info-asunto');
-
-// Referencias al DOM (Drawer Deslizable)
-const drawerDerivacion = document.getElementById('drawer-derivacion');
-const formDerivar = document.getElementById('form-derivar');
-const modalTramiteId = document.getElementById('modal-tramite-id');
-const modalCodigoTramite = document.getElementById('modal-codigo-tramite');
-const modalUbicacionTramite = document.getElementById('modal-ubicacion-tramite');
-const selectOficinaDestino = document.getElementById('select-oficina-destino');
-const selectNuevoEstado = document.getElementById('select-nuevo-estado');
-const textareaProveido = document.getElementById('textarea-proveido');
-const checkboxFirmaDigital = document.getElementById('checkbox-firma-digital');
-const btnCerrarDrawer = document.getElementById('btn-cerrar-drawer');
-const btnCancelarDrawer = document.getElementById('btn-cancelar-drawer');
-
-// Referencias adicionales para impresión
-const btnImprimirFicha = document.getElementById('btn-imprimir-ficha');
-
-// ------------------------------------------------------------------
-// GESTIÓN DE PESTAÑAS (TAB SYSTEM)
-// ------------------------------------------------------------------
-navItems.forEach(item => {
-    item.addEventListener('click', () => {
-        // Quitar estado activo previo
-        navItems.forEach(i => i.classList.remove('active'));
-        tabPanes.forEach(pane => pane.classList.remove('active'));
-
-        // Activar elemento actual
-        item.classList.add('active');
-        const activeTabId = item.getAttribute('data-tab');
-        document.getElementById(activeTabId).classList.add('active');
-
-        // Actualizar título de cabecera
-        switch (activeTabId) {
-            case 'tab-registro':
-                pageCurrentTitle.textContent = "Ventanilla Única de Registro";
-                break;
-            case 'tab-bandeja':
-                pageCurrentTitle.textContent = "Bandeja Interna de Trámites";
-                renderizarTabla(); // Recargar tabla al entrar a la bandeja
-                break;
-            case 'tab-consulta':
-                pageCurrentTitle.textContent = "Rastreador de Hojas de Ruta";
-                break;
-        }
-    });
+document.addEventListener("DOMContentLoaded", () => {
+    inicializarHojasRuta();
+    iniciarRelojVivo();
+    filtrarHojasRuta();
+    actualizarContador();
 });
 
-// ------------------------------------------------------------------
-// FUNCIONES AUXILIARES Y RENDERIZADO
-// ------------------------------------------------------------------
+function iniciarRelojVivo() {
+    const tick = () => {
+        const ahora = new Date();
+        const h = String(ahora.getHours()).padStart(2, "0");
+        const m = String(ahora.getMinutes()).padStart(2, "0");
+        const s = String(ahora.getSeconds()).padStart(2, "0");
 
-// Guardar datos en LocalStorage y actualizar la UI
-function guardarEstadoYSincronizar() {
-    localStorage.setItem('hojasDeRuta', JSON.stringify(hojasDeRuta));
-    actualizarContador();
-    renderizarTabla();
+        const el = document.getElementById("sisco-clock-time");
+        if (el) el.textContent = `${h}:${m}:${s}`;
+    };
+    tick();
+    setInterval(tick, 1000);
 }
 
-// Actualizar el indicador de trámites activos
-function actualizarContador() {
-    contadorTramites.textContent = hojasDeRuta.length;
-}
-
-// Obtener la clase CSS del badge correspondiente al estado
-function obtenerClaseBadge(estado) {
-    switch (estado) {
-        case 'Pendiente':
-            return 'badge-pendiente';
-        case 'En Revisión':
-            return 'badge-revision';
-        case 'Aprobado':
-            return 'badge-aprobado';
-        case 'Archivado / Completado':
-        case 'Archivado':
-            return 'badge-archivado';
-        default:
-            return 'badge-pendiente';
-    }
-}
-
-// Renderizar la lista general de correspondencia en la bandeja de control
-function renderizarTabla() {
-    tbodyHojasRuta.innerHTML = '';
-
-    if (hojasDeRuta.length === 0) {
-        tablaVacia.classList.remove('hidden');
-        tablaHojasRuta.classList.add('hidden');
-        return;
-    }
-
-    tablaVacia.classList.add('hidden');
-    tablaHojasRuta.classList.remove('hidden');
-
-    hojasDeRuta.forEach(tramite => {
-        const fila = document.createElement('tr');
-
-        fila.innerHTML = `
-            <td><strong>${tramite.codigo}</strong></td>
-            <td>
-                <div style="font-weight: 600;">${tramite.remitente}</div>
-                <div style="font-size: 0.75rem; color: var(--text-muted);">${tramite.ci}</div>
-            </td>
-            <td>${tramite.asunto}</td>
-            <td>${tramite.oficinaActual}</td>
-            <td><span class="badge ${obtenerClaseBadge(tramite.estadoActual)}">${tramite.estadoActual}</span></td>
-            <td>
-                <button class="btn-derivar" onclick="abrirDrawerDerivacion(${tramite.id})">
-                    <span>➡️</span> Derivar
-                </button>
-            </td>
-        `;
-
-        tbodyHojasRuta.appendChild(fila);
-    });
-}
-
-// Generar código único de hoja de ruta (HR-OR-Año-Correlativo)
-function generarCodigoHojaRuta() {
-    const añoActual = new Date().getFullYear();
-    const correlativo = String(hojasDeRuta.length + 1).padStart(4, '0');
-    return `HR-OR-${añoActual}-${correlativo}`;
-}
-
-// ------------------------------------------------------------------
-// ACCIONES Y EVENTOS
-// ------------------------------------------------------------------
-
-// Registrar una nueva correspondencia (Ventanilla Única)
-function registrarCorrespondencia(event) {
-    event.preventDefault();
-
-    const remitente = inputRemitente.value.trim();
-    const ci = inputCI.value.trim();
-    const asunto = inputAsunto.value.trim();
-    const destinoInicial = selectDestinoInicial.value;
-
-    if (!remitente || !ci || !asunto || !destinoInicial) {
-        alert("Por favor complete todos los campos obligatorios.");
-        return;
-    }
-
-    const nuevoCodigo = generarCodigoHojaRuta();
-    const fechaHoraIngreso = new Date().toLocaleString('es-BO');
-
-    // Estructura de datos para modelar la correspondencia
-    const nuevoTramite = {
-        id: Date.now(),
-        codigo: nuevoCodigo,
-        remitente: remitente,
-        ci: ci,
-        asunto: asunto,
-        oficinaActual: destinoInicial,
-        estadoActual: 'Pendiente',
-        fechaRegistro: fechaHoraIngreso,
-        historial: [
+function inicializarHojasRuta() {
+    const local = localStorage.getItem("oruro_hojas_ruta_v2");
+    if (local) {
+        hojasRuta = JSON.parse(local);
+    } else {
+        hojasRuta = [
             {
-                fecha: fechaHoraIngreso,
-                oficinaDestino: destinoInicial,
-                estado: 'Pendiente',
-                comentario: 'Recepción del trámite en Ventanilla Única e inicio del flujo de la Hoja de Ruta.',
-                firmaDigital: null
+                id: "HR-2026-0001",
+                remitente: "Juan Pérez Ramos",
+                ci: "4581298 OR",
+                asunto: "Solicitud de asfaltado y mejoramiento tramo Caracollo - La Joya",
+                ubicacion: "Secretaría de Obras Públicas (SEDECA)",
+                prioridad: "Urgente",
+                fecha: "02 Sep 2026 - 08:30",
+                historial: [
+                    { fecha: "02 Sep 2026 - 08:30", oficina: "Ventanilla Única", observacion: "Radicación e ingreso de solicitud." },
+                    { fecha: "02 Sep 2026 - 09:15", oficina: "Secretaría de Obras Públicas (SEDECA)", observacion: "Derivado para informe de pre-factibilidad." }
+                ]
+            },
+            {
+                id: "HR-2026-0002",
+                remitente: "Sindicato Agrario Poopó",
+                ci: "7812903 OR",
+                asunto: "Inspección técnica ambiental por afluentes mineros en cuenca",
+                ubicacion: "Secretaría de Medio Ambiente y Agua",
+                prioridad: "Normal",
+                fecha: "02 Sep 2026 - 09:45",
+                historial: [
+                    { fecha: "02 Sep 2026 - 09:45", oficina: "Ventanilla Única", observacion: "Radicación e ingreso de nota." }
+                ]
+            },
+            {
+                id: "HR-2026-0003",
+                remitente: "Asociación de Productores de Quinua Salinas",
+                ci: "3491029 OR",
+                asunto: "Convenio interinstitucional para equipamiento de centro de acopio",
+                ubicacion: "Secretaría General",
+                prioridad: "Muy Urgente",
+                fecha: "02 Sep 2026 - 10:15",
+                historial: [
+                    { fecha: "02 Sep 2026 - 10:15", oficina: "Ventanilla Única", observacion: "Ingreso directo a despacho." }
+                ]
             }
+        ];
+        guardarLocal();
+    }
+}
+
+function guardarLocal() {
+    localStorage.setItem("oruro_hojas_ruta_v2", JSON.stringify(hojasRuta));
+}
+
+function actualizarContador() {
+    const el = document.getElementById("stat-total-tramites");
+    if (el) el.textContent = hojasRuta.length;
+}
+
+function cambiarPestana(nombre) {
+    document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
+
+    const btn = document.querySelector(`.nav-item[onclick*="${nombre}"]`);
+    if (btn) btn.classList.add("active");
+
+    const pane = document.getElementById(`pane-${nombre}`);
+    if (pane) pane.classList.add("active");
+
+    const titles = {
+        registro: "Ventanilla Única de Correspondencia",
+        bandeja: "Bandeja Institucional de Hojas de Ruta",
+        rastreo: "Rastreo Ciudadano de Hoja de Ruta"
+    };
+    const t = document.getElementById("page-title");
+    if (t && titles[nombre]) t.textContent = titles[nombre];
+}
+
+function registrarCorrespondencia(e) {
+    e.preventDefault();
+
+    const remitente = document.getElementById("input-remitente").value.trim();
+    const ci        = document.getElementById("input-ci").value.trim();
+    const asunto    = document.getElementById("input-asunto").value.trim();
+    const destino   = document.getElementById("select-destino").value;
+    const prioridad = document.getElementById("select-prioridad").value;
+
+    const num = String(hojasRuta.length + 1).padStart(4, "0");
+    const id = `HR-2026-${num}`;
+    const fecha = new Date().toLocaleDateString('es-BO', { day:'2-digit', month:'short', year:'numeric' }) + " - " + new Date().toLocaleTimeString('es-BO', {hour:'2-digit', minute:'2-digit'});
+
+    const nueva = {
+        id, remitente, ci, asunto, ubicacion: destino, prioridad, fecha,
+        historial: [
+            { fecha, oficina: "Ventanilla Única", observacion: "Radicación e ingreso de solicitud." },
+            { fecha, oficina: destino, observacion: "Derivación inicial automática." }
         ]
     };
 
-    hojasDeRuta.push(nuevoTramite);
-    guardarEstadoYSincronizar();
+    hojasRuta.unshift(nueva);
+    guardarLocal();
 
-    // Resetear formulario y dar feedback visual
-    formCorrespondencia.reset();
-    alert(`Trámite iniciado con éxito. Código de seguimiento: ${nuevoCodigo}`);
-
-    // Redirigir automáticamente a la pestaña de bandeja
-    document.querySelector('.nav-item[data-tab="tab-bandeja"]').click();
+    document.getElementById("form-correspondencia").reset();
+    actualizarContador();
+    filtrarHojasRuta();
+    mostrarToast(`Hoja de Ruta ${id} radicada exitosamente.`, "success");
+    setTimeout(() => abrirFichaHR(id), 300);
 }
 
-// Abrir drawer de derivación
-window.abrirDrawerDerivacion = function(id) {
-    const tramite = hojasDeRuta.find(t => t.id === id);
-    if (!tramite) return;
-
-    modalTramiteId.value = tramite.id;
-    modalCodigoTramite.textContent = tramite.codigo;
-    modalUbicacionTramite.textContent = tramite.oficinaActual;
-
-    // Resetear campos
-    selectOficinaDestino.value = '';
-    selectNuevoEstado.value = 'En Revisión';
-    textareaProveido.value = '';
-    checkboxFirmaDigital.checked = false;
-
-    drawerDerivacion.classList.remove('hidden');
-    // Forzar reflow de animación
-    setTimeout(() => {
-        drawerDerivacion.classList.add('open');
-    }, 10);
-};
-
-// Cerrar drawer de derivación
-function cerrarDrawer() {
-    drawerDerivacion.classList.remove('open');
-    setTimeout(() => {
-        drawerDerivacion.classList.add('hidden');
-    }, 300); // Esperar que termine la animación
+function eliminarHojaRuta(id) {
+    if (confirm(`¿Eliminar la Hoja de Ruta ${id}?`)) {
+        hojasRuta = hojasRuta.filter(h => h.id !== id);
+        guardarLocal();
+        actualizarContador();
+        filtrarHojasRuta();
+        mostrarToast(`Hoja de Ruta ${id} eliminada.`, "warning");
+    }
 }
 
-// Guardar la derivación en el historial del trámite
-function procesarDerivacion(event) {
-    event.preventDefault();
+function filtrarHojasRuta() {
+    const query = (document.getElementById("input-buscar-hr")?.value ?? "").toLowerCase().trim();
 
-    const id = parseInt(modalTramiteId.value);
-    const oficinaDestino = selectOficinaDestino.value;
-    const nuevoEstado = selectNuevoEstado.value;
-    const proveido = textareaProveido.value.trim();
-    const firmarDigital = checkboxFirmaDigital.checked;
-
-    if (!oficinaDestino || !nuevoEstado || !proveido) {
-        alert("Por favor complete todos los datos de derivación.");
-        return;
-    }
-
-    const tramite = hojasDeRuta.find(t => t.id === id);
-    if (!tramite) return;
-
-    const fechaHoraDerivacion = new Date().toLocaleString('es-BO');
-
-    // Simular Hash de firma digital de ADSIB Bolivia
-    let hashFirma = null;
-    if (firmarDigital) {
-        hashFirma = 'adsib-hash-' + Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
-    }
-
-    // Añadir paso al historial
-    tramite.historial.push({
-        fecha: fechaHoraDerivacion,
-        oficinaDestino: oficinaDestino,
-        estado: nuevoEstado,
-        comentario: proveido,
-        firmaDigital: hashFirma
+    hojasRutaFiltradas = hojasRuta.filter(h => {
+        return !query || h.id.toLowerCase().includes(query) || h.remitente.toLowerCase().includes(query) || h.asunto.toLowerCase().includes(query);
     });
 
-    tramite.oficinaActual = oficinaDestino;
-    tramite.estadoActual = nuevoEstado;
-
-    guardarEstadoYSincronizar();
-    cerrarDrawer();
-
-    // Si el trámite derivado estaba siendo consultado, refrescar la vista de consulta
-    if (!infoTramiteBuscado.classList.contains('hidden') && infoCodigo.textContent === tramite.codigo) {
-        buscarTramitePorCodigo(tramite.codigo);
-    }
+    renderTabla();
 }
 
-// Buscar trámite y renderizar la línea de tiempo (Timeline)
-function consultarTramite() {
-    const codigoABuscar = inputBuscarCodigo.value.trim().toUpperCase();
-    if (!codigoABuscar) {
-        alert("Ingrese un código de Hoja de Ruta para realizar la búsqueda.");
-        return;
-    }
-    buscarTramitePorCodigo(codigoABuscar);
-}
+function renderTabla() {
+    const tbody = document.getElementById("tabla-hojas-body");
+    if (!tbody) return;
+    tbody.innerHTML = "";
 
-function buscarTramitePorCodigo(codigo) {
-    const tramite = hojasDeRuta.find(t => t.codigo.toUpperCase() === codigo.toUpperCase());
-
-    if (!tramite) {
-        alert(`No se encontró ninguna Hoja de Ruta con el código: ${codigo}`);
-        seguimientoVacio.classList.remove('hidden');
-        infoTramiteBuscado.classList.add('hidden');
-        timelineDerivaciones.classList.add('hidden');
-        return;
-    }
-
-    // Mostrar contenedores
-    seguimientoVacio.classList.add('hidden');
-    infoTramiteBuscado.classList.remove('hidden');
-    timelineDerivaciones.classList.remove('hidden');
-
-    // Rellenar metadatos
-    infoCodigo.textContent = tramite.codigo;
-    infoEstado.textContent = tramite.estadoActual;
-    infoEstado.className = `badge ${obtenerClaseBadge(tramite.estadoActual)}`;
-    infoRemitente.textContent = tramite.remitente;
-    infoAsunto.textContent = tramite.asunto;
-
-    // Renderizar la línea de tiempo
-    timelineDerivaciones.innerHTML = '';
-
-    tramite.historial.forEach((movimiento, index) => {
-        const item = document.createElement('div');
-        item.classList.add('timeline-item');
-        
-        if (index === tramite.historial.length - 1) {
-            item.classList.add('active');
-        } else {
-            item.classList.add('completed');
-        }
-
-        let firmaHtml = '';
-        if (movimiento.firmaDigital) {
-            firmaHtml = `
-                <div class="timeline-signature-block" style="margin-top: 10px; font-size: 0.75rem; background: rgba(16, 185, 129, 0.08); border: 1px dashed rgba(16, 185, 129, 0.3); padding: 6px 12px; border-radius: 4px; display: inline-flex; align-items: center; gap: 8px; color: #34d399; width: fit-content;">
-                    <span>🔒 Firmado Digitalmente (ADSIB Bolivia)</span>
-                    <code style="font-family: monospace; color: #a3e635; font-size: 0.7rem; background: rgba(0,0,0,0.3); padding: 1px 6px; border-radius: 2px;">${movimiento.firmaDigital}</code>
+    hojasRutaFiltradas.forEach(h => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>
+                <strong style="font-family:'JetBrains Mono',monospace;color:var(--primary-light);">${h.id}</strong>
+            </td>
+            <td>
+                <div style="font-weight:700;color:var(--text-main);">${h.remitente}</div>
+                <div style="font-size:0.68rem;color:var(--text-muted);">C.I.: ${h.ci}</div>
+            </td>
+            <td>
+                <span style="font-size:0.8rem;color:var(--text-secondary);">${h.asunto}</span>
+            </td>
+            <td>
+                <span style="font-size:0.75rem;font-weight:700;color:var(--accent-gold);">${h.ubicacion}</span>
+            </td>
+            <td>
+                <span style="font-size:0.72rem;font-weight:800;padding:3px 8px;border-radius:999px;background:${h.prioridad === 'Normal' ? 'rgba(56,189,248,0.15)' : 'rgba(251,113,133,0.15)'};color:${h.prioridad === 'Normal' ? 'var(--primary-light)' : 'var(--accent-rose)'};">${h.prioridad}</span>
+            </td>
+            <td>
+                <div style="display:flex;gap:6px;">
+                    <button class="btn-ficha" onclick="abrirFichaHR('${h.id}')" title="Ver Hoja de Ruta A4">
+                        Hoja A4
+                    </button>
+                    <button class="btn-secondary" style="padding:4px 8px;font-size:0.75rem;" onclick="abrirDerivacionModal('${h.id}')" title="Derivar a otra oficina">
+                        Derivar
+                    </button>
+                    <button class="btn-delete" onclick="eliminarHojaRuta('${h.id}')">
+                        ✕
+                    </button>
                 </div>
-            `;
-        }
-
-        item.innerHTML = `
-            <div class="timeline-dot"></div>
-            <div class="timeline-card">
-                <div class="timeline-header">
-                    <span class="timeline-office">📍 ${movimiento.oficinaDestino}</span>
-                    <span class="timeline-date">${movimiento.fecha}</span>
-                </div>
-                <div class="timeline-status">Estado: ${movimiento.estado}</div>
-                <div class="timeline-comment">"${movimiento.comentario}"</div>
-                ${firmaHtml}
-            </div>
+            </td>
         `;
-
-        timelineDerivaciones.appendChild(item);
+        tbody.appendChild(tr);
     });
 }
 
-// Imprimir Ficha de Hoja de Ruta
-if (btnImprimirFicha) {
-    btnImprimirFicha.addEventListener('click', () => {
-        window.print();
-    });
+// ─── Derivación ──────────────────────────────────────────────────
+function abrirDerivacionModal(id) {
+    idSeleccionadoDerivacion = id;
+    const h = hojasRuta.find(item => item.id === id);
+    if (!h) return;
+
+    const el = (elementId) => document.getElementById(elementId);
+    if (el("deriv-modal-subtitle")) el("deriv-modal-subtitle").textContent = `${h.id} · Remitente: ${h.remitente}`;
+    document.getElementById("modal-derivacion-hr").classList.add("open");
 }
 
-// ------------------------------------------------------------------
-// CONFIGURACIÓN DE LISTENERS
-// ------------------------------------------------------------------
-formCorrespondencia.addEventListener('submit', registrarCorrespondencia);
-formDerivar.addEventListener('submit', procesarDerivacion);
-btnBuscar.addEventListener('click', consultarTramite);
+function cerrarDerivacionModal() {
+    document.getElementById("modal-derivacion-hr").classList.remove("open");
+    idSeleccionadoDerivacion = null;
+}
 
-// Cerrar drawer
-btnCerrarDrawer.addEventListener('click', cerrarDrawer);
-btnCancelarDrawer.addEventListener('click', cerrarDrawer);
+function guardarDerivacion(e) {
+    e.preventDefault();
+    if (!idSeleccionadoDerivacion) return;
 
-// Cerrar drawer al hacer click en el overlay
-drawerDerivacion.addEventListener('click', (e) => {
-    if (e.target === drawerDerivacion) {
-        cerrarDrawer();
+    const h = hojasRuta.find(item => item.id === idSeleccionadoDerivacion);
+    if (!h) return;
+
+    const nuevaOficina = document.getElementById("select-nueva-oficina").value;
+    const instruccion   = document.getElementById("input-instruccion").value.trim();
+    const fecha = new Date().toLocaleDateString('es-BO', { day:'2-digit', month:'short', year:'numeric' }) + " - " + new Date().toLocaleTimeString('es-BO', {hour:'2-digit', minute:'2-digit'});
+
+    h.ubicacion = nuevaOficina;
+    h.historial.push({ fecha, oficina: nuevaOficina, observacion: instruccion });
+    guardarLocal();
+
+    cerrarDerivacionModal();
+    filtrarHojasRuta();
+    mostrarToast(`Hoja de Ruta ${h.id} derivada a ${nuevaOficina}.`, "success");
+}
+
+// ─── Rastreo Ciudadano ───────────────────────────────────────────
+function buscarRastreoCiudadano() {
+    const cod = (document.getElementById("input-rastreo-codigo")?.value || "").toUpperCase().trim();
+    const contenedor = document.getElementById("contenedor-resultado-rastreo");
+    if (!cod || !contenedor) return;
+
+    const h = hojasRuta.find(item => item.id === cod);
+    if (!h) {
+        contenedor.style.display = "block";
+        contenedor.innerHTML = `<p style="color:var(--accent-rose);font-weight:700;">No se encontró la Hoja de Ruta "${cod}". Verifique el número de trámite.</p>`;
+        return;
     }
-});
 
-// Permitir presionar "Enter" para buscar
-inputBuscarCodigo.addEventListener('keypress', (event) => {
-    if (event.key === 'Enter') {
-        consultarTramite();
+    contenedor.style.display = "block";
+    contenedor.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid var(--border-subtle);padding-bottom:14px;margin-bottom:16px;">
+            <div>
+                <h3 style="font-family:var(--font-brand);color:var(--primary-light);font-size:1.2rem;">${h.id}</h3>
+                <p style="font-size:0.85rem;color:var(--text-main);margin-top:2px;"><strong>Remitente:</strong> ${h.remitente} (C.I. ${h.ci})</p>
+                <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:2px;"><strong>Asunto:</strong> ${h.asunto}</p>
+            </div>
+            <span style="font-size:0.75rem;font-weight:800;padding:5px 12px;border-radius:999px;background:rgba(245,158,11,0.15);color:var(--accent-gold);border:1px solid rgba(245,158,11,0.3);">Ubicación: ${h.ubicacion}</span>
+        </div>
+        <h4 style="font-family:var(--font-brand);font-size:0.9rem;color:var(--text-main);margin-bottom:12px;">LÍNEA DE TIEMPO Y HISTORIAL DE PROVEÍDOS:</h4>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+            ${h.historial.map((step, idx) => `
+                <div style="display:flex;gap:14px;align-items:flex-start;position:relative;">
+                    <div style="width:28px;height:28px;border-radius:50%;background:rgba(56,189,248,0.2);border:1px solid var(--primary-light);color:var(--primary-light);font-weight:900;font-size:0.75rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${idx + 1}</div>
+                    <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border-subtle);padding:10px 14px;border-radius:8px;flex:1;">
+                        <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:var(--text-muted);font-weight:700;">
+                            <span>${step.oficina}</span>
+                            <span>${step.fecha}</span>
+                        </div>
+                        <p style="font-size:0.82rem;color:var(--text-main);margin-top:4px;">${step.observacion}</p>
+                    </div>
+                </div>
+            `).join("")}
+        </div>
+    `;
+}
+
+// ─── Modal A4 & Reporte ───────────────────────────────────────────
+function abrirFichaHR(id) {
+    const h = hojasRuta.find(item => item.id === id);
+    if (!h) return;
+
+    const el = (elementId) => document.getElementById(elementId);
+    if (el("ficha-hr-subtitle"))  el("ficha-hr-subtitle").textContent  = `${h.id} · Remitente: ${h.remitente}`;
+    if (el("ficha-hr-codigo"))    el("ficha-hr-codigo").textContent    = `HOJA DE RUTA DEPARTAMENTAL N° ${h.id}`;
+    if (el("ficha-hr-fecha"))     el("ficha-hr-fecha").textContent     = h.fecha;
+    if (el("ficha-hr-num"))       el("ficha-hr-num").textContent       = h.id;
+    if (el("ficha-hr-remitente")) el("ficha-hr-remitente").textContent = h.remitente;
+    if (el("ficha-hr-ci"))        el("ficha-hr-ci").textContent        = h.ci;
+    if (el("ficha-hr-asunto"))    el("ficha-hr-asunto").textContent    = h.asunto;
+    if (el("ficha-hr-destino"))   el("ficha-hr-destino").textContent   = h.ubicacion;
+    if (el("ficha-hr-prioridad")) el("ficha-hr-prioridad").textContent = h.prioridad;
+
+    document.getElementById("modal-ficha-hr").classList.add("open");
+}
+
+function cerrarFichaHR() {
+    document.getElementById("modal-ficha-hr").classList.remove("open");
+}
+
+function imprimirFichaHR() {
+    window.print();
+}
+
+function generarReporteEjecutivoCorrespondencia() {
+    const el = (elementId) => document.getElementById(elementId);
+    const tbody = el("reporte-hr-tabla-body");
+    if (tbody) {
+        tbody.innerHTML = hojasRuta.map(h => `
+            <tr>
+                <td><strong>${h.id}</strong></td>
+                <td>${h.remitente}</td>
+                <td>${h.asunto}</td>
+                <td>${h.ubicacion}</td>
+                <td>${h.prioridad}</td>
+            </tr>
+        `).join("");
     }
-});
 
-// Inicialización automática
-guardarEstadoYSincronizar();
-actualizarContador();
+    const area = el("area-impresion-reporte-correspondencia");
+    if (area) area.style.display = "block";
+    window.print();
+    setTimeout(() => { if (area) area.style.display = "none"; }, 1000);
+}
+
+function mostrarToast(mensaje, tipo = "info") {
+    const container = document.getElementById("toast-container");
+    if (!container) return;
+    const toast = document.createElement("div");
+    toast.className = `toast ${tipo}`;
+    toast.innerHTML = `<span>${mensaje}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3500);
+}

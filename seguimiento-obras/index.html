@@ -3,83 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gobernación de Oruro - Control de Obras viales (EVM)</title>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Gobernación de Oruro — Control de Obras Viales (EVM - Valor Ganado)</title>
+    <meta name="description" content="Sistema de fiscalización financiera y avance físico de proyectos de infraestructura vial bajo metodología EVM — Gobernación Autónoma Departamental de Oruro.">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./assets/css/styles.css">
 </head>
 <body>
+    <!-- Fondo ambiental dinámico -->
+    <div class="bg-glow-orb orb-1"></div>
+    <div class="bg-glow-orb orb-2"></div>
+    <div class="bg-glow-orb orb-3"></div>
+    <div class="bg-noise-overlay"></div>
+
     <div class="app-workspace">
-        <!-- Sidebar -->
+        <!-- ══════════════ SIDEBAR ══════════════ -->
         <aside class="sidebar">
             <div class="sidebar-brand">
-                <div class="brand-icon">🚧</div>
+                <div class="brand-escudo-wrap">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo de Oruro" class="brand-escudo">
+                    <div class="brand-pulse-ring"></div>
+                </div>
                 <div>
                     <h2>GOBIERNO DE ORURO</h2>
-                    <p>INVERSIÓN PÚBLICA / SEDECA</p>
+                    <p class="brand-sub">OBRAS PÚBLICAS · SEDECA</p>
+                </div>
+            </div>
+
+            <!-- Live Clock Widget -->
+            <div class="live-clock-widget">
+                <div class="clock-time" id="clock-time">00:00:00</div>
+                <div class="clock-date" id="clock-date">Cargando...</div>
+                <div class="clock-badge">
+                    <span class="clock-badge-dot"></span>
+                    SEDECA Fiscalización Activa
                 </div>
             </div>
             
             <nav class="navigation-menu">
-                <button class="nav-item active" onclick="switchTab('dashboard')">📋 Monitoreo Vial (EVM)</button>
-                <button class="nav-item" onclick="switchTab('registro')">✍️ Registrar Proyecto</button>
+                <div class="nav-section-label">MÓDULOS DE FISCALIZACIÓN</div>
+                <button class="nav-item active" id="nav-dashboard" onclick="switchTab('dashboard')">
+                    <div class="nav-icon-box">
+                        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+                    </div>
+                    <span>Monitoreo Vial (EVM)</span>
+                    <span class="nav-count" id="nav-count">0</span>
+                </button>
+                <button class="nav-item" id="nav-registro" onclick="switchTab('registro')">
+                    <div class="nav-icon-box">
+                        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                    </div>
+                    <span>Registrar Proyecto</span>
+                </button>
+
+                <div class="nav-section-label" style="margin-top:16px;">HERRAMIENTAS AUDITORA</div>
+                <button class="nav-item" onclick="generarReporteEjecutivoObras()">
+                    <div class="nav-icon-box cyan-glow">
+                        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                    </div>
+                    <span>Informe Ejecutivo A4</span>
+                </button>
+                <button class="nav-item" onclick="abrirCalculadoraEVMDirecta()">
+                    <div class="nav-icon-box">
+                        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="8" y="8" width="8" height="4"/><path d="M8 16h.01M12 16h.01M16 16h.01"/></svg>
+                    </div>
+                    <span>Calculadora EVM</span>
+                </button>
             </nav>
 
             <div class="sidebar-footer">
-                <div class="server-status">
-                    <span class="status-indicator online"></span>
-                    <span>Auditoría de Inversión (EVM)</span>
+                <div class="user-operator-pill">
+                    <div class="operator-avatar">FO</div>
+                    <div class="operator-info">
+                        <span class="operator-name">Fiscal de Obra</span>
+                        <span class="operator-role">Ingeniería SEDECA Oruro</span>
+                    </div>
+                    <div class="operator-status"></div>
+                </div>
+                <div class="hash-integrity-badge">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    Firma Hash EVM-256 Activa
                 </div>
             </div>
         </aside>
 
-        <!-- Main Content -->
+        <!-- ══════════════ MAIN CONTENT ══════════════ -->
         <main class="main-content">
             <!-- Top Bar -->
             <header class="top-bar">
                 <div>
-                    <span class="section-indicator">FASE 9 - Control Presupuestario</span>
-                    <h1 id="page-title">Monitoreo Financiero de Proyectos Viales</h1>
+                    <div class="badge-institutional">
+                        <span class="badge-dot"></span>
+                        SECRETARÍA DE OBRAS PÚBLICAS · CONTROL PRESUPUESTARIO EVM · FASE 9
+                    </div>
+                    <h1 id="page-title">Monitoreo Financiero y Físico de Proyectos Viales</h1>
                 </div>
                 <div class="top-bar-stats">
                     <div class="quick-stat">
-                        <span class="stat-num" id="stat-presupuesto">Bs 0.00</span>
-                        <span class="stat-lbl">Presupuesto Total</span>
+                        <span class="stat-num amber" id="stat-presupuesto">Bs 0.00</span>
+                        <span class="stat-lbl">Presupuesto Total (BAC)</span>
                     </div>
                     <div class="quick-stat">
-                        <span class="stat-num text-info" id="stat-spi-promedio">0.00</span>
+                        <span class="stat-num cyan" id="stat-spi-promedio">0.00</span>
                         <span class="stat-lbl">SPI Promedio (Plazo)</span>
                     </div>
                     <div class="quick-stat">
-                        <span class="stat-num text-success" id="stat-cpi-promedio">0.00</span>
+                        <span class="stat-num emerald" id="stat-cpi-promedio">0.00</span>
                         <span class="stat-lbl">CPI Promedio (Costo)</span>
                     </div>
                 </div>
             </header>
 
-            <!-- Tab Dashboard -->
+            <!-- ═══════ TAB: DASHBOARD MONITOREO VIAL ═══════ -->
             <div id="tab-dashboard" class="tab-pane active">
                 <div class="card-focus table-card">
                     <div class="card-header flex-header">
                         <div>
-                            <h2>Control de Avance mediante Valor Ganado</h2>
+                            <h2>Control de Avance mediante Valor Ganado (EVM)</h2>
                             <p>Seguimiento de obras ejecutadas por el Servicio Departamental de Caminos y contratistas.</p>
                         </div>
-                        <button class="btn-primary" onclick="switchTab('registro')">+ Registrar Obra</button>
+                        <div class="header-actions">
+                            <button class="btn-secondary" onclick="generarReporteEjecutivoObras()">Informe A4</button>
+                            <button class="btn-primary" onclick="switchTab('registro')">+ Registrar Obra</button>
+                        </div>
+                    </div>
+
+                    <!-- Toolbar Filtros -->
+                    <div class="filter-toolbar">
+                        <div class="search-box">
+                            <svg class="search-box-icon" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                            <input type="text" id="input-buscar-obra" placeholder="Buscar proyecto vial, provincia o empresa..." oninput="filtrarObras()">
+                        </div>
+
+                        <select id="filtro-provincia-obra" onchange="filtrarObras()" class="filter-select">
+                            <option value="">Todas las Provincias de Oruro</option>
+                            <option value="Cercado">Cercado (Oruro)</option>
+                            <option value="Pantaleón Dalence">Pantaleón Dalence (Huanuni)</option>
+                            <option value="Poopó">Poopó</option>
+                            <option value="Eduardo Abaroa">Eduardo Abaroa (Challapata)</option>
+                            <option value="Sajama">Sajama (Curahuara)</option>
+                            <option value="Ladislao Cabrera">Ladislao Cabrera (Salinas)</option>
+                            <option value="Sabaya">Sabaya</option>
+                            <option value="Carangas">Carangas (Corque)</option>
+                        </select>
+
+                        <select id="filtro-estado-evm" onchange="filtrarObras()" class="filter-select">
+                            <option value="">Todos los Estados EVM</option>
+                            <option value="optimo">Excelente / En Plazo & Presupuesto</option>
+                            <option value="alerta">Alerta de Desviación</option>
+                            <option value="critico">Crítico / Sobrecosto o Retraso</option>
+                        </select>
+
+                        <div class="filter-result-badge" id="filter-result-badge-obras">0 obras</div>
                     </div>
 
                     <div class="table-responsive">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Proyecto Vial</th>
+                                    <th>Proyecto Vial / Provincia</th>
                                     <th>Presupuesto (BAC)</th>
                                     <th>Costo Real (AC)</th>
-                                    <th>Progreso (Planificado vs Real)</th>
+                                    <th>Progreso (Plan vs Real)</th>
                                     <th>SPI (Cronograma)</th>
                                     <th>CPI (Costo)</th>
-                                    <th>Desviación Monetaria</th>
-                                    <th>Acciones</th>
+                                    <th>Estado EVM</th>
+                                    <th>Acciones Rápidas</th>
                                 </tr>
                             </thead>
                             <tbody id="tabla-proyectos">
@@ -88,8 +176,7 @@
                         </table>
                         
                         <!-- Empty State -->
-                        <div id="estado-vacio" class="empty-state">
-                            <div class="empty-animation">🚧</div>
+                        <div id="estado-vacio" class="empty-state" style="display:none;">
                             <h3>Sin Obras Registradas</h3>
                             <p>No se encontraron proyectos viales cargados. Agrega uno nuevo para comenzar.</p>
                         </div>
@@ -98,93 +185,330 @@
 
                 <!-- Leyenda e Interpretación Técnica -->
                 <div class="card-focus legend-card">
-                    <h3>Guía de Interpretación de Indicadores EVM</h3>
+                    <h3>Guía de Interpretación Técnica EVM (ANSI/EIA 748)</h3>
                     <div class="legend-grid">
                         <div class="legend-item">
-                            <span class="indicator-dot dot-green"></span>
-                            <div>
-                                <strong>Rendimiento Óptimo (SPI / CPI &ge; 1.0)</strong>
-                                <p>El proyecto se ejecuta antes del plazo planificado o con menor costo del presupuestado.</p>
-                            </div>
+                            <div class="indicator-tag tag-success">SPI / CPI &gt; 1.0</div>
+                            <p><strong>Eficiencia Superior:</strong> El proyecto se ejecuta adelantado respecto al cronograma o por debajo del costo presupuestado.</p>
                         </div>
                         <div class="legend-item">
-                            <span class="indicator-dot dot-yellow"></span>
-                            <div>
-                                <strong>Rendimiento Aceptable / Alerta (0.85 - 0.99)</strong>
-                                <p>Existe un leve retraso en cronograma o un incremento menor en los costos. Requiere supervisión.</p>
-                            </div>
+                            <div class="indicator-tag tag-warning">SPI / CPI = 1.0</div>
+                            <p><strong>Conforme a Plan:</strong> Desempeño exacto según la línea base del proyecto vial.</p>
                         </div>
                         <div class="legend-item">
-                            <span class="indicator-dot dot-red"></span>
-                            <div>
-                                <strong>Desviación Crítica (&lt; 0.85)</strong>
-                                <p>Retraso grave en la entrega física o sobrecosto crítico. Alerta inmediata para auditoría física.</p>
-                            </div>
+                            <div class="indicator-tag tag-danger">SPI / CPI &lt; 1.0</div>
+                            <p><strong>Desviación Crítica:</strong> Alerta de retraso en obras o sobrecosto financiero. Requiere reprogramación.</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Tab Registro -->
+            <!-- ═══════ TAB: REGISTRO DE PROYECTO ═══════ -->
             <div id="tab-registro" class="tab-pane">
-                <div class="card-focus centered-card">
+                <div class="card-focus form-card">
                     <div class="card-header">
-                        <h2>Registrar Proyecto Vial</h2>
-                        <p>Ingrese los datos presupuestarios y de avance reportados por la supervisión de obra.</p>
+                        <h2>Registrar Nuevo Proyecto Vial</h2>
+                        <p>Incorporación de obra al catálogo del Servicio Departamental de Caminos con línea base EVM.</p>
                     </div>
 
-                    <form id="form-proyecto" onsubmit="registrarProyecto(event)">
-                        <div class="form-group">
-                            <label for="pro-nombre">Nombre de la Obra</label>
-                            <input type="text" id="pro-nombre" placeholder="Ej. Doble Vía Oruro - Challapata (Tramo II)" required autocomplete="off">
+                    <form id="form-obra" onsubmit="registrarNuevaObra(event)">
+                        <div class="form-group full-width">
+                            <label for="obra-nombre">Nombre Oficial del Proyecto Vial</label>
+                            <input type="text" id="obra-nombre" placeholder="Ej. Asfaltado Tramo Oruro - Huanuni (Fase II)" required>
                         </div>
 
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="pro-provincia">Provincia</label>
-                                <select id="pro-provincia" required>
+                                <label for="obra-provincia">Provincia del Departamento de Oruro</label>
+                                <select id="obra-provincia" required>
                                     <option value="Cercado">Cercado</option>
-                                    <option value="Eduardo Abaroa">Eduardo Abaroa</option>
                                     <option value="Pantaleón Dalence">Pantaleón Dalence</option>
                                     <option value="Poopó">Poopó</option>
-                                    <option value="Ladislao Cabrera">Ladislao Cabrera</option>
-                                    <option value="Sebastián Pagador">Sebastián Pagador</option>
+                                    <option value="Eduardo Abaroa">Eduardo Abaroa</option>
                                     <option value="Sajama">Sajama</option>
+                                    <option value="Ladislao Cabrera">Ladislao Cabrera</option>
                                     <option value="Sabaya">Sabaya</option>
+                                    <option value="Carangas">Carangas</option>
+                                    <option value="Sebastián Pagador">Sebastián Pagador</option>
+                                    <option value="Saucarí">Saucarí</option>
                                 </select>
                             </div>
 
                             <div class="form-group">
-                                <label for="pro-presupuesto">Presupuesto Asignado (Bs. BAC)</label>
-                                <input type="number" id="pro-presupuesto" min="1000" placeholder="Ej. 5000000" required>
+                                <label for="obra-empresa">Empresa Contratista / Ejecutora</label>
+                                <input type="text" id="obra-empresa" placeholder="Ej. SEDECA Oruro / Consorcio Altiplano" required>
                             </div>
                         </div>
 
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="pro-avance-plan">Avance Físico Planificado (%)</label>
-                                <input type="number" id="pro-avance-plan" min="0" max="100" placeholder="0 - 100" required>
+                                <label for="obra-bac">Presupuesto Total Planificado (BAC) en Bs.</label>
+                                <input type="number" step="0.01" id="obra-bac" placeholder="Ej. 15000000.00" required>
                             </div>
 
                             <div class="form-group">
-                                <label for="pro-avance-real">Avance Físico Real (%)</label>
-                                <input type="number" id="pro-avance-real" min="0" max="100" placeholder="0 - 100" required>
+                                <label for="obra-ac">Costo Real Ejecutado (AC) en Bs.</label>
+                                <input type="number" step="0.01" id="obra-ac" placeholder="Ej. 8200000.00" required>
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label for="pro-costo-real">Costo Real Devengado a la Fecha (Bs. AC)</label>
-                            <input type="number" id="pro-costo-real" min="0" placeholder="Ej. 4200000" required>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="obra-planificado">% Avance Físico Planificado (PV)</label>
+                                <input type="number" step="0.1" min="0" max="100" id="obra-planificado" placeholder="Ej. 60.0" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="obra-real">% Avance Físico Real Ejecutado (EV)</label>
+                                <input type="number" step="0.1" min="0" max="100" id="obra-real" placeholder="Ej. 58.5" required>
+                            </div>
                         </div>
 
-                        <button type="submit" class="btn-glow">Registrar y Procesar EVM</button>
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary" onclick="switchTab('dashboard')">Cancelar</button>
+                            <button type="submit" class="btn-glow">Guardar &amp; Calcular Indicadores EVM</button>
+                        </div>
                     </form>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Scripts -->
+    <!-- ═══════ MODAL: Ficha Técnica A4 de Certificación EVM ═══════ -->
+    <div id="modal-ficha-obra" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-actions-bar">
+                <div class="modal-title-group">
+                    <div class="modal-title-icon amber">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    </div>
+                    <div>
+                        <h3>Certificado de Auditoría EVM de Proyecto Vial</h3>
+                        <p class="modal-subtitle" id="ficha-obra-subtitle">Documento Oficial SEDECA · Ley N° 1178</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-secondary" onclick="cerrarFichaObra()">Cerrar</button>
+                    <button class="btn-primary" onclick="imprimirFichaObra()">Imprimir Certificado A4</button>
+                </div>
+            </div>
+
+            <div class="documento-resolucion" id="area-impresion-obra">
+                <div class="escudo-agua"></div>
+
+                <div class="resolucion-header">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo de Oruro" class="res-escudo">
+                    <div class="res-header-text">
+                        <h3>GOBIERNO AUTÓNOMO DEPARTAMENTAL DE ORURO</h3>
+                        <h5>SECRETARÍA DE OBRAS PÚBLICAS · SERVICIO DE CAMINOS (SEDECA)</h5>
+                        <h4 id="ficha-obra-codigo">CERTIFICADO DE AVANCE VIAL EVM N° SEDECA-2026-0001</h4>
+                    </div>
+                    <div class="seal-top-right">
+                        <div class="gold-official-seal">
+                            <span>EVM<br>SEDECA</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resolucion-body">
+                    <p class="fecha-emision">Oruro, <span id="ficha-obra-fecha">02 de Septiembre de 2026</span></p>
+
+                    <p><strong>CERTIFICACIÓN DE AUDITORÍA FINANCIERA Y FÍSICA:</strong> El Servicio Departamental de Caminos (SEDECA) certifica la evaluación de desempeño del proyecto de infraestructura vial mediante la metodología internacional de Valor Ganado (Earned Value Management - ANSI/EIA 748).</p>
+
+                    <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.86rem;color:#000;" border="1" cellpadding="8">
+                        <tr>
+                            <td style="background:#f8fafc;font-weight:700;width:32%;">PROYECTO VIAL:</td>
+                            <td><strong id="ficha-obra-nombre" style="color:#b45309;">Asfaltado Tramo Oruro - Huanuni</strong></td>
+                        </tr>
+                        <tr>
+                            <td style="background:#f8fafc;font-weight:700;">PROVINCIA / UBICACIÓN:</td>
+                            <td><span id="ficha-obra-provincia">Pantaleón Dalence</span> | Empresa: <strong id="ficha-obra-empresa">Consorcio Altiplano</strong></td>
+                        </tr>
+                        <tr>
+                            <td style="background:#f8fafc;font-weight:700;">PRESUPUESTO TOTAL (BAC):</td>
+                            <td><strong id="ficha-obra-bac" style="color:#059669;">Bs. 15.000.000,00</strong></td>
+                        </tr>
+                        <tr>
+                            <td style="background:#f8fafc;font-weight:700;">COSTO REAL EJECUTADO (AC):</td>
+                            <td id="ficha-obra-ac">Bs. 8.200.000,00</td>
+                        </tr>
+                        <tr>
+                            <td style="background:#f8fafc;font-weight:700;">INDICADORES EVM:</td>
+                            <td>SPI (Cronograma): <strong id="ficha-obra-spi" style="color:#0284c7;">1.02</strong> | CPI (Costo): <strong id="ficha-obra-cpi" style="color:#059669;">1.05</strong></td>
+                        </tr>
+                        <tr>
+                            <td style="background:#f8fafc;font-weight:700;">ESTIMADO AL FINALIZAR (EAC):</td>
+                            <td><strong id="ficha-obra-eac" style="color:#b45309;">Bs. 14.285.714,29</strong> (Ahorro proyectado)</td>
+                        </tr>
+                    </table>
+
+                    <p><strong>DICTAMEN TÉCNICO:</strong> La obra presenta un desempeño <strong id="ficha-obra-dictamen">Excelente</strong>. Se autoriza la prosecución de desembolsos según planilla de avance físico.</p>
+                </div>
+
+                <div class="resolucion-verification-row">
+                    <div class="qr-box-simulated">
+                        <svg width="56" height="56" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M2 2h8v8H2V2zm2 2v4h4V4H4zm8-2h8v8h-8V2zm2 2v4h4V4h-4zM2 14h8v8H2v-8zm2 2v4h4v-4H4zm13-2h3v3h-3v-3zm0 5h3v3h-3v-3zm-5-5h3v3h-3v-3zm0 5h3v3h-3v-3z"/>
+                        </svg>
+                        <span>Sello Digital EVM SEDECA Oruro</span>
+                    </div>
+
+                    <div class="security-hash-block">
+                        <small>HASH DE AUDITORÍA DE INVERSIÓN PÚBLICA:</small>
+                        <code id="ficha-obra-hash">SHA256: 91fa82b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7f6</code>
+                    </div>
+                </div>
+
+                <div class="resolucion-firmas">
+                    <div class="firma-block">
+                        <div class="linea-firma"></div>
+                        <p><strong>Fiscal de Obra (SEDECA)</strong></p>
+                        <p>Ingeniero Residente Departamental</p>
+                    </div>
+                    <div class="firma-block">
+                        <div class="linea-firma"></div>
+                        <p><strong>Director Departamental de Caminos</strong></p>
+                        <p>Gobierno Autónomo Departamental de Oruro</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════ MODAL: Audit Timeline Obra ═══════ -->
+    <div id="modal-timeline-obra" class="modal-overlay">
+        <div class="modal-content" style="max-width:680px;">
+            <div class="modal-actions-bar">
+                <div class="modal-title-group">
+                    <div class="modal-title-icon cyan">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <div>
+                        <h3>Línea de Tiempo del Proyecto Vial</h3>
+                        <p class="modal-subtitle" id="timeline-obra-subtitle">Hitos y Planillas de Avance</p>
+                    </div>
+                </div>
+                <button class="btn-secondary" onclick="cerrarTimelineObra()">✕</button>
+            </div>
+            <div style="padding:28px;" id="timeline-obra-body">
+                <!-- Dinámico -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════ MODAL: Calculadora EVM Interactiva ═══════ -->
+    <div id="modal-calc-evm" class="modal-overlay">
+        <div class="modal-content" style="max-width:600px;">
+            <div class="modal-actions-bar">
+                <div class="modal-title-group">
+                    <div class="modal-title-icon amber">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="8" y="8" width="8" height="4"/><path d="M8 16h.01M12 16h.01M16 16h.01"/></svg>
+                    </div>
+                    <div>
+                        <h3>Simulador y Calculadora EVM</h3>
+                        <p class="modal-subtitle">Estimaciones de Costo al Finalizar (EAC)</p>
+                    </div>
+                </div>
+                <button class="btn-secondary" onclick="cerrarCalculadoraEVMDirecta()">✕</button>
+            </div>
+            <div style="padding:28px;">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>BAC (Presupuesto Total)</label>
+                        <input type="number" id="calc-bac" value="10000000" oninput="simularEVM()">
+                    </div>
+                    <div class="form-group">
+                        <label>AC (Costo Real Ejecutado)</label>
+                        <input type="number" id="calc-ac" value="5000000" oninput="simularEVM()">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>% PV (Planificado)</label>
+                        <input type="number" id="calc-pv" value="50" oninput="simularEVM()">
+                    </div>
+                    <div class="form-group">
+                        <label>% EV (Real Ganado)</label>
+                        <input type="number" id="calc-ev" value="52" oninput="simularEVM()">
+                    </div>
+                </div>
+
+                <div id="calc-evm-results-box" style="margin-top:20px;background:rgba(255,255,255,0.03);border:1px solid var(--border-main);padding:18px;border-radius:12px;">
+                    <!-- Resultados simulados -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════ IMPRESIÓN INFORME EJECUTIVO OBRAS A4 ═══════ -->
+    <div id="area-impresion-reporte-obras" class="documento-resolucion" style="display:none;">
+        <div class="resolucion-header">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo" class="res-escudo">
+            <div class="res-header-text">
+                <h3>GOBIERNO AUTÓNOMO DEPARTAMENTAL DE ORURO</h3>
+                <h5>SECRETARÍA DE OBRAS PÚBLICAS · AUDITORÍA DE INVERSIÓN PÚBLICA</h5>
+                <h4>INFORME EJECUTIVO CONSOLIDADO DE PROYECTOS VIALES (EVM)</h4>
+            </div>
+            <div class="gold-official-seal">
+                <span>AUDITORÍA<br>OBRAS</span>
+            </div>
+        </div>
+
+        <div class="resolucion-body">
+            <p class="fecha-emision">Oruro, <span id="reporte-obras-fecha">02 de Septiembre de 2026</span></p>
+
+            <p><strong>INFORME DE INVERSIÓN PÚBLICA:</strong> Se presenta el resumen consolidado de desempeño presupuestario y avance de obras viales fiscalizadas por la Gobernación de Oruro.</p>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin:24px 0;text-align:center;border:1px solid #cbd5e1;padding:16px;border-radius:8px;background:#f8fafc;">
+                <div>
+                    <h5 style="color:#64748b;font-size:0.7rem;">PRESUPUESTO TOTAL (BAC)</h5>
+                    <h3 style="font-size:1.3rem;color:#b45309;" id="rep-obra-bac">Bs. 0.00</h3>
+                </div>
+                <div>
+                    <h5 style="color:#0284c7;font-size:0.7rem;">SPI PROMEDIO (PLAZO)</h5>
+                    <h3 style="font-size:1.5rem;color:#0284c7;" id="rep-obra-spi">1.00</h3>
+                </div>
+                <div>
+                    <h5 style="color:#059669;font-size:0.7rem;">CPI PROMEDIO (COSTO)</h5>
+                    <h3 style="font-size:1.5rem;color:#059669;" id="rep-obra-cpi">1.00</h3>
+                </div>
+            </div>
+
+            <table style="width:100%;border-collapse:collapse;margin-top:20px;font-size:0.8rem;color:#000;" border="1" cellpadding="6">
+                <thead>
+                    <tr style="background:#e2e8f0;">
+                        <th>Proyecto Vial</th>
+                        <th>Provincia</th>
+                        <th>BAC (Bs.)</th>
+                        <th>AC (Costo Real)</th>
+                        <th>SPI</th>
+                        <th>CPI</th>
+                        <th>Estado EVM</th>
+                    </tr>
+                </thead>
+                <tbody id="reporte-obras-tabla-body">
+                    <!-- Dinámico -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="resolucion-firmas">
+            <div class="firma-block">
+                <div class="linea-firma"></div>
+                <p><strong>Secretaría de Obras Públicas</strong></p>
+                <p>GAD-ORURO</p>
+            </div>
+            <div class="firma-block">
+                <div class="linea-firma"></div>
+                <p><strong>Director Departamental de Caminos</strong></p>
+                <p>SEDECA Oruro</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
     <script src="./src/main.js"></script>
 </body>
 </html>

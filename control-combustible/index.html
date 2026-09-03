@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gobernación de Oruro — Control & Surtidor de Combustible Oficial</title>
     <meta name="description" content="Sistema de gestión, despacho y fiscalización de carburantes (Gasolina & Diésel) — Gobernación Autónoma Departamental de Oruro.">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./assets/css/styles.css">
 </head>
 <body class="theme-fuel-station">
@@ -18,12 +18,13 @@
         <!-- ══════════════ HEADER OPERATIVO TIPO SURTIDOR ══════════════ -->
         <header class="fuel-header-bar">
             <div class="fuel-brand-group">
-                <div class="fuel-brand-logo">
-                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                <div class="brand-escudo-wrap">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo de Oruro" class="brand-escudo">
+                    <div class="brand-pulse-ring"></div>
                 </div>
                 <div>
-                    <h1 class="fuel-brand-title">SURTIDOR & DEPOSITOS GAD-ORU</h1>
-                    <p class="fuel-brand-sub">CONTROL DE CARBURANTES · LEY N° 1178</p>
+                    <h1 class="fuel-brand-title">SURTIDOR & DEPÓSITOS GAD-ORU</h1>
+                    <p class="fuel-brand-sub">CONTROL DE CARBURANTES · LEY N° 1178 · ANH / B-SISA</p>
                 </div>
             </div>
 
@@ -35,7 +36,7 @@
                 </div>
                 <div class="fuel-operator-badge">
                     <div class="operator-avatar-fuel">TS</div>
-                    <span>Tesorería & Surtidores</span>
+                    <span>Tesorería &amp; Surtidores</span>
                 </div>
             </div>
         </header>
@@ -106,242 +107,293 @@
                         <span class="tank-sub-lbl">Estado Depósito</span>
                         <span class="tank-status-pill ok" id="status-diesel">🟢 Operativo</span>
                     </div>
-                    <button class="btn-refill-sm" onclick="recargarTanque('Diésel Oíl')">+ Reponer</button>
+                    <button class="btn-refill-sm diesel" onclick="recargarTanque('Diésel Oíl')">+ Reponer</button>
                 </div>
             </div>
         </section>
 
-        <!-- ══════════════ NAVEGACIÓN Y PANEL PRINCIPAL ══════════════ -->
-        <main class="fuel-main-layout">
-            <!-- Tab Navigation Tabs -->
-            <div class="fuel-tabs-bar">
-                <button class="fuel-tab-btn active" id="tab-btn-vales" onclick="switchTab('vales')">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                    Bandeja de Vales Despachados (<span id="cnt-vales">0</span>)
-                </button>
-
-                <button class="fuel-tab-btn" id="tab-btn-emitir" onclick="switchTab('emitir')">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-                    Emitir Vale / Despacho
-                </button>
-
-                <button class="fuel-tab-btn" onclick="abrirVerificadorDirecto()">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                    Verificador de Firma SHA-256
-                </button>
-
-                <button class="fuel-tab-btn" onclick="exportarCSV()">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    Exportar Reporte CSV
-                </button>
-            </div>
-
-            <!-- Tab Pane: Vales -->
-            <div id="pane-vales" class="fuel-pane active">
-                <div class="fuel-table-card">
-                    <div class="fuel-table-toolbar">
-                        <div class="fuel-search-input-wrap">
-                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                            <input type="text" id="input-buscar" placeholder="Buscar por código, conductor, placa o comisión..." oninput="filtrarVales()">
-                            <span class="k-badge">Ctrl+K</span>
-                        </div>
-
-                        <select id="filtro-tipo" onchange="filtrarVales()" class="fuel-select">
-                            <option value="">Todos los Carburantes</option>
-                            <option value="Gasolina Especial">Gasolina Especial</option>
-                            <option value="Diésel Oíl">Diésel Oíl</option>
-                        </select>
-
-                        <div class="result-count-tag" id="filter-result-badge">0 Vales</div>
+        <!-- ══════════════ TABLA DE DESPACHOS Y CONTROLES ══════════════ -->
+        <main class="fuel-main-content">
+            <div class="fuel-table-card">
+                <div class="table-header-bar">
+                    <div>
+                        <h2>Registro de Vales de Despacho B-SISA</h2>
+                        <p>Planilla digital de carburantes asignados al parque automotor y maquinaria pesada SEDECA.</p>
                     </div>
 
-                    <div class="fuel-table-wrap">
-                        <table class="fuel-table">
-                            <thead>
-                                <tr>
-                                    <th onclick="ordenarPor('codigo')" class="th-sort">Código Vale <span>↕</span></th>
-                                    <th onclick="ordenarPor('conductor')" class="th-sort">Conductor Comisionado <span>↕</span></th>
-                                    <th onclick="ordenarPor('placa')" class="th-sort">Placa Vehículo <span>↕</span></th>
-                                    <th>Carburante</th>
-                                    <th onclick="ordenarPor('litros')" class="th-sort">Volumen (Litros) <span>↕</span></th>
-                                    <th>Token Hash SHA-256</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-vales">
-                                <!-- Filas dinámicas -->
-                            </tbody>
-                        </table>
-
-                        <div id="estado-vacio" class="empty-state-fuel" style="display:none;">
-                            <div class="empty-fuel-icon">⛽</div>
-                            <h3>Sin Vales Registrados</h3>
-                            <p>No hay cupones de combustible coincidentes con la búsqueda.</p>
-                        </div>
-                    </div>
-
-                    <div class="fuel-table-footer">
-                        <span id="table-total-count">0 vales conciliados</span>
-                        <span id="table-total-litros" class="litros-sum-tag">0 Litros Despachados</span>
+                    <div class="table-header-actions">
+                        <button class="btn-secondary" onclick="generarReporteEjecutivoCombustible()">Informe A4</button>
+                        <button class="btn-fuel-primary" onclick="abrirModalNuevoDespacho()">+ Nuevo Despacho</button>
                     </div>
                 </div>
-            </div>
 
-            <!-- Tab Pane: Emitir -->
-            <div id="pane-emitir" class="fuel-pane">
-                <div class="fuel-form-card">
-                    <div class="form-card-title">
-                        <div class="form-title-icon">✍️</div>
-                        <div>
-                            <h2>Emisión de Vale de Despacho</h2>
-                            <p>Complete el formulario de comisión oficial para generar el cupón térmico firmado con token Hash.</p>
-                        </div>
+                <!-- Toolbar Filtros -->
+                <div class="filter-toolbar" style="margin-bottom:16px;display:flex;gap:10px;">
+                    <input type="text" id="input-buscar-vale" placeholder="Buscar por vale, placa, conductor o unidad..." oninput="filtrarVales()" style="flex:1;padding:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:white;">
+                    <select id="filtro-combustible-tipo" onchange="filtrarVales()" style="padding:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:white;">
+                        <option value="">Todos los Combustibles</option>
+                        <option value="Gasolina Especial">Gasolina Especial</option>
+                        <option value="Diésel Oíl">Diésel Oíl</option>
+                    </select>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="fuel-table">
+                        <thead>
+                            <tr>
+                                <th>N° Vale B-SISA</th>
+                                <th>Vehículo / Placa</th>
+                                <th>Unidad / Secretaría</th>
+                                <th>Conductor</th>
+                                <th>Carburante</th>
+                                <th>Volumen (Lts)</th>
+                                <th>Costo Total (Bs.)</th>
+                                <th>Acciones Rápidas</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-vales-body">
+                            <!-- Filas dinámicas -->
+                        </tbody>
+                    </table>
+
+                    <div id="estado-vacio-combustible" class="empty-state" style="display:none;padding:40px;text-align:center;">
+                        <h3>Sin Despachos Registrados</h3>
+                        <p>No se encontraron vales de combustible registrados.</p>
                     </div>
-
-                    <form id="form-vale" onsubmit="registrarVale(event)">
-                        <div class="f-grid-2">
-                            <div class="f-group">
-                                <label for="val-conductor">Conductor Destinatario</label>
-                                <input type="text" id="val-conductor" placeholder="Nombre completo del servidor público" required>
-                            </div>
-                            <div class="f-group">
-                                <label for="val-placa">Placa del Vehículo Oficial</label>
-                                <input type="text" id="val-placa" placeholder="Ej. 2451-FDS" required style="text-transform:uppercase;">
-                            </div>
-                        </div>
-
-                        <div class="f-grid-2">
-                            <div class="f-group">
-                                <label for="val-tipo">Tipo de Carburante</label>
-                                <select id="val-tipo" required>
-                                    <option value="Gasolina Especial">Gasolina Especial (Tanque Depósito 01)</option>
-                                    <option value="Diésel Oíl">Diésel Oíl (Tanque SEDECA 02)</option>
-                                </select>
-                            </div>
-                            <div class="f-group">
-                                <label for="val-litros">Cantidad a Despachar (Litros)</label>
-                                <input type="number" id="val-litros" min="5" max="250" placeholder="Ej. 40" required>
-                            </div>
-                        </div>
-
-                        <div class="f-group full">
-                            <label for="val-destino">Ruta de Comisión / Justificación Institucional</label>
-                            <input type="text" id="val-destino" placeholder="Ej. Inspección de Tramos Viales Oruro - Huanuni - Challapata" required>
-                        </div>
-
-                        <div class="f-actions">
-                            <button type="button" class="btn-fuel-sec" onclick="switchTab('vales')">Cancelar</button>
-                            <button type="submit" class="btn-fuel-main">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                                Emitir Vale y Firmar Token SHA-256
-                            </button>
-                        </div>
-                    </form>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- ═══════ MODAL TICKET TÉRMICO IMPRIMIBLE ═══════ -->
-    <div id="modal-boleta" class="modal-overlay">
-        <div class="modal-content-fuel">
+    <!-- ═══════ MODAL: Nuevo Despacho ═══════ -->
+    <div id="modal-nuevo-despacho" class="modal-overlay">
+        <div class="modal-content" style="max-width:580px;">
             <div class="modal-actions-bar">
                 <div class="modal-title-group">
-                    <div class="modal-title-icon">🎟️</div>
+                    <div class="modal-title-icon amber">⛽</div>
                     <div>
-                        <h3>Boleta Térmica de Vale Emitido</h3>
-                        <p class="modal-subtitle" id="t-codigo-sub">VAL-2026-0001 · GAD-ORU</p>
+                        <h3>Emisión de Vale de Combustible B-SISA</h3>
+                        <p class="modal-subtitle">Asignación oficial a vehículo departamental</p>
                     </div>
                 </div>
-                <button class="btn-close-fuel" onclick="cerrarModal()">✕</button>
+                <button class="btn-secondary" onclick="cerrarModalNuevoDespacho()">✕</button>
             </div>
 
-            <div class="ticket-wrapper">
-                <div class="ticket-combustible" id="ticket-impresion">
-                    <div class="ticket-header">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo Oruro" class="ticket-escudo">
-                        <h3>GOBIERNO AUTÓNOMO DE ORURO</h3>
-                        <p class="ticket-sub">VALE DE COMBUSTIBLE OFICIAL</p>
-                        <p class="sub-ticket-info">Sistemas Administrativos · Ley N° 1178</p>
+            <form id="form-despacho" onsubmit="registrarDespacho(event)" style="padding:24px;">
+                <div class="form-group">
+                    <label>Vehículo / Placa / B-SISA</label>
+                    <input type="text" id="desp-vehiculo" placeholder="Ej. Camioneta Toyota Hilux (4521-FDS)" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Secretaría / Unidad</label>
+                        <select id="desp-unidad" required>
+                            <option value="Servicio de Caminos (SEDECA)">Servicio de Caminos (SEDECA)</option>
+                            <option value="Secretaría General">Secretaría General</option>
+                            <option value="Secretaría de Obras Públicas">Secretaría de Obras Públicas</option>
+                            <option value="Secretaría de Medio Ambiente">Secretaría de Medio Ambiente</option>
+                            <option value="Dirección Jurídica">Dirección Jurídica</option>
+                        </select>
                     </div>
-
-                    <div class="ticket-divider">*********************************</div>
-
-                    <div class="ticket-details">
-                        <div class="t-row"><span>CÓDIGO VALE:</span><strong id="t-codigo">VAL-2026-0001</strong></div>
-                        <div class="t-row"><span>FECHA EMISIÓN:</span><span id="t-fecha">13 Jul 2026</span></div>
-                        <div class="t-row"><span>CONDUCTOR:</span><span id="t-conductor">Nombre Conductor</span></div>
-                        <div class="t-row"><span>PLACA VEHÍCULO:</span><strong id="t-placa">2451-FDS</strong></div>
-                        <div class="t-row"><span>CARBURANTE:</span><span id="t-tipo">Gasolina Especial</span></div>
-                        <div class="t-row"><span>CANTIDAD:</span><strong id="t-litros">40 Litros</strong></div>
-                        <div class="t-row"><span>DESTINO:</span><span id="t-destino">Comisión de Servicio</span></div>
+                    <div class="form-group">
+                        <label>Conductor Asignado</label>
+                        <input type="text" id="desp-conductor" placeholder="Ej. Marcos Mamani" required>
                     </div>
+                </div>
 
-                    <div class="ticket-divider">*********************************</div>
-
-                    <div class="ticket-seguridad">
-                        <p class="token-lbl">TOKEN HASH SHA-256 DE AUDITORÍA:</p>
-                        <div class="token-value" id="t-token">SHA-OR-23423A3B43C56D78</div>
-
-                        <div class="barcode-simulado">
-                            <div class="bar w1"></div><div class="bar w3"></div><div class="bar w2"></div>
-                            <div class="bar w1"></div><div class="bar w4"></div><div class="bar w1"></div>
-                            <div class="bar w2"></div><div class="bar w3"></div><div class="bar w1"></div>
-                            <div class="bar w4"></div><div class="bar w2"></div><div class="bar w1"></div>
-                        </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tipo de Carburante</label>
+                        <select id="desp-tipo" required onchange="actualizarPrecioCalculado()">
+                            <option value="Gasolina Especial">Gasolina Especial (Bs. 3.74 / Lt)</option>
+                            <option value="Diésel Oíl">Diésel Oíl (Bs. 3.72 / Lt)</option>
+                        </select>
                     </div>
+                    <div class="form-group">
+                        <label>Volumen a Cargar (Litros)</label>
+                        <input type="number" step="0.5" id="desp-litros" placeholder="Ej. 60.0" required oninput="actualizarPrecioCalculado()">
+                    </div>
+                </div>
 
-                    <div class="ticket-firmas">
-                        <div class="ticket-firma-line">
-                            <div class="f-line"></div>
-                            <p>Firma Responsable</p>
-                            <p>Tesorería GAD-ORU</p>
-                        </div>
-                        <div class="ticket-firma-line">
-                            <div class="f-line"></div>
-                            <p>Firma Conductor</p>
-                            <p>Beneficiario</p>
+                <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);padding:14px;border-radius:10px;margin-bottom:20px;text-align:center;">
+                    <span style="font-size:0.75rem;color:var(--text-muted);">COSTO TOTAL ESTIMADO:</span>
+                    <h3 style="font-family:var(--font-mono);color:var(--primary-light);font-size:1.4rem;" id="desp-costo-preview">Bs. 0.00</h3>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="cerrarModalNuevoDespacho()">Cancelar</button>
+                    <button type="submit" class="btn-glow">Emitir Vale &amp; Despachar Carburante</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ═══════ MODAL: Vale A4 Membretado SAFCO ═══════ -->
+    <div id="modal-ficha-vale" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-actions-bar">
+                <div class="modal-title-group">
+                    <div class="modal-title-icon amber">📄</div>
+                    <div>
+                        <h3>Vale Oficial de Despacho de Combustible SAFCO</h3>
+                        <p class="modal-subtitle" id="ficha-vale-subtitle">Documento Oficial · Ley N° 1178 · B-SISA ANH</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-secondary" onclick="cerrarFichaVale()">Cerrar</button>
+                    <button class="btn-primary" onclick="imprimirFichaVale()">Imprimir Vale A4</button>
+                </div>
+            </div>
+
+            <div class="documento-resolucion" id="area-impresion-vale">
+                <div class="escudo-agua"></div>
+
+                <div class="resolucion-header">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo" class="res-escudo">
+                    <div class="res-header-text">
+                        <h3>GOBIERNO AUTÓNOMO DEPARTAMENTAL DE ORURO</h3>
+                        <h5>SURTIDOR CENTRAL & DEPÓSITOS DE CARBURANTES · LEY N° 1178</h5>
+                        <h4 id="ficha-vale-codigo">VALE DE DESPACHO DE COMBUSTIBLE N° VALE-2026-0001</h4>
+                    </div>
+                    <div class="seal-top-right">
+                        <div class="gold-official-seal">
+                            <span>B-SISA<br>ANH</span>
                         </div>
                     </div>
                 </div>
 
-                <button class="btn-fuel-main btn-full" onclick="imprimirBoleta()">
-                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-                    Imprimir Vale Térmico
-                </button>
+                <div class="resolucion-body">
+                    <p class="fecha-emision">Oruro, <span id="ficha-vale-fecha">02 de Septiembre de 2026</span></p>
+
+                    <p><strong>AUTORIZACIÓN DE CARGA DE CARBURANTE:</strong> Se autoriza el despacho oficial de combustible del Tanque Central de la Gobernación de Oruro para el vehículo del parque automotor asignado a funciones institucionales.</p>
+
+                    <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.86rem;color:#000;" border="1" cellpadding="8">
+                        <tr>
+                            <td style="background:#f8fafc;font-weight:700;width:32%;">CÓDIGO VALE B-SISA:</td>
+                            <td><strong id="ficha-vale-num" style="color:#b45309;">VALE-2026-0001</strong></td>
+                        </tr>
+                        <tr>
+                            <td style="background:#f8fafc;font-weight:700;">VEHÍCULO / PLACA:</td>
+                            <td><strong id="ficha-vale-vehiculo">Camioneta Toyota Hilux (4521-FDS)</strong></td>
+                        </tr>
+                        <tr>
+                            <td style="background:#f8fafc;font-weight:700;">SECRETARÍA / UNIDAD:</td>
+                            <td id="ficha-vale-unidad">Servicio de Caminos (SEDECA)</td>
+                        </tr>
+                        <tr>
+                            <td style="background:#f8fafc;font-weight:700;">CONDUCTOR AUTORIZADO:</td>
+                            <td id="ficha-vale-conductor">Marcos Mamani Choque</td>
+                        </tr>
+                        <tr>
+                            <td style="background:#f8fafc;font-weight:700;">CARBURANTE & VOLUMEN:</td>
+                            <td><span id="ficha-vale-tipo">Gasolina Especial</span> | Carga: <strong id="ficha-vale-litros" style="color:#0284c7;">60.0 Lts</strong></td>
+                        </tr>
+                        <tr>
+                            <td style="background:#f8fafc;font-weight:700;">IMPORTE TOTAL:</td>
+                            <td><strong id="ficha-vale-costo" style="color:#059669;">Bs. 224,40</strong></td>
+                        </tr>
+                    </table>
+
+                    <p><strong>DECLARACIÓN DE CONFORMIDAD:</strong> El conductor declara recibir el volumen exacto de carburante surtido exclusivamente para el cumplimiento de tareas departamentales.</p>
+                </div>
+
+                <div class="resolucion-verification-row">
+                    <div class="qr-box-simulated">
+                        <svg width="56" height="56" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M2 2h8v8H2V2zm2 2v4h4V4H4zm8-2h8v8h-8V2zm2 2v4h4V4h-4zM2 14h8v8H2v-8zm2 2v4h4v-4H4zm13-2h3v3h-3v-3zm0 5h3v3h-3v-3zm-5-5h3v3h-3v-3zm0 5h3v3h-3v-3z"/>
+                        </svg>
+                        <span>Registro ANH B-SISA Certificado</span>
+                    </div>
+
+                    <div class="security-hash-block">
+                        <small>HASH DE AUDITORÍA SAFCO CARBURANTES:</small>
+                        <code id="ficha-vale-hash">SHA256: 4521fds9876543210123456789abcdef0123456789abcdef0123456789abcdef</code>
+                    </div>
+                </div>
+
+                <div class="resolucion-firmas">
+                    <div class="firma-block">
+                        <div class="linea-firma"></div>
+                        <p><strong>Conductor Recibidor</strong></p>
+                        <p>Servidor Público Asignado</p>
+                    </div>
+                    <div class="firma-block">
+                        <div class="linea-firma"></div>
+                        <p><strong>Encargado de Surtidores &amp; Carburantes</strong></p>
+                        <p>Gobierno Autónomo Departamental de Oruro</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- ═══════ MODAL: Verificador de Token ═══════ -->
-    <div id="modal-verificador" class="modal-overlay">
-        <div class="modal-content-fuel">
-            <div class="modal-actions-bar">
-                <div class="modal-title-group">
-                    <div class="modal-title-icon">🔍</div>
-                    <div>
-                        <h3>Verificador Antifraude de Token</h3>
-                        <p class="modal-subtitle">Validación Criptográfica · GAD-ORU</p>
-                    </div>
+    <!-- ═══════ IMPRESIÓN REPORTE EJECUTIVO COMBUSTIBLE A4 ═══════ -->
+    <div id="area-impresion-reporte-combustible" class="documento-resolucion" style="display:none;">
+        <div class="resolucion-header">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo" class="res-escudo">
+            <div class="res-header-text">
+                <h3>GOBIERNO AUTÓNOMO DEPARTAMENTAL DE ORURO</h3>
+                <h5>TESORERÍA Y CONTAMINACIÓN FISCAL · CONTROL DE CARBURANTES SAFCO</h5>
+                <h4>INFORME EJECUTIVO DE DESPACHO DE COMBUSTIBLE (B-SISA)</h4>
+            </div>
+            <div class="gold-official-seal">
+                <span>AUDITORÍA<br>CARBURANTES</span>
+            </div>
+        </div>
+
+        <div class="resolucion-body">
+            <p class="fecha-emision">Oruro, <span id="reporte-comb-fecha">02 de Septiembre de 2026</span></p>
+
+            <p><strong>RESUMEN DE CONSUMO INSTITUCIONAL:</strong> Se presenta el consolidado de volumen de combustible surtido al parque automotor y maquinaria de la Gobernación de Oruro.</p>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin:24px 0;text-align:center;border:1px solid #cbd5e1;padding:16px;border-radius:8px;background:#f8fafc;">
+                <div>
+                    <h5 style="color:#64748b;font-size:0.7rem;">TOTAL VALES</h5>
+                    <h3 style="font-size:1.5rem;color:#0f172a;" id="rep-comb-vales">0</h3>
                 </div>
-                <button class="btn-close-fuel" onclick="cerrarVerificadorDirecto()">✕</button>
+                <div>
+                    <h5 style="color:#0284c7;font-size:0.7rem;">VOLUMEN SURTIDO (LTS)</h5>
+                    <h3 style="font-size:1.5rem;color:#0284c7;" id="rep-comb-litros">0 Lts</h3>
+                </div>
+                <div>
+                    <h5 style="color:#059669;font-size:0.7rem;">COSTO TOTAL FISCAL</h5>
+                    <h3 style="font-size:1.4rem;color:#059669;" id="rep-comb-costo">Bs. 0.00</h3>
+                </div>
             </div>
 
-            <div class="ticket-wrapper">
-                <div class="f-group full">
-                    <label>Token Hash SHA-256 a Verificar</label>
-                    <div style="display:flex;gap:8px;margin-top:6px;">
-                        <input type="text" id="input-token-verificar" placeholder="Ej. SHA-OR-8F32C69DA564" style="text-transform:uppercase;flex:1;padding:10px;" onkeydown="if(event.key==='Enter'){verificarToken();}">
-                        <button class="btn-fuel-main" onclick="verificarToken()">Verificar</button>
-                    </div>
-                </div>
+            <table style="width:100%;border-collapse:collapse;margin-top:20px;font-size:0.8rem;color:#000;" border="1" cellpadding="6">
+                <thead>
+                    <tr style="background:#e2e8f0;">
+                        <th>Vale B-SISA</th>
+                        <th>Vehículo</th>
+                        <th>Unidad</th>
+                        <th>Carburante</th>
+                        <th>Volumen (Lts)</th>
+                        <th>Importe (Bs.)</th>
+                    </tr>
+                </thead>
+                <tbody id="reporte-comb-tabla-body">
+                    <!-- Dinámico -->
+                </tbody>
+            </table>
+        </div>
 
-                <div id="resultado-verificacion" class="verification-box" style="display:none;"></div>
+        <div class="resolucion-firmas">
+            <div class="firma-block">
+                <div class="linea-firma"></div>
+                <p><strong>Unidad de Carburantes SAFCO</strong></p>
+                <p>GAD-ORURO</p>
+            </div>
+            <div class="firma-block">
+                <div class="linea-firma"></div>
+                <p><strong>Auditoría Interna SAFCO</strong></p>
+                <p>Gobierno Autónomo Departamental de Oruro</p>
             </div>
         </div>
     </div>
 
-    <!-- Toast Notifications -->
+    <!-- Toast Container -->
     <div id="toast-container" class="toast-container"></div>
 
     <script src="./src/main.js"></script>

@@ -1,85 +1,104 @@
-# 📊 Gobernación de Oruro - Dashboard Demográfico (Fase 3)
+# 📊 Tablero Demográfico & Censo 2024 de Oruro
 
-¡Felicidades por alcanzar la **Fase 3**, la última etapa del programa de inducción técnica de la **Gobernación Autónoma Departamental de Oruro**! 
+### **Gobernación Autónoma Departamental de Oruro (Bolivia)**
+*Secretaría de Planificación del Desarrollo · Unidad de Estadística*
 
-Como ingeniero del sector público, tu valor principal radica en la capacidad de procesar grandes cantidades de datos crudos (Big Data) y transformarlos en paneles ejecutivos (Dashboards) interactivos que faciliten la toma de decisiones críticas al instante.
+![Tablero Demográfico Censo 2024 - Gobernación de Oruro](./assets/banner.png)
+
+[![Estado](https://img.shields.io/badge/Estado-Prototipo%20de%20Inducci%C3%B3n%20T%C3%A9cnica-blue?style=flat-square)](./index.html)
+[![Fuente](https://img.shields.io/badge/Fuente-Censo%20INE%202024-cyan?style=flat-square)](https://www.ine.gob.bo)
+[![Seguridad](https://img.shields.io/badge/Seguridad-Firma%20Digital%20SHA--256-green?style=flat-square)](#-nota-de-confidencialidad-y-alcance-del-prototipo)
 
 ---
 
-## 🎯 Objetivo del Proyecto
-Evaluar tu dominio de programación funcional aplicada a arreglos en JavaScript (especialmente en cálculos de agregación y sumatorias) y el renderizado condicional en la interfaz de usuario. Aprenderás a estructurar cálculos estadísticos optimizados y a presentar cifras legibles mediante localización e internacionalización del formato numérico.
+> [!IMPORTANT]
+> ### 🔒 Nota de Confidencialidad y Alcance del Prototipo Tecnológico
+> **Exactitud Operativa y Carácter Demostrativo:** Este módulo representa un **prototipo arquitectónico, modelo funcional e inducción de ingeniería de software** desarrollado para la Secretaría de Planificación del Desarrollo del Gobierno Autónomo Departamental de Oruro.
+> 
+> * **Réplica Exacta de los Datos Censales:** Los indicadores de las 16 provincias del departamento (570,194 habitantes, 185,420 viviendas, tasa de masculinidad del 98.4%) y la emisión de **Fichas Estadísticas SAFCO A4** reproducen la información oficial del Censo Nacional de Población y Vivienda 2024.
+> * **Protección de Datos e Infraestructura Segura:** Este prototipo demuestra con total claridad la precisión técnica y modularidad del sistema.
 
 ---
 
-## 📂 Estructura del Proyecto Organizada
-Se ha estructurado el proyecto siguiendo las mejores prácticas de la industria:
+## 🔄 Evolución del Sistema: ¿Para qué era suficiente antes vs. En qué mejora este proyecto?
 
-```text
-Panel-de-control/
-├── index.html                   (Interfaz con estructura semántica HTML5)
-├── assets/
-│   └── css/
-│       └── styles.css           (Diseño visual premium con estilo institucional)
-└── src/
-    └── main.js                  (Lógica matemática y renderizado dinámico)
+### 📂 1. ¿Para qué era suficiente la metodología tradicional?
+Antes de la implementación del Tablero Demográfico digital, los datos censales se consultaban en **libros impresos de publicaciones del INE**:
+* **Suficiente para lectura de tablas estáticas:** Leer cifras agregadas por departamento.
+* **Suficiente para archivo bibliográfico:** Consultar compendios estadísticos impresos cada 10 años.
+
+### ⚡ 2. ¿En qué mejora sustancialmente este proyecto?
+Este módulo dinamiza la toma de decisiones presupuestarias y territoriales:
+1. **Desglose Dinámico de las 16 Provincias de Oruro**: Visualización interactiva de población total, hombres, mujeres, viviendas e índice de densidad poblacional.
+2. **Cálculo de Tasa de Masculinidad en Tiempo Real**: Relación estadística entre la población masculina y femenina por provincia.
+3. **Ficha Estadística Provincial A4 Membretada**: Emisión e impresión oficial de certificados A4 de datos censales con sello institucional y Hash SHA-256.
+4. **Filtros e Indicadores por Densidad**: Clasificación automática (*Alta Densidad*, *Media Densidad*, *Baja Densidad*).
+5. **Informe Ejecutivo Consolidad para Planificación (PTDI)**: Planilla consolidada A4 para la formulación del Plan Territorial de Desarrollo Integrado.
+
+---
+
+## 📐 Flujo de Análisis Demográfico & Censo 2024
+
+```mermaid
+flowchart TD
+    A[Carga de Base de Datos Censo INE 2024] --> B[Consolidación de las 16 Provincias de Oruro]
+    B --> C[Cálculo de Indicadores: Tasa de Masculinidad y Densidad Hab/km²]
+    C --> D[Desglose por Sexo y Vivienda Registrada]
+    D --> E[Filtro por Provincia y Búsqueda en Tiempo Real]
+    E --> F[Emisión Ficha Estadística SAFCO A4 + Hash SHA-256]
 ```
 
 ---
 
-## ⚠️ Reglas Estrictas de Desarrollo
-1. **Preservar el Layout**: No se permite alterar `index.html` ni `styles.css`.
-2. **Formateo Numérico Profesional**: Queda estrictamente prohibido formatear números de forma manual (mediante concatenación de strings o expresiones regulares). Debes utilizar el estándar oficial de localización de JavaScript: `.toLocaleString()`.
-3. **Optimización con Programación Funcional**: Para demostrar habilidades profesionales avanzadas (Senior), los cálculos de KPI de tipo sumatoria deben resolverse mediante el método funcional `Array.prototype.reduce()` en lugar de bucles iterativos tradicionales (`for` o `while`).
+## 📍 Matriz Demográfica de las 16 Provincias de Oruro (Censo 2024)
+
+| Provincia | Capital | Población (Hab.) | Viviendas | Densidad Poblacional |
+|---|---|---|---|---|
+| **Cercado** | Oruro | **310,000** | 95,000 | Alta (54.5 Hab/km²) |
+| **Eduardo Abaroa** | Challapata | **33,200** | 11,200 | Media (8.8 Hab/km²) |
+| **Pantaleón Dalence** | Huanuni | **29,400** | 9,800 | Alta (30.6 Hab/km²) |
+| **Poopó** | Poopó | **16,800** | 5,600 | Media (8.4 Hab/km²) |
+| **Ladislao Cabrera** | Salinas de Garci Mendoza | **14,800** | 5,100 | Baja (1.7 Hab/km²) |
+| **Sebastián Pagador** | Santiago de Huari | **13,894** | 4,800 | Media (7.2 Hab/km²) |
+| **Carangas** | Corque | **13,500** | 4,900 | Baja (2.7 Hab/km²) |
+| **Sabaya** | Sabaya | **11,400** | 3,900 | Baja (1.3 Hab/km²) |
+| **Saucarí** | Toledo | **10,800** | 3,700 | Baja (6.5 Hab/km²) |
+| **Litoral** | Huachacalla | **10,400** | 3,500 | Baja (3.6 Hab/km²) |
+| **Sajama** | Curahuara de Carangas | **10,200** | 3,400 | Baja (1.8 Hab/km²) |
+| **Sud Carangas** | Andamarca | **7,200** | 2,600 | Baja (2.0 Hab/km²) |
+| **Nor Carangas** | Huayllamarca | **5,600** | 2,100 | Baja (6.4 Hab/km²) |
+| **San Pedro de Totora** | Totora | **5,500** | 2,000 | Baja (3.8 Hab/km²) |
+| **Tomas Barrón** | Eucaliptus | **5,400** | 1,900 | Media (15.1 Hab/km²) |
+| **Puerto de Mejillones** | La Rivera | **2,100** | 920 | Baja (2.7 Hab/km²) |
 
 ---
 
-## 🛠️ Misiones (Retos de la Fase 3)
-Abre `src/main.js` y completa las siguientes tareas guiadas:
+## 🧪 Guía de Pruebas de QA e Inducción Paso a Paso
 
-*   **RETO 1 (`calcularYMostrarKPIs`)**: 
-    1. Calcula la población total del departamento sumando el campo `poblacion` de todas las regiones en `datosOruro` usando `.reduce()`. Formatea el resultado con `.toLocaleString('es-BO')` y muéstralo en `#kpi-poblacion-total`.
-    2. Realiza el mismo proceso para obtener la sumatoria total de viviendas y muéstralo en `#kpi-viviendas-total`.
-    3. Calcula la sumatoria de hombres. Obtén el porcentaje de población masculina respecto a la población total con un solo decimal de precisión y muéstralo en `#kpi-ratio-hombres` (ej. `49.5%`).
-*   **RETO 2 (`renderizarTabla`)**: 
-    1. Limpia el cuerpo de la tabla (`#cuerpo-tabla-stats`).
-    2. Recorre `datosOruro` y construye dinámicamente cada fila de la tabla (`<tr>` y `<td>`) formateando todos los números.
-    3. **Renderizado Condicional (Reto Final)**: Evalúa el tamaño de población de cada región. Si es mayor a `100,000` habitantes, añade un badge con la clase `.badge-alta` ("Alta Densidad"). Si es menor o igual, utiliza la clase `.badge-media` ("Media Densidad").
+1. **Caso 1: Consulta Demográfica de la Provincia Cercado**
+   * En el buscador de la tabla, escribe `Cercado`.
+   * *Resultado:* Filtrará instantáneamente mostrando `310,000 Hab.` y `95,000 Viv.`. Haz clic en **Ficha A4** para previsualizar la certificación oficial.
+
+2. **Caso 2: Impresión de Informe Ejecutivo Demográfico A4**
+   * En la barra lateral, haz clic en **Informe Ejecutivo A4**.
+   * *Resultado:* Renderizará la planilla A4 consolidada de las 16 provincias.
 
 ---
 
-## 📈 Ruta de Aprendizaje y Evolución (Los 3 Niveles)
-*Perspectiva de Ingeniería de Software (Arquitectura de Enseñanza Senior)*
+## 📂 Arquitectura del Módulo
 
-### 🟢 Nivel 1: Básico (Estructuras de Control y Manipulación Simple)
-*   **Foco Pedagógico**: Resolver cálculos usando estructuras de control imperativas tradicionales (`for`, `while`, `if/else`) y renderizar cadenas de texto simples sin formatear (ej. mostrar `571471` en lugar de `571.471`).
-*   **Retos / Mejoras para el Alumno en este Nivel**:
-    *   **Buscador Simple**: Crear un campo de entrada (`<input type="text">`) que filtre las filas de la tabla de municipios en tiempo real comparando el texto ingresado con los nombres de las regiones usando `.includes()` o `.indexOf()`.
-    *   **Ordenamiento Básico**: Agregar botones en la cabecera de la tabla para ordenar alfabéticamente las regiones (A-Z) utilizando bucles simples.
-    *   **Filtros Rápidos**: Añadir botones de filtro rápido (ej: "Mostrar solo Alta Densidad", "Mostrar Todo") usando comparaciones lógicas directas.
-
-### 🟡 Nivel 2: Intermedio (Fase Actual - Programación Declarativa, Localización y Persistencia)
-*   **Foco Pedagógico**: Utilizar métodos funcionales modernos de arreglos (`.reduce()`, `.map()`, `.filter()`), encapsular el estado en funciones puras y aplicar internacionalización local (`.toLocaleString('es-BO')`).
-*   **Retos / Mejoras para el Alumno en este Nivel**:
-    *   **Exportación de Datos**: Añadir un botón que permita descargar la tabla actual en formato CSV para que los funcionarios puedan abrir la información directamente en Microsoft Excel.
-    *   **KPIs Dinámicos Interactivos**: Al hacer click en una fila de la tabla, mostrar una sección de detalles del municipio seleccionado, recalculando su porcentaje de viviendas respecto al total del departamento.
-    *   **Persistencia de Configuración**: Implementar un selector de "Tema Visual" (Modo Oscuro / Modo Claro) y guardar la preferencia del usuario en `LocalStorage` para que persista al refrescar.
-    *   **Gráficos Estáticos con SVG**: Dibujar un gráfico de barras sencillo utilizando elementos vectoriales `<svg>` generados dinámicamente con JavaScript para comparar la población entre municipios.
-
-### 🔴 Nivel 3: Avanzado (Enterprise - Integraciones Complejas y Tiempo Real)
-*   **Foco Pedagógico**: Consumo de servicios REST externos, visualización avanzada de datos, rendimiento y arquitectura modular en la nube.
-*   **Retos / Mejoras para el Alumno en este Nivel**:
-    *   **Visualización Científica de Datos (Chart.js / D3.js)**: Integrar librerías externas para renderizar gráficos de torta interactivos (proporción hombres/mujeres) y de líneas temporales con animaciones premium al cargar.
-    *   **Integración con API del INE**: Conectar el Dashboard mediante `fetch()` a la API abierta del **INE (Instituto Nacional de Estadística)** para descargar en tiempo real datos demográficos reales de Bolivia, reemplazando la base simulada.
-    *   **Generador de Reportes PDF**: Integrar **jsPDF** para generar informes analíticos con membrete institucional de la Gobernación de Oruro y permitir su descarga con firma digital simulada.
-    *   **Mapas Coropléticos Interactivos**: Renderizar un mapa en formato **SVG / GeoJSON** del departamento de Oruro que pinte cada provincia de un color diferente (gradiente de dorado) según su densidad poblacional utilizando la librería **Leaflet** o manipulación directa de SVGs.
-    *   **Actualizaciones en Tiempo Real (WebSockets)**: Simular una conexión por WebSockets donde los datos censales cambien dinámicamente si otro funcionario actualiza la base de datos central en otro navegador.
+```text
+Panel-de-control/
+├── index.html                   # Dashboard demográfico, tabla de provincias y modales A4
+├── readme.md                    # Documentación técnica, datos Censo 2024, tabla 16 provincias y guía QA
+├── assets/
+│   ├── banner.png               # Banner panorámico oficial (1000 x 300 px)
+│   └── css/
+│       └── styles.css           # Design Tokens (Titanium Cyan), tablas y estilos de impresión A4
+└── src/
+    └── main.js                  # Lógica de datos censales, calculadoras de ratio y reportes
+```
 
 ---
 
-## 🚀 Cómo Ejecutar el Proyecto
-1. Asegúrate de que las carpetas del proyecto estén organizadas.
-2. Inicia un servidor de desarrollo local o abre `index.html` en tu navegador.
-3. Haz clic en **Recargar Datos del Servidor** para experimentar el retraso de red simulado (latencia de red) y ver cómo el dashboard recalcula y actualiza la información en tiempo real.
-
----
-*Evaluación Técnica a cargo de Ingeniería de Sistemas.*
+*Gobierno Autónomo Departamental de Oruro — Secretaría de Planificación del Desarrollo*

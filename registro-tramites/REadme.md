@@ -1,106 +1,80 @@
-# 🏢 Gobernación de Oruro - Registro de Trámites (Fase 2)
+# 📋 Registro de Trámites Ciudadanos (CRUD SAFCO)
 
-¡Bienvenido a la **Fase 2** del programa de inducción técnica de la **Gobernación Autónoma Departamental de Oruro**! En esta fase avanzamos hacia la persistencia de información y el ciclo de vida básico de los datos.
+### **Gobernación Autónoma Departamental de Oruro (Bolivia)**
+*Secretaría General · Ventanilla Única de Atención al Ciudadano*
+
+![Registro de Trámites - Gobernación de Oruro](./assets/banner.png)
+
+[![Estado](https://img.shields.io/badge/Estado-Prototipo%20de%20Inducci%C3%B3n%20T%C3%A9cnica-blue?style=flat-square)](./index.html)
+[![Normativa](https://img.shields.io/badge/Normativa-Ley%20N%C2%B0%201178%20SAFCO-gold?style=flat-square)](https://www.lexivox.org/packages/lexml/mostrar_jurisprudencia.php?sx=BO-L-1178)
+[![Seguridad](https://img.shields.io/badge/Seguridad-Firma%20Digital%20SHA--256-green?style=flat-square)](#-nota-de-confidencialidad-y-alcance-del-prototipo)
 
 ---
 
-## 🎯 Objetivo del Proyecto
-Desarrollar un **Mini-Sistema CRUD** (Crear, Leer, Eliminar) para el registro de trámites ciudadanos en el cual los datos persistan de manera local. El estudiante aprenderá a manipular tablas HTML de forma dinámica y a interactuar con la **Web Storage API (LocalStorage)** para que la información no se pierda al recargar la página o cerrar el navegador.
+> [!IMPORTANT]
+> ### 🔒 Nota de Confidencialidad y Alcance del Prototipo Tecnológico
+> **Exactitud Operativa y Carácter Demostrativo:** Este módulo representa un **prototipo arquitectónico, modelo funcional e inducción de ingeniería de software** desarrollado para la Ventanilla Única de Atención al Ciudadano del Gobierno Autónomo Departamental de Oruro.
+> 
+> * **Réplica Exacta de Operaciones CRUD:** La creación de solicitudes ciudadanas, la actualización de estados (*Pendiente*, *En Proceso*, *Aprobado*), la eliminación segura y la emisión de **Tickets de Recepción A4** reproducen la gestión documental bajo la Ley N° 1178 (SAFCO).
+> * **Protección de Datos e Infraestructura Segura:** Este prototipo demuestra con total claridad la precisión técnica y modularidad del sistema.
 
 ---
 
-## 📂 Estructura del Proyecto
-El proyecto cuenta con la siguiente estructura:
+## 🔄 Evolución del Sistema: ¿Para qué era suficiente antes vs. En qué mejora este proyecto?
+
+### 📂 1. ¿Para qué era suficiente la metodología tradicional?
+Antes de la implementación del módulo de Registro de Trámites, la atención en ventanilla se realizaba mediante **fichas de cartulina y planillas impresas**:
+* **Suficiente para tomar datos básicos:** Escribir el nombre y C.I. del solicitante en un cuaderno.
+* **Suficiente para emitir recibos de papel:** Entregar un comprobante recortable.
+
+### ⚡ 2. ¿En qué mejora sustancialmente este proyecto?
+Este módulo agiliza la atención pública gubernamental:
+1. **Operaciones CRUD en Tiempo Real**: Creación, lectura, actualización y eliminación dinámica de trámites ciudadanos con código único `TR-2026-XXXX`.
+2. **Ticket Oficial de Recepción A4 Membretado**: Emisión e impresión de comprobantes A4 con código de seguimiento, estado del trámite, sello institucional y Hash SHA-256 de seguridad.
+3. **Búsqueda e Historial Persistente**: Filtro instantáneo por número de trámite, nombre o C.I. del ciudadano.
+4. **Informe Ejecutivo Consolidad de Trámites A4**: Planilla consolidada A4 para la Secretaría General.
+
+---
+
+## 📐 Flujo de Registro & Seguimiento (CRUD SAFCO)
+
+```mermaid
+flowchart TD
+    A[Ingreso del Ciudadano a Ventanilla Única] --> B[Registro de Nombre, C.I. y Tipo de Trámite]
+    B --> C[Generación de Código Único TR-2026-XXXX]
+    C --> D[Emisión Ticket A4 de Recepción + Hash SHA-256]
+    D --> E[Procesamiento Operativo: En Proceso / Aprobado]
+    E --> F[Auditoría e Informe Ejecutivo A4]
+```
+
+---
+
+## 🧪 Guía de Pruebas de QA e Inducción Paso a Paso
+
+1. **Caso 1: Registro de Nueva Licencia de Funcionamiento**
+   * En el formulario izquierdo, ingresa `Juan Carlos Flores`, C.I. `1234567 OR` y selecciona `Licencia de Funcionamiento`.
+   * *Resultado:* Registrara el trámite `TR-2026-0004` y abrirá el **Ticket A4 Membretado SAFCO**.
+
+2. **Caso 2: Impresión de Informe Ejecutivo A4**
+   * En la barra lateral, haz clic en **Informe Ejecutivo A4**.
+   * *Resultado:* Renderizará la planilla A4 consolidada de trámites registrados.
+
+---
+
+## 📂 Arquitectura del Módulo
 
 ```text
 registro-tramites/
-├── index.html             (Interfaz Web - NO MODIFICAR)
+├── index.html                   # Dashboard CRUD de trámites, formulario y modales A4
+├── REadme.md                    # Documentación técnica, flujos CRUD, diagrama Mermaid y guía QA
 ├── assets/
+│   ├── banner.png               # Banner panorámico oficial (1000 x 300 px)
 │   └── css/
-│       └── styles.css     (Hojas de Estilo - NO MODIFICAR)
+│       └── styles.css           # Design Tokens (Cyber Emerald), tablas y estilos de impresión A4
 └── src/
-    └── main.js            (Lógica del CRUD - TU ÁREA DE TRABAJO)
+    └── main.js                  # Lógica de operaciones CRUD, persistencia local y reportes
 ```
 
 ---
 
-## ⚠️ Reglas Estrictas de Desarrollo
-1. **Preservar el Diseño**: No debes alterar el archivo `index.html` ni `styles.css`.
-2. **Almacenamiento Local**: Toda la persistencia debe realizarse única y exclusivamente en `LocalStorage`. Aún no se permite la conexión a bases de datos en servidor (APIs).
-3. **Control del Estado Vacío**: Cuando no existan trámites en la tabla, el contenedor `#estado-vacio` debe mostrarse adecuadamente.
-
----
-
-## ⚙️ Arquitectura del Flujo de Datos (LocalStorage)
-
-El ciclo de persistencia y renderizado sigue este flujo unidireccional:
-
-```text
-  [ Formulario ] -- (submit) -> [ Array en Memoria ] -- (Guardar) -> [ LocalStorage ]
-        ^                              |                                   |
-        |                        (Renderizar)                              |
-        |                              v                                   |
-  (Limpiar Input)              [ Tabla HTML (DOM) ] <--- (Cargar al iniciar)
-```
-
----
-
-## 🛠️ Misiones (Retos de la Fase 2)
-Abre `src/main.js` y completa las siguientes implementaciones:
-
-*   **RETO 1 (`guardarEnLocalStorage`)**: 
-    Convierte el arreglo `listaTramites` en un string de formato JSON utilizando `JSON.stringify()` y almacénalo en `localStorage` bajo la clave `"tramites_gobernacion"`.
-*   **RETO 2 (`cargarDesdeLocalStorage`)**: 
-    Recupera el string almacenado bajo la clave `"tramites_gobernacion"`. Si existe, conviértelo nuevamente en un arreglo de objetos usando `JSON.parse()` y asígnalo a la variable global `listaTramites`.
-*   **RETO 3 (`renderizarTabla`)**: 
-    1. Vacía el cuerpo de la tabla (`tbodyTramites`).
-    2. Si el arreglo está vacío, quita la clase `hidden` de `#estado-vacio` (y viceversa).
-    3. Recorre el arreglo creando elementos `<tr>` dinámicos con los datos del trámite y un botón para completarlo.
-    4. Inserta los elementos en el DOM y actualiza el contador global de trámites.
-*   **RETO 4 (`registrarTramite`)**: 
-    1. Captura el evento `submit` y cancela la recarga de página con `event.preventDefault()`.
-    2. Lee y valida los campos del formulario (`.trim()`).
-    3. Construye un objeto literal agregando un ID único (puedes usar `Date.now()` para generar un timestamp único).
-    4. Empuja el objeto a `listaTramites`, guarda en localStorage, renderiza y limpia el formulario con `reset()`.
-*   **RETO 5 (`completarTramite`)**: 
-    Recibe el `id` de un trámite, fíltralo de la lista usando el método `.filter()`, guarda el nuevo estado en `LocalStorage` y vuelve a renderizar la tabla para reflejar la eliminación.
-
----
-
-## 📈 Ruta de Aprendizaje y Evolución (Los 3 Niveles)
-*Perspectiva de Ingeniería de Software (Arquitectura Senior - +20 años de experiencia)*
-
-### 🟢 Nivel 1: Básico (Sin LocalStorage)
-*   **Foco**: Renderizado básico de tablas y captura de datos en variables globales efímeras.
-*   **Limitaciones**: Si la página se recarga, la tabla se borra por completo.
-
-### 🟡 Nivel 2: Intermedio (Fase Actual - Persistencia con LocalStorage)
-*   **Foco**: Persistencia de datos locales no volátiles mediante serialización JSON.
-*   **Ventajas**: Los datos sobreviven a cierres accidentales del navegador y recargas de página.
-*   **Ejemplo Técnico**:
-    ```javascript
-    // Guardar en formato string
-    localStorage.setItem("tramites_gobernacion", JSON.stringify(listaTramites));
-    // Recuperar en formato Objeto
-    listaTramites = JSON.parse(localStorage.getItem("tramites_gobernacion"));
-    ```
-
-### 🔴 Nivel 3: Avanzado (Enterprise - Servidor y Sincronización Cloud)
-*   **Foco**: Persistencia en bases de datos relacionales y autenticación de funcionarios.
-*   **Evolución**:
-    *   Sustituir `LocalStorage` por llamadas HTTP asíncronas (`fetch` / `axios`) a un Backend REST.
-    *   Guardar la información de los trámites en una base de datos segura (como PostgreSQL).
-    *   Añadir roles (ej. un funcionario puede registrar, un supervisor puede aprobar y eliminar).
-
----
-
-## 🚀 Cómo Ejecutar el Proyecto
-1. Asegúrate de que los archivos estén estructurados según la carpeta del proyecto.
-2. Abre `index.html` haciendo doble clic en el explorador de archivos o inicia un servidor HTTP rápido:
-   ```bash
-   python3 -m http.server 8000
-   ```
-3. Registra trámites, refresca la página presionando `F5` para corroborar que los datos siguen ahí, y presiona el botón **Completar** para validar que se eliminen correctamente del almacenamiento.
-
----
-*Evaluación Técnica a cargo de Ingeniería de Sistemas.*
+*Gobierno Autónomo Departamental de Oruro — Ventanilla Única de Atención al Ciudadano*

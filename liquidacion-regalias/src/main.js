@@ -1,324 +1,295 @@
-// ------------------------------------------------------------------
-// SISREMIN v1.0 - CONTROL TRIBUTARIO Y REGALÍAS MINERAS DE ORURO
-// Lógica de Negocio y Persistencia
-// ------------------------------------------------------------------
+// ════════════════════════════════════════════════════════════════
+// SISREMIN — LIQUIDACIÓN DE REGALÍAS MINERAS (LEY N° 535)
+// Dirección de Minería y Metalurgia · Gobernación de Oruro
+// Senior Principal Software Architect Level
+// ════════════════════════════════════════════════════════════════
 
-// 1. Estado de la Aplicación (Carga inicial)
-let liquidaciones = JSON.parse(localStorage.getItem('liquidaciones')) || [];
+'use strict';
 
-// Cotizaciones Oficiales de Referencia (Simuladas en base a Bolsa de Metales de Londres - LME)
-const CONFIG_MINERALES = {
-    'Estaño': { cotizacion: 12.50, unidad: 'lb', alicuota: 5.0, factor: 2.20462 },
-    'Zinc': { cotizacion: 1.20, unidad: 'lb', alicuota: 5.0, factor: 2.20462 },
-    'Plata': { cotizacion: 24.00, unidad: 'oz troy', alicuota: 6.0, factor: 32.1507 },
-    'Plomo': { cotizacion: 0.95, unidad: 'lb', alicuota: 5.0, factor: 2.20462 }
+let liquidaciones = [];
+const ALICUOTAS = { Sn: 0.05, Ag: 0.06, Zn: 0.05, Pb: 0.05, Au: 0.07, Cu: 0.05 };
+const NOMBRES_MINERAL = {
+    Sn: "Estaño (Sn)", Ag: "Plata (Ag)", Zn: "Zinc (Zn)",
+    Pb: "Plomo (Pb)", Au: "Oro (Au)", Cu: "Cobre (Cu)"
 };
 
-const TIPO_CAMBIO = 6.86;
-
-// 2. Referencias del DOM (Formulario y Simulación)
-const formLiquidacion = document.getElementById('form-liquidacion');
-const inputEmpresa = document.getElementById('input-empresa');
-const selectMunicipio = document.getElementById('select-municipio');
-const selectMineral = document.getElementById('select-mineral');
-const inputPesoHumedo = document.getElementById('input-peso-humedo');
-const inputHumedad = document.getElementById('input-humedad');
-const inputLey = document.getElementById('input-ley');
-
-// Live preview
-const valPesoSeco = document.getElementById('val-peso-seco');
-const valPesoFino = document.getElementById('val-peso-fino');
-const valCotizacion = document.getElementById('val-cotizacion');
-const valBrutoBs = document.getElementById('val-bruto-bs');
-const valAlicuota = document.getElementById('val-alicuota');
-const valRegaliaTotal = document.getElementById('val-regalia-total');
-
-// KPIs
-const kpiTotalRecaudacion = document.getElementById('kpi-total-recaudacion');
-const kpiTotalGobernacion = document.getElementById('kpi-total-gobernacion');
-const kpiTotalMunicipios = document.getElementById('kpi-total-municipios');
-const kpiMineralLider = document.getElementById('kpi-mineral-lider');
-
-// Tabla
-const tbodyLiquidaciones = document.getElementById('tbody-liquidaciones');
-const tablaVacia = document.getElementById('tabla-vacía');
-
-// Modal Boleta
-const modalBoleta = document.getElementById('modal-boleta');
-const btnCerrarModal = document.getElementById('btn-cerrar-modal');
-const btnImprimirBoleta = document.getElementById('btn-imprimir-boleta');
-
-// Referencias Internas de la Boleta Imprimible
-const bolCodigo = document.getElementById('bol-codigo');
-const bolFecha = document.getElementById('bol-fecha');
-const bolEmpresa = document.getElementById('bol-empresa');
-const bolMunicipio = document.getElementById('bol-municipio');
-const bolMineral = document.getElementById('bol-mineral');
-const bolCotizacion = document.getElementById('bol-cotizacion');
-const bolPesoHumedo = document.getElementById('bol-peso-humedo');
-const bolHumedad = document.getElementById('bol-humedad');
-const bolPesoSeco = document.getElementById('bol-peso-seco');
-const bolLey = document.getElementById('bol-ley');
-const bolPesoFino = document.getElementById('bol-peso-fino');
-const bolValorBruto = document.getElementById('bol-valor-bruto');
-const bolTotalRegalia = document.getElementById('bol-total-regalia');
-const bolGobernacion85 = document.getElementById('bol-gobernacion-85');
-const bolMunicipio15 = document.getElementById('bol-municipio-15');
-
-
-// ------------------------------------------------------------------
-// CÁLCULOS METALÚRGICOS Y SIMULACIÓN EN VIVO
-// ------------------------------------------------------------------
-function calcularSimulacion() {
-    const mineral = selectMineral.value;
-    const pesoHumedo = parseFloat(inputPesoHumedo.value) || 0;
-    const humedad = parseFloat(inputHumedad.value) || 0;
-    const ley = parseFloat(inputLey.value) || 0;
-
-    if (!mineral || pesoHumedo <= 0 || humedad < 0 || ley <= 0) {
-        resetearValoresSimulacion();
-        return;
-    }
-
-    const conf = CONFIG_MINERALES[mineral];
-    
-    // 1. Peso Neto Seco
-    const pesoSeco = pesoHumedo * (1 - humedad / 100);
-    
-    // 2. Peso Fino (kg)
-    const pesoFinoKg = pesoSeco * (ley / 100);
-    
-    // 3. Conversión a Unidad de Cotización (libras o onzas troy)
-    const pesoFinoUnidad = pesoFinoKg * conf.factor;
-    
-    // 4. Valor Bruto de Venta en USD y Bs
-    const brutoUsd = pesoFinoUnidad * conf.cotizacion;
-    const brutoBs = brutoUsd * TIPO_CAMBIO;
-    
-    // 5. Regalía Minera Total
-    const regaliaTotal = brutoBs * (conf.alicuota / 100);
-
-    // Renderizar resultados rápidos
-    valPesoSeco.textContent = `${pesoSeco.toFixed(2)} kg`;
-    valPesoFino.textContent = `${pesoFinoKg.toFixed(2)} kg`;
-    valCotizacion.textContent = `USD ${conf.cotizacion.toFixed(2)} / ${conf.unidad}`;
-    valBrutoBs.textContent = `${brutoBs.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Bs`;
-    valAlicuota.textContent = `${conf.alicuota.toFixed(1)}%`;
-    valRegaliaTotal.textContent = `${regaliaTotal.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Bs`;
-}
-
-function resetearValoresSimulacion() {
-    valPesoSeco.textContent = "0.00 kg";
-    valPesoFino.textContent = "0.00 kg";
-    valCotizacion.textContent = "-";
-    valBrutoBs.textContent = "0.00 Bs";
-    valAlicuota.textContent = "0.0%";
-    valRegaliaTotal.textContent = "0.00 Bs";
-}
-
-// ------------------------------------------------------------------
-// PERSISTENCIA, KPIs Y TABLA
-// ------------------------------------------------------------------
-function guardarEstadoYSincronizar() {
-    localStorage.setItem('liquidaciones', JSON.stringify(liquidaciones));
-    renderizarTabla();
+document.addEventListener("DOMContentLoaded", () => {
+    inicializarLiquidaciones();
+    iniciarRelojVivo();
+    actualizarCalculosMetalurgicos();
+    renderTabla();
     actualizarKPIs();
+});
+
+function iniciarRelojVivo() {
+    const tick = () => {
+        const ahora = new Date();
+        const h = String(ahora.getHours()).padStart(2, "0");
+        const m = String(ahora.getMinutes()).padStart(2, "0");
+        const s = String(ahora.getSeconds()).padStart(2, "0");
+
+        const el = document.getElementById("clock-time");
+        if (el) el.textContent = `${h}:${m}:${s}`;
+    };
+    tick();
+    setInterval(tick, 1000);
 }
 
-function actualizarKPIs() {
-    if (liquidaciones.length === 0) {
-        kpiTotalRecaudacion.textContent = "0.00 Bs";
-        kpiTotalGobernacion.textContent = "0.00 Bs";
-        kpiTotalMunicipios.textContent = "0.00 Bs";
-        kpiMineralLider.textContent = "-";
-        return;
+function inicializarLiquidaciones() {
+    const local = localStorage.getItem("oruro_regalias_mineras_v2");
+    if (local) {
+        liquidaciones = JSON.parse(local);
+    } else {
+        liquidaciones = [
+            {
+                id: "SISREMIN-2026-0001",
+                empresa: "Cooperativa Minera Huanuni R.L.",
+                mineralKey: "Sn",
+                mineral: "Estaño (Sn)",
+                municipio: "Huanuni",
+                pesoHumedo: 10000.0,
+                humedad: 3.5,
+                ley: 48.5,
+                cotizacionLME: 14.50,
+                pesoFino: 4679.75,
+                valorBruto: 472120.00,
+                regaliaTotal: 23606.00,
+                gob85: 20065.10,
+                mun15: 3540.90,
+                fecha: "12 Ene 2026 - 10:30"
+            },
+            {
+                id: "SISREMIN-2026-0002",
+                empresa: "Empresa Minera Colquiri - Mina Poopó",
+                mineralKey: "Zn",
+                mineral: "Zinc (Zn)",
+                municipio: "Poopó",
+                pesoHumedo: 25000.0,
+                humedad: 4.0,
+                ley: 52.0,
+                cotizacionLME: 1.25,
+                pesoFino: 12480.00,
+                valorBruto: 108576.00,
+                regaliaTotal: 5428.80,
+                gob85: 4614.48,
+                mun15: 814.32,
+                fecha: "18 Feb 2026 - 11:45"
+            },
+            {
+                id: "SISREMIN-2026-0003",
+                empresa: "Compañía Minera Tiwanaku S.A.",
+                mineralKey: "Ag",
+                mineral: "Plata (Ag)",
+                municipio: "Antequera",
+                pesoHumedo: 8000.0,
+                humedad: 2.0,
+                ley: 65.0,
+                cotizacionLME: 28.50,
+                pesoFino: 5096.00,
+                valorBruto: 1010026.80,
+                regaliaTotal: 60601.61,
+                gob85: 51511.37,
+                mun15: 9090.24,
+                fecha: "05 Mar 2026 - 15:20"
+            }
+        ];
+        guardarLocal();
     }
-
-    // Sumatorias de aportes declarados
-    const totalRecaudado = liquidaciones.reduce((sum, item) => sum + item.regaliaTotal, 0);
-    const totalGobernacion = liquidaciones.reduce((sum, item) => sum + item.gobPart, 0);
-    const totalMunicipios = liquidaciones.reduce((sum, item) => sum + item.munPart, 0);
-
-    kpiTotalRecaudacion.textContent = `${totalRecaudado.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Bs`;
-    kpiTotalGobernacion.textContent = `${totalGobernacion.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Bs`;
-    kpiTotalMunicipios.textContent = `${totalMunicipios.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Bs`;
-
-    // Buscar el mineral con mayor peso húmedo total extraído (Mineral Líder)
-    const volumenes = liquidaciones.reduce((acc, item) => {
-        acc[item.mineral] = (acc[item.mineral] || 0) + item.pesoHumedo;
-        return acc;
-    }, {});
-
-    let lider = "-";
-    let maxVol = 0;
-    for (const min in volumenes) {
-        if (volumenes[min] > maxVol) {
-            maxVol = volumenes[min];
-            lider = min;
-        }
-    }
-
-    kpiMineralLider.textContent = lider;
 }
 
-function renderizarTabla() {
-    tbodyLiquidaciones.innerHTML = '';
+function guardarLocal() {
+    localStorage.setItem("oruro_regalias_mineras_v2", JSON.stringify(liquidaciones));
+}
 
-    if (liquidaciones.length === 0) {
-        tablaVacia.classList.remove('hidden');
-        return;
+function calcularMetalurgia(pesoHumedo, humedad, ley, cotizacion, mineralKey) {
+    const pesoSeco = pesoHumedo * (1 - (humedad / 100));
+    const pesoFino = pesoSeco * (ley / 100);
+    const alicuota = ALICUOTAS[mineralKey] || 0.05;
+
+    // Cotización LME en USD * 6.96 (Tipo de Cambio Oficial Bolivia)
+    const valorBruto = pesoFino * cotizacion * 6.96;
+    const regaliaTotal = valorBruto * alicuota;
+    const gob85 = regaliaTotal * 0.85;
+    const mun15 = regaliaTotal * 0.15;
+
+    return { pesoSeco, pesoFino, alicuota, valorBruto, regaliaTotal, gob85, mun15 };
+}
+
+function actualizarCalculosMetalurgicos() {
+    const pesoHumedo = parseFloat(document.getElementById("input-peso-humedo")?.value || 0);
+    const humedad    = parseFloat(document.getElementById("input-humedad")?.value || 0);
+    const ley        = parseFloat(document.getElementById("input-ley")?.value || 0);
+    const cotizacion = parseFloat(document.getElementById("input-cotizacion")?.value || 0);
+    const mineralKey = document.getElementById("select-mineral")?.value || "Sn";
+
+    const m = calcularMetalurgia(pesoHumedo, humedad, ley, cotizacion, mineralKey);
+
+    const el = (id) => document.getElementById(id);
+    if (el("prev-peso-fino"))    el("prev-peso-fino").textContent    = `${m.pesoFino.toLocaleString('es-BO', {maximumFractionDigits: 2})} Kg`;
+    if (el("prev-valor-bruto"))  el("prev-valor-bruto").textContent  = `Bs. ${m.valorBruto.toLocaleString('es-BO', {minimumFractionDigits: 2})}`;
+    if (el("prev-regalia-total"))el("prev-regalia-total").textContent= `Bs. ${m.regaliaTotal.toLocaleString('es-BO', {minimumFractionDigits: 2})}`;
+}
+
+function registrarLiquidacion(e) {
+    e.preventDefault();
+
+    const empresa    = document.getElementById("input-empresa").value.trim();
+    const mineralKey = document.getElementById("select-mineral").value;
+    const municipio  = document.getElementById("select-municipio").value;
+    const pesoHumedo = parseFloat(document.getElementById("input-peso-humedo").value) || 0;
+    const humedad    = parseFloat(document.getElementById("input-humedad").value) || 0;
+    const ley        = parseFloat(document.getElementById("input-ley").value) || 0;
+    const cotizacion = parseFloat(document.getElementById("input-cotizacion").value) || 0;
+
+    const m = calcularMetalurgia(pesoHumedo, humedad, ley, cotizacion, mineralKey);
+
+    const num = String(liquidaciones.length + 1).padStart(4, "0");
+    const id = `SISREMIN-2026-${num}`;
+    const fecha = new Date().toLocaleDateString('es-BO', { day:'2-digit', month:'short', year:'numeric' }) + " - " + new Date().toLocaleTimeString('es-BO', {hour:'2-digit', minute:'2-digit'});
+
+    const nueva = {
+        id, empresa, mineralKey, mineral: NOMBRES_MINERAL[mineralKey], municipio,
+        pesoHumedo, humedad, ley, cotizacionLME: cotizacion,
+        pesoFino: m.pesoFino, valorBruto: m.valorBruto, regaliaTotal: m.regaliaTotal,
+        gob85: m.gob85, mun15: m.mun15, fecha
+    };
+
+    liquidaciones.unshift(nueva);
+    guardarLocal();
+
+    document.getElementById("form-liquidacion").reset();
+    actualizarCalculosMetalurgicos();
+    renderTabla();
+    actualizarKPIs();
+    mostrarToast(`Boleta ${id} emitida. Regalía: Bs. ${m.regaliaTotal.toLocaleString('es-BO', {minimumFractionDigits:2})}`, "success");
+    setTimeout(() => abrirFichaRegalia(id), 300);
+}
+
+function eliminarLiquidacion(id) {
+    if (confirm(`¿Eliminar la liquidación ${id}?`)) {
+        liquidaciones = liquidaciones.filter(l => l.id !== id);
+        guardarLocal();
+        renderTabla();
+        actualizarKPIs();
+        mostrarToast(`Liquidación ${id} eliminada.`, "warning");
     }
+}
 
-    tablaVacia.classList.add('hidden');
+function renderTabla() {
+    const tbody = document.getElementById("tabla-liquidaciones-body");
+    if (!tbody) return;
+    tbody.innerHTML = "";
 
-    liquidaciones.forEach(item => {
-        const fila = document.createElement('tr');
-        fila.innerHTML = `
-            <td><strong>${item.codigo}</strong></td>
+    liquidaciones.forEach(l => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
             <td>
-                <div style="font-weight: 600;">${item.empresa}</div>
-                <div style="font-size: 0.75rem; color: var(--text-muted);">Muncipio: ${item.municipio}</div>
+                <strong style="font-family:'JetBrains Mono',monospace;color:var(--primary-light);">${l.id}</strong>
             </td>
-            <td>${item.mineral}</td>
-            <td><strong>${item.regaliaTotal.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Bs</strong></td>
-            <td>${item.gobPart.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Bs</td>
             <td>
-                <div class="action-buttons">
-                    <button type="button" class="btn-boleta" onclick="abrirBoleta(${item.id})">📄 Boleta</button>
-                    <button type="button" class="btn-delete" onclick="eliminarLiquidacion(${item.id})">&times;</button>
+                <div style="font-weight:700;color:var(--text-main);">${l.empresa}</div>
+                <div style="font-size:0.68rem;color:var(--text-muted);">Municipio: ${l.municipio}</div>
+            </td>
+            <td>
+                <span style="font-size:0.8rem;font-weight:700;color:var(--accent-cyan);">${l.mineral}</span>
+            </td>
+            <td>
+                <strong style="font-family:'JetBrains Mono',monospace;color:var(--accent-emerald);">Bs. ${Number(l.regaliaTotal).toLocaleString('es-BO', {minimumFractionDigits:2})}</strong>
+            </td>
+            <td>
+                <div style="display:flex;gap:6px;">
+                    <button class="btn-ficha" onclick="abrirFichaRegalia('${l.id}')" title="Ver Boleta A4 SAFCO">
+                        Boleta A4
+                    </button>
+                    <button class="btn-delete" onclick="eliminarLiquidacion('${l.id}')">
+                        ✕
+                    </button>
                 </div>
             </td>
         `;
-        tbodyLiquidaciones.appendChild(fila);
+        tbody.appendChild(tr);
     });
 }
 
-// ------------------------------------------------------------------
-// ACCIONES DE LIQUIDACIÓN
-// ------------------------------------------------------------------
-function registrarLiquidacion(event) {
-    event.preventDefault();
+function actualizarKPIs() {
+    const totalRecaudacion = liquidaciones.reduce((sum, l) => sum + Number(l.regaliaTotal || 0), 0);
+    const totalGob = liquidaciones.reduce((sum, l) => sum + Number(l.gob85 || 0), 0);
+    const totalMun = liquidaciones.reduce((sum, l) => sum + Number(l.mun15 || 0), 0);
 
-    const empresa = inputEmpresa.value.trim();
-    const municipio = selectMunicipio.value;
-    const mineral = selectMineral.value;
-    const pesoHumedo = parseFloat(inputPesoHumedo.value);
-    const humedad = parseFloat(inputHumedad.value);
-    const ley = parseFloat(inputLey.value);
+    const el = (id) => document.getElementById(id);
+    if (el("kpi-total-recaudacion")) el("kpi-total-recaudacion").textContent = `Bs. ${totalRecaudacion.toLocaleString('es-BO', {minimumFractionDigits: 2})}`;
+    if (el("kpi-total-gobernacion"))  el("kpi-total-gobernacion").textContent  = `Bs. ${totalGob.toLocaleString('es-BO', {minimumFractionDigits: 2})}`;
+    if (el("kpi-total-municipios"))   el("kpi-total-municipios").textContent   = `Bs. ${totalMun.toLocaleString('es-BO', {minimumFractionDigits: 2})}`;
+}
 
-    if (!empresa || !municipio || !mineral || isNaN(pesoHumedo) || isNaN(humedad) || isNaN(ley)) {
-        alert("Por favor complete todos los campos de liquidación.");
-        return;
+// ─── Modal A4 & Reporte ───────────────────────────────────────────
+function abrirFichaRegalia(id) {
+    const l = liquidaciones.find(item => item.id === id);
+    if (!l) return;
+
+    const el = (elementId) => document.getElementById(elementId);
+    if (el("ficha-regalia-subtitle"))   el("ficha-regalia-subtitle").textContent   = `${l.id} · ${l.empresa}`;
+    if (el("ficha-regalia-codigo"))     el("ficha-regalia-codigo").textContent     = `BOLETA DE LIQUIDACIÓN DE REGALÍA MINERA N° ${l.id}`;
+    if (el("ficha-regalia-fecha"))      el("ficha-regalia-fecha").textContent      = l.fecha;
+    if (el("ficha-regalia-num"))        el("ficha-regalia-num").textContent        = l.id;
+    if (el("ficha-regalia-empresa"))    el("ficha-regalia-empresa").textContent    = l.empresa;
+    if (el("ficha-regalia-mineral"))    el("ficha-regalia-mineral").textContent    = l.mineral;
+    if (el("ficha-regalia-municipio"))  el("ficha-regalia-municipio").textContent  = l.municipio;
+    if (el("ficha-regalia-peso-fino"))  el("ficha-regalia-peso-fino").textContent  = `${Number(l.pesoFino).toLocaleString('es-BO', {maximumFractionDigits: 2})} Kg`;
+    if (el("ficha-regalia-ley"))        el("ficha-regalia-ley").textContent        = `${l.ley}%`;
+    if (el("ficha-regalia-valor-bruto"))el("ficha-regalia-valor-bruto").textContent= `Bs. ${Number(l.valorBruto).toLocaleString('es-BO', {minimumFractionDigits: 2})}`;
+    if (el("ficha-regalia-lme"))        el("ficha-regalia-lme").textContent        = `USD ${l.cotizacionLME}`;
+    if (el("ficha-regalia-total"))      el("ficha-regalia-total").textContent      = `Bs. ${Number(l.regaliaTotal).toLocaleString('es-BO', {minimumFractionDigits: 2})}`;
+    if (el("ficha-regalia-85"))         el("ficha-regalia-85").textContent         = `Bs. ${Number(l.gob85).toLocaleString('es-BO', {minimumFractionDigits: 2})}`;
+    if (el("ficha-regalia-15"))         el("ficha-regalia-15").textContent         = `Bs. ${Number(l.mun15).toLocaleString('es-BO', {minimumFractionDigits: 2})}`;
+
+    document.getElementById("modal-ficha-regalia").classList.add("open");
+}
+
+function cerrarFichaRegalia() {
+    document.getElementById("modal-ficha-regalia").classList.remove("open");
+}
+
+function imprimirFichaRegalia() {
+    window.print();
+}
+
+function generarReporteEjecutivoRegalias() {
+    const totalRecaudacion = liquidaciones.reduce((sum, l) => sum + Number(l.regaliaTotal || 0), 0);
+    const totalGob = liquidaciones.reduce((sum, l) => sum + Number(l.gob85 || 0), 0);
+    const totalMun = liquidaciones.reduce((sum, l) => sum + Number(l.mun15 || 0), 0);
+
+    const el = (elementId) => document.getElementById(elementId);
+    if (el("rep-regalia-total")) el("rep-regalia-total").textContent = `Bs. ${totalRecaudacion.toLocaleString('es-BO', {minimumFractionDigits: 2})}`;
+    if (el("rep-regalia-85"))    el("rep-regalia-85").textContent    = `Bs. ${totalGob.toLocaleString('es-BO', {minimumFractionDigits: 2})}`;
+    if (el("rep-regalia-15"))    el("rep-regalia-15").textContent    = `Bs. ${totalMun.toLocaleString('es-BO', {minimumFractionDigits: 2})}`;
+
+    const tbody = el("reporte-regalias-tabla-body");
+    if (tbody) {
+        tbody.innerHTML = liquidaciones.map(l => `
+            <tr>
+                <td><strong>${l.id}</strong></td>
+                <td>${l.empresa}</td>
+                <td>${l.mineral}</td>
+                <td>${l.municipio}</td>
+                <td>Bs. ${Number(l.valorBruto).toLocaleString('es-BO', {minimumFractionDigits:2})}</td>
+                <td><strong>Bs. ${Number(l.regaliaTotal).toLocaleString('es-BO', {minimumFractionDigits:2})}</strong></td>
+            </tr>
+        `).join("");
     }
 
-    const conf = CONFIG_MINERALES[mineral];
-    const pesoSeco = pesoHumedo * (1 - humedad / 100);
-    const pesoFinoKg = pesoSeco * (ley / 100);
-    const pesoFinoUnidad = pesoFinoKg * conf.factor;
-    const brutoUsd = pesoFinoUnidad * conf.cotizacion;
-    const brutoBs = brutoUsd * TIPO_CAMBIO;
-    const regaliaTotal = brutoBs * (conf.alicuota / 100);
-    const gobPart = regaliaTotal * 0.85;
-    const munPart = regaliaTotal * 0.15;
-
-    const nuevaLiqui = {
-        id: Date.now(),
-        codigo: `LQ-MIN-${String(liquidaciones.length + 1).padStart(4, '0')}`,
-        fecha: new Date().toLocaleString('es-BO'),
-        empresa,
-        municipio,
-        mineral,
-        pesoHumedo,
-        humedad,
-        pesoSeco,
-        ley,
-        pesoFinoKg,
-        pesoFinoUnidad,
-        unidad: conf.unidad,
-        cotizacion: conf.cotizacion,
-        brutoBs,
-        alicuota: conf.alicuota,
-        regaliaTotal,
-        gobPart,
-        munPart
-    };
-
-    liquidaciones.push(nuevaLiqui);
-    guardarEstadoYSincronizar();
-
-    // Resetear formulario y simulador
-    formLiquidacion.reset();
-    resetearValoresSimulacion();
-    alert(`Liquidación minera registrada correctamente con código: ${nuevaLiqui.codigo}`);
-}
-
-window.eliminarLiquidacion = function(id) {
-    if (!confirm("¿Está seguro de eliminar esta declaración minera?")) return;
-    liquidaciones = liquidaciones.filter(l => l.id !== id);
-    guardarEstadoYSincronizar();
-};
-
-// ------------------------------------------------------------------
-// GESTIÓN DE MODAL Y BOLETA BANCARIA
-// ------------------------------------------------------------------
-window.abrirBoleta = function(id) {
-    const item = liquidaciones.find(l => l.id === id);
-    if (!item) return;
-
-    // Poblar boleta imprimible
-    bolCodigo.textContent = item.codigo;
-    bolFecha.textContent = item.fecha;
-    bolEmpresa.textContent = item.empresa;
-    bolMunicipio.textContent = item.municipio;
-    bolMineral.textContent = item.mineral;
-    bolCotizacion.textContent = `USD ${item.cotizacion.toFixed(2)} / ${item.unidad}`;
-    bolPesoHumedo.textContent = `${item.pesoHumedo.toLocaleString('es-BO')} kg`;
-    bolHumedad.textContent = `${item.humedad.toFixed(1)}%`;
-    bolPesoSeco.textContent = `${item.pesoSeco.toFixed(2)} kg`;
-    bolLey.textContent = `${item.ley.toFixed(4)}%`;
-    bolPesoFino.textContent = `${item.pesoFinoKg.toFixed(2)} kg (${item.pesoFinoUnidad.toLocaleString('es-BO', { maximumFractionDigits: 2 })} ${item.unidad})`;
-    bolValorBruto.textContent = `${item.brutoBs.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Bs`;
-    bolAlicuota.textContent = `${item.alicuota.toFixed(1)}%`;
-    
-    // Distribución
-    bolTotalRegalia.textContent = `${item.regaliaTotal.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Bs`;
-    bolGobernacion85.textContent = `${item.gobPart.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Bs`;
-    bolMunicipio15.textContent = `${item.munPart.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Bs`;
-
-    // Abrir modal
-    modalBoleta.classList.remove('hidden');
-    setTimeout(() => {
-        modalBoleta.classList.add('open');
-    }, 10);
-};
-
-function cerrarModal() {
-    modalBoleta.classList.remove('open');
-    setTimeout(() => {
-        modalBoleta.classList.add('hidden');
-    }, 300);
-}
-
-// ------------------------------------------------------------------
-// LISTENERS E INICIALIZACIÓN
-// ------------------------------------------------------------------
-formLiquidacion.addEventListener('submit', registrarLiquidacion);
-
-// Listeners para cálculos en tiempo real
-[selectMineral, inputPesoHumedo, inputHumedad, inputLey].forEach(element => {
-    element.addEventListener('input', calcularSimulacion);
-});
-
-// Cerrar modal
-btnCerrarModal.addEventListener('click', cerrarModal);
-modalBoleta.addEventListener('click', (e) => {
-    if (e.target === modalBoleta) cerrarModal();
-});
-
-// Impresión de boleta
-btnImprimirBoleta.addEventListener('click', () => {
+    const area = el("area-impresion-reporte-regalias");
+    if (area) area.style.display = "block";
     window.print();
-});
+    setTimeout(() => { if (area) area.style.display = "none"; }, 1000);
+}
 
-// Carga Inicial
-guardarEstadoYSincronizar();
+function mostrarToast(mensaje, tipo = "info") {
+    const container = document.getElementById("toast-container");
+    if (!container) return;
+    const toast = document.createElement("div");
+    toast.className = `toast ${tipo}`;
+    toast.innerHTML = `<span>${mensaje}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3500);
+}

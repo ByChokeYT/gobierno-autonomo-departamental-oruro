@@ -24,21 +24,98 @@ El ecosistema de desarrollo consta de **7 proyectos modulares**, estructurados d
 
 | # | Proyecto / Módulo | Nivel / Fase | Descripción Principal | Tecnologías Clave |
 |---|---|---|---|---|
-| 1 | **[SISREMIN](./liquidacion-regalias) - Regalías Mineras** | Fase 5 (Avanzado) | Liquidación y facturación de regalías de la Dirección de Minería y Metalurgia bajo la Ley N° 535. | CSS `@media print`, LocalStorage, Fórmulas de Ley Fina y Cotización Bolsa de Londres (LME). |
-| 2 | **[Sistema de Correspondencia](./sistema-correspondencia)** | Fase 4 (Avanzado) | Registro y derivación de Hojas de Ruta entre secretarías con timeline interactivo de auditoría. | Datos anidados (Historial), Renderizado dinámico de Timeline, Modales de Proveídos. |
+| 1 | **[SISREMIN - Regalías Mineras](./liquidacion-regalias)** | Fase 5 (Avanzado - Ley 535) | Liquidación metalúrgica y tributaria de la Dirección de Minería bajo la Ley N° 535, alícuotas, Boleta A4 y Firma SHA-256. | Fórmulas Ley Fina, Cotizaciones LME, Distribución 85/15, Boleta A4, Firma Hash SHA-256. |
+| 2 | **[SISCO - Hojas de Ruta](./sistema-correspondencia)** | Fase 4 (Avanzado - SAFCO) | Radicación en Ventanilla Única, derivación entre secretarías, timeline de proveídos, Hoja A4 y Firma SHA-256. | Radicación Ventanilla Única, Timeline Derivación, Hoja de Ruta SAFCO A4, Rastreo Ciudadano. |
 | 3 | **[Panel de Control Demográfico](./Panel-de-control)** | Fase 3 (Intermedio) | Dashboard estadístico interactivo para el análisis poblacional y toma de decisiones gubernamentales. | Programación funcional avanzada (`.reduce()`), Localización numérica (`.toLocaleString()`). |
-| 4 | **[Registro de Trámites CRUD](./registro-tramites)** | Fase 2 (Básico-Medio) | Mini-sistema CRUD de correspondencia ciudadana con persistencia local permanente. | LocalStorage API, Sincronización asíncrona del DOM, Control de estados vacíos. |
-| 5 | **[Sistema de Turnos FIFO](./sistema-turnos)** | Fase 1 (Básico) | Emisor y gestor de turnos secuenciales para salas de atención al ciudadano. | Estructuras de colas en memoria, Programación de algoritmos FIFO (`.shift()`, `.push()`). |
+| 4 | **[Registro de Trámites CRUD](./registro-tramites)** | Fase 2 (SAFCO - CRUD) | Registro, seguimiento en tiempo real, operaciones CRUD, Ticket de Recepción A4 y Firma SHA-256. | Operaciones CRUD, Ticket Recepción A4, LocalStorage, Búsqueda Filtros. |
+| 5 | **[Sistema de Turnos FIFO](./sistema-turnos)** | Fase 1 (SAFCO - Turnos) | Gestión de colas FIFO, llamador de ventanillas, Ticket de Atención A4 y Firma SHA-256. | Algoritmo Cola FIFO, Llamador Ventanillas, Ticket Atención A4, Firma Hash SHA-256. |
 | 6 | **[Monitor del Dólar](./monitor-dolar)** | Herramienta Auxiliar | Dashboard de visualización del tipo de cambio e histórico del dólar en tiempo real. | ES6 Modules, Fetch API asíncrona, Control y actualización del DOM. |
 | 7 | **[Licencias Ambientales](./licencias-ambientales)** | Fase 7 (Avanzado - Ley 1333) | Fiscalización territorial, mapa SVG interactivo de provincias, categorización Ley N° 1333 y emisión de D.I.A. A4. | Mapa SVG Interactivo, Risk Score (1-11 Pts), Declaratoria D.I.A. A4, Firma Digital SHA-256. |
 | 8 | **[Consola Jurídica - Personerías](./control-personerias)** | Fase 6 (Avanzado - Ley 031) | Registro, validación documental 4/4 y emisión de Resoluciones A4 con borrador en vivo y Firma SHA-256. | Live Drafting, Visual Micro-Chips, Impresión A4, Firma Criptográfica SHA-256, LocalStorage. |
 | 9 | **[Control de Activos Fijos](./control-activos)** | Fase 8 (Avanzado - Ley 1178) | Inventario patrimonial SAFCO, asignación a custodios, etiquetas autoadhesivas QR, Acta A4 y Firma SHA-256. | Generador QR, Acta de Entrega A4, Trazabilidad Custodia, Analítica Patrimonial, LocalStorage. |
+| 10 | **[Monitoreo de Obras Viales (EVM)](./seguimiento-obras)** | Fase 9 (Avanzado - EVM) | Fiscalización de obras públicas SEDECA con metodología Earned Value (SPI, CPI, EAC), Certificados A4 y Firma SHA-256. | Fórmulas EVM, Simulador de Desviaciones, Certificado A4 SEDECA, Firma Hash SHA-256. |
+| 11 | **[Control de Combustible](./control-combustible)** | Fase 10 (Avanzado - B-SISA) | Control de carburantes, tanques 3D de depósitos centrales, vales B-SISA A4 y Firma SHA-256. | Depósitos 3D Animados, Precios Subvencionados, Vales B-SISA A4, Firma Hash SHA-256. |
+| 12 | **[Oruro Produce Marketplace](./oruro-marketplace-app)** | Fase 11 (Feria 16 Provincias) | Catálogo de productores de las 16 provincias, quinua real, camélidos, Ficha A4 SAFCO y Firma SHA-256. | Catálogo 16 Provincias, Ficha A4 Productor, Filtros Origen, Firma Hash SHA-256. |
 
 ---
 
 ## 🛠️ Detalles de los Módulos de Software
 
-### 1. 📦 Control de Activos Fijos (`control-activos`)
+### 1. 🪙 SISREMIN — Liquidación de Regalías Mineras (`liquidacion-regalias`)
+Módulo desarrollado para la **Dirección de Minería y Metalurgia** de la Gobernación de Oruro para la administración, liquidación metalúrgica y recaudación de regalías mineras bajo la Ley N° 535:
+
+![SISREMIN - Liquidación de Regalías Mineras - Gobernación Autónoma Departamental de Oruro](./liquidacion-regalias/assets/banner.png)
+
+*   **Calculadora Metalúrgica en Tiempo Real**: Determinación de Peso Seco (Kg), Peso Fino (Kg), Valor Bruto de Venta (Bs.) y alícuotas según mineral (Estaño 5%, Plata 6%, Zinc 5%, Plomo 5%, Oro 7%).
+*   **Distribución Autonómica (Ley N° 535)**: División automática de recaudación entre el **85% para la Gobernación de Oruro** (obras de infraestructura) y el **15% para el Municipio Productor** de origen.
+*   **Boleta de Pre-Liquidación A4 Membretada**: Emisión de certificados A4 oficiales con visto técnico del Banco Unión, desglose tributario y Hash SHA-256.
+*   **Informe Ejecutivo A4**: Consolidado de recaudación minera para auditoría de recursos naturales.
+
+### 2. 🏛️ SISCO — Hojas de Ruta & Correspondencia (`sistema-correspondencia`)
+Módulo desarrollado para la **Secretaría General** y **Ventanilla Única** de la Gobernación de Oruro para la radicación, distribución interinstitucional y seguimiento de Hojas de Ruta bajo la Ley N° 1178 (SAFCO):
+
+![SISCO - Hojas de Ruta - Gobernación Autónoma Departamental de Oruro](./sistema-correspondencia/assets/banner.png)
+
+*   **Ventanilla Única de Radicación**: Registro instantáneo de solicitudes ciudadanas con código único `HR-2026-XXXX` y asignación de prioridad operativa.
+*   **Timeline de Derivación & Proveídos**: Historial dinámico que audita el tránsito de documentos entre secretarías con observaciones formales.
+*   **Hoja de Ruta A4 Membretada SAFCO**: Emisión e impresión oficial del documento de Hoja de Ruta A4 con matriz de proveídos para firmas y sellos.
+*   **Rastreo Ciudadano de Trámites**: Herramienta de consulta pública en tiempo real para usuarios.
+
+### 3. 📊 Tablero Demográfico & Censo 2024 (`Panel-de-control`)
+Módulo desarrollado para la **Secretaría de Planificación del Desarrollo** y la **Unidad de Estadística** de la Gobernación de Oruro para el análisis demográfico y presupuestario del Censo 2024:
+
+![Tablero Demográfico Censo 2024 - Gobernación Autónoma Departamental de Oruro](./Panel-de-control/assets/banner.png)
+
+*   **Desglose de las 16 Provincias**: Población total (570,194 Hab.), viviendas (185,420 Viv.) e índice de densidad poblacional.
+*   **Tasa de Masculinidad en Tiempo Real**: Indicadores estadísticos por provincia.
+*   **Ficha Estadística Provincial A4**: Emisión e impresión oficial de certificados A4 censales con Hash SHA-256.
+
+### 4. 📋 Registro de Trámites Ciudadanos (`registro-tramites`)
+Módulo desarrollado para la **Ventanilla Única de Atención al Ciudadano** de la Gobernación de Oruro para la gestión CRUD y entrega de comprobantes de trámites públicos:
+
+![Registro de Trámites - Gobernación Autónoma Departamental de Oruro](./registro-tramites/assets/banner.png)
+
+*   **Gestión CRUD Completa**: Creación, actualización de estados (*Pendiente*, *En Proceso*, *Aprobado*), eliminación y filtrado de trámites.
+*   **Ticket Oficial de Recepción A4**: Emisión e impresión oficial de comprobantes A4 con código de seguimiento `TR-2026-XXXX`, visto SAFCO y Hash SHA-256.
+
+### 5. 🎟️ Sistema de Turnos FIFO & Ventanillas (`sistema-turnos`)
+Módulo desarrollado para las **Salas de Atención al Ciudadano** de la Gobernación de Oruro para la distribución equitativa de turnos y llamado digital a ventanillas:
+
+![Sistema de Turnos FIFO - Gobernación Autónoma Departamental de Oruro](./sistema-turnos/assets/banner.png)
+
+*   **Algoritmo de Colas FIFO en Memoria**: Gestión secuencial equitativa (`.shift()` / `.push()`).
+*   **Llamador Digital en Pantalla Gigante**: Notificación visual y sonora de llamado a ventanillas (Ventanilla 1, 2 y 3).
+*   **Ticket de Atención A4 Membretado**: Emisión de tickets A4 con número de turno `T-XXX`, área de atención y Hash SHA-256.
+
+### 6. 🌾 Oruro Produce Marketplace (`oruro-marketplace-app`)
+Módulo desarrollado para la **Secretaría Departamental de Desarrollo Productivo** de la Gobernación de Oruro para la feria virtual y comercialización de productos de las 16 provincias:
+
+![Oruro Produce Marketplace - Gobernación Autónoma Departamental de Oruro](./oruro-marketplace-app/assets/banner.png)
+
+*   **Catálogo de las 16 Provincias**: Quinua Real orgánica de Salinas, charque de llama de Challapata, textiles de alpaca de Curahuara de Carangas y artesanías mineras.
+*   **Certificado A4 de Productor SAFCO**: Emisión e impresión oficial de fichas A4 de acreditación de origen con vistos legales y Hash SHA-256.
+
+### 7. ⛽ Control de Combustible & Depósitos B-SISA (`control-combustible`)
+Módulo desarrollado para la **Tesorería Departamental** y el **Control de Surtidores** de la Gobernación de Oruro para la administración y fiscalización de carburantes bajo la normativa de la Agencia Nacional de Hidrocarburos (ANH) y B-SISA:
+
+![Control de Combustible B-SISA - Gobernación Autónoma Departamental de Oruro](./control-combustible/assets/banner.png)
+
+*   **Tanques de Depósito 3D Animados**: Control visual en tiempo real de volumen disponible en los depósitos centrales de Gasolina Especial (Bs. 3.74/Lt) y Diésel Oíl (Bs. 3.72/Lt).
+*   **Vale Oficial de Despacho B-SISA A4 Membretado**: Emisión e impresión de vales A4 con registro B-SISA, firma del chofer, firma del encargado de surtidor y Hash SHA-256.
+*   **Reabastecimiento de Tanques**: Herramienta interactiva para registrar el ingreso de camiones cisterna.
+*   **Informe Ejecutivo de Consumo SAFCO**: Consolidado de consumo por unidad ejecutora para auditoría financiera.
+
+### 7. 🚧 Monitoreo de Obras Viales EVM (`seguimiento-obras`)
+Módulo desarrollado para la **Secretaría Departamental de Obras Públicas** y el **SEDECA** de la Gobernación de Oruro para la fiscalización financiera y avance físico mediante la metodología de Valor Ganado (*Earned Value Management - ANSI/EIA 748*):
+
+![Monitoreo de Obras Viales EVM - Gobernación Autónoma Departamental de Oruro](./seguimiento-obras/assets/banner.png)
+
+*   **Fórmulas EVM Automatizadas**: Cálculo instantáneo de `SPI` (Índice de Cronograma), `CPI` (Índice de Costo) y `EAC` (Estimación de Costo al Finalizar).
+*   **Certificado de Auditoría Vial A4 Membretado**: Emisión oficial de informes A4 con vistos técnicos, sellos del SEDECA, firmas de Fiscalización y Hash SHA-256.
+*   **Simulador de Desviación de Proyectos**: Herramienta interactiva para proyectar variaciones presupuestarias y reprogramación de obras públicas.
+*   **Línea de Tiempo de Hitos**: Historial de licitación, orden de proceder e inspecciones físicas.
+
+### 8. 📦 Control de Activos Fijos (`control-activos`)
 Módulo desarrollado para la **Unidad de Bienes y Servicios** de la Gobernación de Oruro para el inventario, control patrimonial e imposición de responsabilidad a custodios bajo la Ley N° 1178 (SAFCO):
 
 ![Control de Activos Fijos - Gobernación Autónoma Departamental de Oruro](./control-activos/assets/banner.png)
@@ -48,7 +125,7 @@ Módulo desarrollado para la **Unidad de Bienes y Servicios** de la Gobernación
 *   **Trazabilidad & Historial de Custodia**: Timeline interactivo que registra altas, reasignaciones de oficina y mantenimientos técnicos.
 *   **Analítica Patrimonial**: Consolidado dinámico de valor fiscal e inventario físico clasificado por categoría SAFCO.
 
-### 2. 🌿 Licencias Ambientales & Mapa de Riesgo (`licencias-ambientales`)
+### 9. 🌿 Licencias Ambientales & Mapa de Riesgo (`licencias-ambientales`)
 Módulo desarrollado para la **Secretaría Departamental de Medio Ambiente y Agua** del Gobierno Autónomo Departamental de Oruro para la evaluación y fiscalización ambiental bajo la Ley N° 1333 de Medio Ambiente:
 
 ![Licencias Ambientales & Mapa de Riesgo - Gobernación Autónoma Departamental de Oruro](./licencias-ambientales/assets/banner.png)
@@ -58,7 +135,7 @@ Módulo desarrollado para la **Secretaría Departamental de Medio Ambiente y Agu
 *   **Declaratoria de Impacto Ambiental (D.I.A.) A4 Membretada**: Emisión e impresión oficial de certificados A4 con sello institucional, visto, considerandos y firma de la AACD.
 *   **Trazabilidad & Verificador Criptográfico SHA-256**: Herramienta de auditoría para verificar autenticidad de licencias con Hash de 256 bits y código QR.
 
-### 3. 📜 Consola Jurídica — Personerías Jurídicas (`control-personerias`)
+### 10. 📜 Consola Jurídica — Personerías Jurídicas (`control-personerias`)
 Módulo desarrollado para la **Dirección General de Asuntos Jurídicos** de la Gobernación de Oruro para la fiscalización y emisión de Resoluciones Administrativas bajo la Ley N° 031 Marco de Autonomías:
 
 ![Consola Jurídica - Gobernación Autónoma Departamental de Oruro](./control-personerias/assets/banner.png)

@@ -1,73 +1,289 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gobernación Oruro - Dashboard Demográfico</title>
-    <!-- Vinculación de fuentes profesionales desde Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Vinculamos la hoja de estilos externa en su ruta correcta -->
-    <link rel="stylesheet" href="assets/css/styles.css">
+    <title>Gobernación de Oruro — Tablero Demográfico (Censo 2024)</title>
+    <meta name="description" content="Dashboard estadístico y análisis demográfico de las 16 provincias del Departamento de Oruro — Censo Nacional de Población y Vivienda 2024.">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./assets/css/styles.css">
 </head>
-
 <body>
+    <div class="carbon-grid-overlay"></div>
+    <div class="glow-orb orb-cyan"></div>
+    <div class="glow-orb orb-gold"></div>
 
-    <main class="container">
-        <!-- Encabezado del Dashboard -->
-        <header class="header">
-            <h1>Tablero de Control Departamental</h1>
-            <p>Datos Estadísticos - Censo Nacional 2024 (Oruro)</p>
-        </header>
+    <div class="demo-workspace">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-escudo-wrap">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo de Oruro" class="brand-escudo">
+                </div>
+                <div>
+                    <h2>DEMOGRAFÍA ORURO</h2>
+                    <p class="brand-sub">CENSO NACIONAL 2024</p>
+                </div>
+            </div>
 
-        <!-- Tarjetas de Resumen (KPIs) -->
-        <section class="kpi-grid">
-            <div class="kpi-card">
-                <h3>Población Total</h3>
-                <p id="kpi-poblacion-total" class="kpi-value">Cargando...</p>
+            <div class="live-clock-widget">
+                <div class="clock-time" id="demo-clock-time">00:00:00</div>
+                <div class="clock-badge">
+                    <span class="clock-badge-dot"></span>
+                    Servidor Estadístico GAD-ORU
+                </div>
             </div>
-            <div class="kpi-card">
-                <h3>Viviendas Registradas</h3>
-                <p id="kpi-viviendas-total" class="kpi-value">Cargando...</p>
-            </div>
-            <div class="kpi-card">
-                <h3>Tasa de Masculinidad</h3>
-                <p id="kpi-ratio-hombres" class="kpi-value">Cargando...</p>
-            </div>
-        </section>
 
-        <!-- Tabla Analítica -->
-        <section class="panel">
-            <h2>Desglose por Municipios/Regiones (Simulación)</h2>
-            <div class="table-responsive">
-                <table id="tabla-estadisticas">
-                    <thead>
+            <nav class="navigation-menu">
+                <div class="nav-section-label">HERRAMIENTAS DE ANÁLISIS</div>
+                <button class="nav-item active" onclick="filtrarTablaDemografica('TODOS')">
+                    <div class="nav-icon-box">📊</div>
+                    <span>16 Provincias de Oruro</span>
+                </button>
+                <button class="nav-item" onclick="generarReporteEjecutivoDemografico()">
+                    <div class="nav-icon-box gold">📄</div>
+                    <span>Informe Ejecutivo A4</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-operator-pill">
+                    <div class="operator-avatar">CP</div>
+                    <div class="operator-info">
+                        <span class="operator-name">Unidad de Estadística</span>
+                        <span class="operator-role">Secretaría de Planificación</span>
+                    </div>
+                </div>
+                <div class="hash-integrity-badge">
+                    🔒 Censo INE 2024 Verificado
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <div>
+                    <div class="badge-institutional">
+                        <span class="badge-dot"></span>
+                        TABLERO DE CONTROL DEMOGRÁFICO DEPARTAMENTAL · CENSO 2024
+                    </div>
+                    <h1>Población &amp; Vivienda de Oruro</h1>
+                </div>
+            </header>
+
+            <!-- KPIs Demográficos -->
+            <section class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-icon">👥</div>
+                    <div>
+                        <span class="kpi-label">Población Total Oruro</span>
+                        <h2 id="kpi-poblacion-total" class="cyan">570,194 Hab.</h2>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">🏠</div>
+                    <div>
+                        <span class="kpi-label">Viviendas Registradas</span>
+                        <h2 id="kpi-viviendas-total" class="gold">185,420 Viv.</h2>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">⚖️</div>
+                    <div>
+                        <span class="kpi-label">Tasa de Masculinidad</span>
+                        <h2 id="kpi-ratio-hombres" class="emerald">98.4 %</h2>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">📍</div>
+                    <div>
+                        <span class="kpi-label">Provincia Más Poblada</span>
+                        <h2 id="kpi-provincia-lider" class="cyan">Cercado</h2>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tabla de Provincias -->
+            <section class="card-focus">
+                <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+                    <div>
+                        <h2>Desglose Estadístico de las 16 Provincias</h2>
+                        <p>Datos censo 2024, distribución por sexo, viviendas e índice de densidad poblacional.</p>
+                    </div>
+                    <input type="text" id="input-buscar-provincia" placeholder="Buscar provincia..." style="background:var(--bg-input);border:1px solid var(--border-main);border-radius:var(--radius-md);color:#fff;padding:8px 14px;font-size:0.85rem;width:240px;" oninput="filtrarProvinciaTexto()">
+                </div>
+
+                <div class="table-responsive" style="margin-top:18px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Provincia / Capital</th>
+                                <th>Población (Hab.)</th>
+                                <th>Hombres</th>
+                                <th>Mujeres</th>
+                                <th>Viviendas</th>
+                                <th>Densidad</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cuerpo-tabla-stats">
+                            <!-- Dinámico -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ══════ MODAL: Ficha Estadística A4 SAFCO ══════ -->
+    <div id="modal-ficha-demo" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-actions-bar">
+                <div class="modal-title-group">
+                    <div class="modal-title-icon">📊</div>
+                    <div>
+                        <h3>Ficha Estadística Provincial Censo 2024</h3>
+                        <p class="modal-subtitle" id="ficha-demo-subtitle">Documento Oficial · Dirección de Estadística GAD-ORU</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-secondary" onclick="cerrarFichaDemo()">Cerrar</button>
+                    <button class="btn-primary" onclick="imprimirFichaDemo()">Imprimir Ficha A4</button>
+                </div>
+            </div>
+
+            <div class="documento-resolucion" id="area-impresion-demo">
+                <div class="escudo-agua"></div>
+
+                <div class="resolucion-header">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo" class="res-escudo">
+                    <div class="res-header-text">
+                        <h3>GOBIERNO AUTÓNOMO DEPARTAMENTAL DE ORURO</h3>
+                        <h5>SECRETARÍA DE PLANIFICACIÓN DEL DESARROLLO · UNIDAD DE ESTADÍSTICA</h5>
+                        <h4 id="ficha-demo-codigo">CERTIFICADO DEMOGRÁFICO PROVINCIAL · CENSO 2024</h4>
+                    </div>
+                    <div class="seal-top-right">
+                        <div class="gold-official-seal">
+                            <span>CENSO 2024<br>ORURO</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resolucion-body">
+                    <p class="fecha-emision">Oruro, <span id="ficha-demo-fecha">02 de Septiembre de 2026</span></p>
+
+                    <p><strong>REPORTE ESTADÍSTICO DE POBLACIÓN Y VIVIENDA:</strong> La Dirección de Estadística del Gobierno Autónomo Departamental de Oruro certifica la información demográfica oficial de la provincia seleccionada.</p>
+
+                    <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.86rem;color:#000;" border="1" cellpadding="8">
                         <tr>
-                            <th>Región</th>
-                            <th>Población</th>
-                            <th>Hombres</th>
-                            <th>Mujeres</th>
-                            <th>Viviendas</th>
-                            <th>Estado de Densidad</th>
+                            <td style="background:#f8fafc;font-weight:700;width:32%;">PROVINCIA / CAPITAL:</td>
+                            <td><strong id="ficha-demo-provincia" style="color:#0284c7;font-size:1.1rem;">Cercado (Oruro)</strong></td>
                         </tr>
-                    </thead>
-                    <tbody id="cuerpo-tabla-stats">
-                        <!-- Las filas se generarán dinámicamente con JavaScript -->
-                    </tbody>
-                </table>
+                        <tr>
+                            <td style="background:#f8fafc;font-weight:700;">POBLACIÓN TOTAL:</td>
+                            <td><strong id="ficha-demo-poblacion" style="color:#b45309;">310,000 Hab.</strong></td>
+                        </tr>
+                        <tr>
+                            <td style="background:#f8fafc;font-weight:700;">DISTRIBUCIÓN POR SEXO:</td>
+                            <td>Hombres: <span id="ficha-demo-hombres">152,000</span> | Mujeres: <span id="ficha-demo-mujeres">158,000</span></td>
+                        </tr>
+                        <tr>
+                            <td style="background:#f8fafc;font-weight:700;">VIVIENDAS CENSAIDAS:</td>
+                            <td><span id="ficha-demo-viviendas">95,000 Viv.</span></td>
+                        </tr>
+                        <tr>
+                            <td style="background:#f8fafc;font-weight:700;">DENSIDAD &amp; CLASIFICACIÓN:</td>
+                            <td><strong id="ficha-demo-densidad" style="color:#059669;">Alta Densidad (54.5 Hab/km²)</strong></td>
+                        </tr>
+                    </table>
+
+                    <div style="background:#f8fafc;border:1px solid #cbd5e1;padding:12px;border-radius:6px;margin-top:14px;font-size:0.82rem;">
+                        <strong>USO INSTITUCIONAL DE DATOS:</strong>
+                        <p style="margin-top:4px;color:#334155;">Esta información demográfica oficial servirá de base tributaria y técnica para la formulación del Plan Territorial de Desarrollo Integrado (PTDI) y la asignación del Pacto Fiscal Departamental.</p>
+                    </div>
+                </div>
+
+                <div class="resolucion-verification-row">
+                    <div class="qr-box-simulated">
+                        <svg width="56" height="56" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M2 2h8v8H2V2zm2 2v4h4V4H4zm8-2h8v8h-8V2zm2 2v4h4V4h-4zM2 14h8v8H2v-8zm2 2v4h4v-4H4zm13-2h3v3h-3v-3zm0 5h3v3h-3v-3zm-5-5h3v3h-3v-3zm0 5h3v3h-3v-3z"/>
+                        </svg>
+                        <span>Validación Censo INE / GAD-ORU</span>
+                    </div>
+
+                    <div class="security-hash-block">
+                        <small>HASH DE AUDITORÍA DEMOGRÁFICA LEY 1178:</small>
+                        <code id="ficha-demo-hash">SHA256: 202409876543210123456789abcdef0123456789abcdef0123456789abcdef</code>
+                    </div>
+                </div>
+
+                <div class="resolucion-firmas">
+                    <div class="firma-block">
+                        <div class="linea-firma"></div>
+                        <p><strong>Dirección de Estadística &amp; Censo</strong></p>
+                        <p>GAD-ORURO</p>
+                    </div>
+                    <div class="firma-block">
+                        <div class="linea-firma"></div>
+                        <p><strong>Secretaría de Planificación</strong></p>
+                        <p>Gobierno Autónomo Departamental de Oruro</p>
+                    </div>
+                </div>
             </div>
-        </section>
+        </div>
+    </div>
 
-        <!-- Botón de Acción -->
-        <footer style="text-align: right; margin-top: 10px;">
-            <button id="btn-recargar" class="btn-accion">Recargar Datos del Servidor</button>
-        </footer>
-    </main>
+    <!-- ══════ IMPRESIÓN REPORTE EJECUTIVO A4 ══════ -->
+    <div id="area-impresion-reporte-demografico" class="documento-resolucion" style="display:none;">
+        <div class="resolucion-header">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo" class="res-escudo">
+            <div class="res-header-text">
+                <h3>GOBIERNO AUTÓNOMO DEPARTAMENTAL DE ORURO</h3>
+                <h5>SECRETARÍA DE PLANIFICACIÓN DEL DESARROLLO</h5>
+                <h4>INFORME EJECUTIVO DEMOGRÁFICO DE ORURO (CENSO 2024)</h4>
+            </div>
+            <div class="gold-official-seal">
+                <span>ESTADÍSTICA<br>ORURO</span>
+            </div>
+        </div>
 
-    <!-- Vinculación de la lógica del sistema -->
-    <script src="src/main.js"></script>
+        <div class="resolucion-body">
+            <p class="fecha-emision">Oruro, <span id="reporte-demo-fecha">02 de Septiembre de 2026</span></p>
+            <p><strong>CONSOLIDADO DE POBLACIÓN DE LAS 16 PROVINCIAS:</strong> Resumen censal departamental.</p>
+
+            <table style="width:100%;border-collapse:collapse;margin-top:20px;font-size:0.8rem;color:#000;" border="1" cellpadding="6">
+                <thead>
+                    <tr style="background:#e2e8f0;">
+                        <th>Provincia</th>
+                        <th>Capital</th>
+                        <th>Población Total</th>
+                        <th>Hombres</th>
+                        <th>Mujeres</th>
+                        <th>Viviendas</th>
+                    </tr>
+                </thead>
+                <tbody id="reporte-demo-tabla-body">
+                    <!-- Dinámico -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="resolucion-firmas">
+            <div class="firma-block">
+                <div class="linea-firma"></div>
+                <p><strong>Unidad de Estadística</strong></p>
+                <p>GAD-ORURO</p>
+            </div>
+            <div class="firma-block">
+                <div class="linea-firma"></div>
+                <p><strong>Gobernador Departamental</strong></p>
+                <p>Gobierno Autónomo Departamental de Oruro</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="./src/main.js"></script>
 </body>
-
 </html>

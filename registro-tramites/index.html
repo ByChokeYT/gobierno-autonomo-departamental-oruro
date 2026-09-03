@@ -1,112 +1,292 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gobernación de Oruro - Registro de Trámites</title>
-    <!-- Fuente Outfit de Google Fonts para una tipografía premium -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <!-- Vinculamos la hoja de estilos externa -->
-    <link rel="stylesheet" href="assets/css/styles.css">
+    <title>Gobernación de Oruro — Registro de Trámites Ciudadanos (CRUD)</title>
+    <meta name="description" content="Plataforma de registro, seguimiento CRUD y emisión de comprobantes de trámites públicos — Gobernación Autónoma Departamental de Oruro.">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./assets/css/styles.css">
 </head>
-
 <body>
+    <div class="carbon-grid-overlay"></div>
+    <div class="glow-orb orb-emerald"></div>
+    <div class="glow-orb orb-gold"></div>
 
-    <div class="app-container">
-        <!-- Encabezado Institucional -->
-        <header class="header">
-            <div class="logo-area">
-                <span class="logo-icon">🏢</span>
+    <div class="app-workspace">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-escudo-wrap">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo de Oruro" class="brand-escudo">
+                </div>
                 <div>
-                    <h1>Gobernación Autónoma Departamental de Oruro</h1>
-                    <p class="subtitle">Secretaría General - Registro de Trámites</p>
+                    <h2>TRÁMITES ORURO</h2>
+                    <p class="brand-sub">VENTANILLA ÚNICA CRUD</p>
                 </div>
             </div>
-            <!-- Badge de Estado de Trámites -->
-            <div class="stats-badge">
-                <span class="stats-label">Trámites Registrados</span>
-                <span id="contador-tramites" class="stats-value">0</span>
+
+            <div class="live-clock-widget">
+                <div class="clock-time" id="tram-clock-time">00:00:00</div>
+                <div class="clock-badge">
+                    <span class="clock-badge-dot"></span>
+                    Atención al Ciudadano Activa
+                </div>
             </div>
-        </header>
 
-        <div class="grid-layout">
-            <!-- Panel del Formulario (Creación) -->
-            <section class="panel form-panel">
-                <h2>Nuevo Registro</h2>
-                <p class="panel-desc">Ingrese los datos correspondientes para registrar un nuevo trámite ciudadano.</p>
-                
-                <form id="formulario-tramite">
-                    <div class="form-group">
-                        <label for="nombre">Nombre Completo del Ciudadano:</label>
-                        <input type="text" id="nombre" placeholder="Ej. Juan Carlos Flores Pérez" required autocomplete="off">
+            <nav class="navigation-menu">
+                <div class="nav-section-label">ACCIONES PRINCIPALES</div>
+                <button class="nav-item active" onclick="filtrarEstado('TODOS')">
+                    <div class="nav-icon-box">📋</div>
+                    <span>Todos los Trámites</span>
+                </button>
+                <button class="nav-item" onclick="generarReporteEjecutivoTramites()">
+                    <div class="nav-icon-box gold">📄</div>
+                    <span>Informe Ejecutivo A4</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-operator-pill">
+                    <div class="operator-avatar">VU</div>
+                    <div class="operator-info">
+                        <span class="operator-name">Operador Ventanilla</span>
+                        <span class="operator-role">Secretaría General GAD-ORU</span>
+                    </div>
+                </div>
+                <div class="hash-integrity-badge">
+                    🔒 Hash SHA-256 Verificado
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <div>
+                    <div class="badge-institutional">
+                        <span class="badge-dot"></span>
+                        REGISTRO Y GESTIÓN DE TRÁMITES PÚBLICOS DEPARTAMENTALES
+                    </div>
+                    <h1>Control de Trámites Ciudadanos</h1>
+                </div>
+                <div class="top-bar-stats">
+                    <div class="quick-stat">
+                        <span class="stat-num" id="contador-tramites">0</span>
+                        <span class="stat-lbl">Trámites en Memoria</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="workspace-grid" style="display:grid;grid-template-columns:340px 1fr;gap:24px;">
+                <!-- Formulario Nuevo Registro -->
+                <section class="card-focus">
+                    <div class="card-header">
+                        <h2>Nuevo Trámite</h2>
+                        <p>Ingrese los datos del ciudadano para iniciar la hoja de seguimiento.</p>
                     </div>
 
-                    <div class="form-group">
-                        <label for="cedula">Cédula de Identidad (CI):</label>
-                        <input type="text" id="cedula" placeholder="Ej. 1234567 OR" required autocomplete="off">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="tipo-tramite">Tipo de Trámite:</label>
-                        <select id="tipo-tramite" required>
-                            <option value="" disabled selected>Seleccione una opción...</option>
-                            <option value="Licencia de Funcionamiento">Licencia de Funcionamiento</option>
-                            <option value="Pago de Impuestos Departamentales">Pago de Impuestos Departamentales</option>
-                            <option value="Certificación Técnica Ambiental">Certificación Técnica Ambiental</option>
-                            <option value="Trámite Administrativo Legal">Trámite Administrativo Legal</option>
-                            <option value="Solicitud de Audiencia Departamental">Solicitud de Audiencia Departamental</option>
-                        </select>
-                    </div>
-
-                    <button type="submit" id="btn-registrar">Registrar Trámite</button>
-                </form>
-            </section>
-
-            <!-- Panel de la Tabla (Listado) -->
-            <section class="panel table-panel">
-                <h2>Bandeja de Trámites Activos</h2>
-                <p class="panel-desc">Lista de trámites cargados en memoria. Se sincronizan automáticamente.</p>
-                
-                <div class="table-container">
-                    <table id="tabla-tramites">
-                        <thead>
-                            <tr>
-                                <th style="width: 8%">Nro</th>
-                                <th style="width: 27%">Ciudadano</th>
-                                <th style="width: 18%">Cédula (CI)</th>
-                                <th style="width: 27%">Trámite</th>
-                                <th style="width: 20%">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbody-tramites">
-                            <!-- Filas generadas dinámicamente con JavaScript -->
-                        </tbody>
-                    </table>
-                    
-                    <!-- Estado vacío cuando no hay registros -->
-                    <div id="estado-vacio" class="empty-state">
-                        <div class="empty-icon-container">
-                            <svg class="empty-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
-                                <polyline points="14 2 14 8 20 8"/>
-                                <line x1="16" y1="13" x2="8" y2="13"/>
-                                <line x1="16" y1="17" x2="8" y2="17"/>
-                                <line x1="10" y1="9" x2="8" y2="9"/>
-                            </svg>
+                    <form id="formulario-tramite" autocomplete="off" onsubmit="registrarTramite(event)" style="margin-top:14px;">
+                        <div class="form-group">
+                            <label for="nombre">Nombre Completo del Ciudadano</label>
+                            <input type="text" id="nombre" placeholder="Ej. Juan Carlos Flores Pérez" required>
                         </div>
-                        <p class="empty-title">No hay trámites registrados</p>
-                        <p class="empty-subtitle">Todos los trámites han sido completados o no se han cargado datos aún.</p>
+
+                        <div class="form-group">
+                            <label for="cedula">Cédula de Identidad (C.I.)</label>
+                            <input type="text" id="cedula" placeholder="Ej. 1234567 OR" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tipo-tramite">Tipo de Trámite Solicitado</label>
+                            <select id="tipo-tramite" required>
+                                <option value="Licencia de Funcionamiento">Licencia de Funcionamiento</option>
+                                <option value="Pago de Impuestos Departamentales">Pago de Impuestos Departamentales</option>
+                                <option value="Certificación Técnica Ambiental">Certificación Técnica Ambiental</option>
+                                <option value="Trámite Administrativo Legal">Trámite Administrativo Legal</option>
+                                <option value="Solicitud de Audiencia Departamental">Solicitud de Audiencia Departamental</option>
+                            </select>
+                        </div>
+
+                        <div class="form-actions" style="margin-top:16px;">
+                            <button type="submit" class="btn-glow">Registrar &amp; Emitir Ticket A4</button>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- Listado CRUD -->
+                <section class="card-focus">
+                    <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+                        <div>
+                            <h2>Bandeja de Trámites Registrados</h2>
+                            <p>Gestión de registros CRUD en tiempo real con visto SAFCO.</p>
+                        </div>
+                        <input type="text" id="input-buscar-tramite" placeholder="Buscar por N° o ciudadano..." style="background:var(--bg-input);border:1px solid var(--border-main);border-radius:var(--radius-md);color:#fff;padding:8px 14px;font-size:0.85rem;width:220px;" oninput="filtrarTramiteTexto()">
+                    </div>
+
+                    <div class="table-responsive" style="margin-top:18px;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>N° Trámite</th>
+                                    <th>Ciudadano / C.I.</th>
+                                    <th>Tipo de Trámite</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-tramites">
+                                <!-- Dinámico -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- ══════ MODAL: Comprobante A4 SAFCO ══════ -->
+    <div id="modal-ficha-tramite" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-actions-bar">
+                <div class="modal-title-group">
+                    <div class="modal-title-icon">📋</div>
+                    <div>
+                        <h3>Comprobante Oficial de Recepción de Trámite</h3>
+                        <p class="modal-subtitle" id="ficha-tramite-subtitle">Documento SAFCO · Ventanilla Única GAD-ORU</p>
                     </div>
                 </div>
-            </section>
+                <div class="header-actions">
+                    <button class="btn-secondary" onclick="cerrarFichaTramite()">Cerrar</button>
+                    <button class="btn-primary" onclick="imprimirFichaTramite()">Imprimir Ticket A4</button>
+                </div>
+            </div>
+
+            <div class="documento-resolucion" id="area-impresion-tramite">
+                <div class="escudo-agua"></div>
+
+                <div class="resolucion-header">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo" class="res-escudo">
+                    <div class="res-header-text">
+                        <h3>GOBIERNO AUTÓNOMO DEPARTAMENTAL DE ORURO</h3>
+                        <h5>SECRETARÍA GENERAL · VENTANILLA ÚNICA DE ATENCIÓN CIUDADANA</h5>
+                        <h4 id="ficha-tramite-codigo">TICKET DE RECEPCIÓN N° TR-2026-0001</h4>
+                    </div>
+                    <div class="seal-top-right">
+                        <div class="gold-official-seal">
+                            <span>TRÁMITES<br>ORURO</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resolucion-body">
+                    <p class="fecha-emision">Oruro, <span id="ficha-tramite-fecha">02 de Septiembre de 2026</span></p>
+
+                    <p><strong>CONSTANCIA DE RECEPCIÓN TRAMITARIO:</strong> La Ventanilla Única del Gobierno Autónomo Departamental de Oruro certifica la recepción conforme del trámite presentado por el ciudadano.</p>
+
+                    <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.86rem;color:#000;" border="1" cellpadding="8">
+                        <tr>
+                            <td style="background:#f8fafc;font-weight:700;width:32%;">CÓDIGO DE SEGUIMIENTO:</td>
+                            <td><strong id="ficha-tramite-num" style="color:#059669;font-size:1.05rem;">TR-2026-0001</strong></td>
+                        </tr>
+                        <tr>
+                            <td style="background:#f8fafc;font-weight:700;">CIUDADANO SOLICITANTE:</td>
+                            <td><span id="ficha-tramite-nombre">Juan Carlos Flores Pérez</span> | C.I.: <strong id="ficha-tramite-ci">1234567 OR</strong></td>
+                        </tr>
+                        <tr>
+                            <td style="background:#f8fafc;font-weight:700;">TIPO DE TRÁMITE:</td>
+                            <td><strong id="ficha-tramite-tipo" style="color:#0284c7;">Licencia de Funcionamiento</strong></td>
+                        </tr>
+                        <tr>
+                            <td style="background:#f8fafc;font-weight:700;">ESTADO ACTUAL:</td>
+                            <td><span id="ficha-tramite-estado" style="color:#b45309;font-weight:700;">En Proceso</span></td>
+                        </tr>
+                    </table>
+
+                    <div style="background:#f8fafc;border:1px solid #cbd5e1;padding:12px;border-radius:6px;margin-top:14px;font-size:0.82rem;">
+                        <strong>INSTRUCCIONES PARA EL SEGUIMIENTO:</strong>
+                        <p style="margin-top:4px;color:#334155;">Conserve este ticket para consultar el estado del trámite en la plataforma web oficial o de forma presencial con su código <strong>TR-2026-XXXX</strong>.</p>
+                    </div>
+                </div>
+
+                <div class="resolucion-verification-row">
+                    <div class="qr-box-simulated">
+                        <svg width="56" height="56" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M2 2h8v8H2V2zm2 2v4h4V4H4zm8-2h8v8h-8V2zm2 2v4h4V4h-4zM2 14h8v8H2v-8zm2 2v4h4v-4H4zm13-2h3v3h-3v-3zm0 5h3v3h-3v-3zm-5-5h3v3h-3v-3zm0 5h3v3h-3v-3z"/>
+                        </svg>
+                        <span>Ventanilla Única SAFCO GAD-ORU</span>
+                    </div>
+
+                    <div class="security-hash-block">
+                        <small>HASH DE REGISTRO TRAMITARIO SHA-256:</small>
+                        <code id="ficha-tramite-hash">SHA256: 77709876543210123456789abcdef0123456789abcdef0123456789abcdef</code>
+                    </div>
+                </div>
+
+                <div class="resolucion-firmas">
+                    <div class="firma-block">
+                        <div class="linea-firma"></div>
+                        <p><strong>Firma del Solicitante</strong></p>
+                        <p>Ciudadano / C.I.</p>
+                    </div>
+                    <div class="firma-block">
+                        <div class="linea-firma"></div>
+                        <p><strong>Recepción Ventanilla Única</strong></p>
+                        <p>Gobierno Autónomo Departamental de Oruro</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Vinculamos la lógica externa -->
-    <script src="src/main.js"></script>
-</body>
+    <!-- ══════ IMPRESIÓN REPORTE EJECUTIVO A4 ══════ -->
+    <div id="area-impresion-reporte-tramites" class="documento-resolucion" style="display:none;">
+        <div class="resolucion-header">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo" class="res-escudo">
+            <div class="res-header-text">
+                <h3>GOBIERNO AUTÓNOMO DEPARTAMENTAL DE ORURO</h3>
+                <h5>SECRETARÍA GENERAL · REGISTRO DE TRÁMITES</h5>
+                <h4>INFORME EJECUTIVO CONSOLIDADO DE TRÁMITES CIUDADANOS</h4>
+            </div>
+            <div class="gold-official-seal">
+                <span>VENTANILLA<br>ORURO</span>
+            </div>
+        </div>
 
+        <div class="resolucion-body">
+            <p class="fecha-emision">Oruro, <span id="reporte-tram-fecha">02 de Septiembre de 2026</span></p>
+
+            <table style="width:100%;border-collapse:collapse;margin-top:20px;font-size:0.8rem;color:#000;" border="1" cellpadding="6">
+                <thead>
+                    <tr style="background:#e2e8f0;">
+                        <th>N° Trámite</th>
+                        <th>Ciudadano</th>
+                        <th>Cédula (C.I.)</th>
+                        <th>Tipo de Trámite</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="reporte-tram-tabla-body">
+                    <!-- Dinámico -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="resolucion-firmas">
+            <div class="firma-block">
+                <div class="linea-firma"></div>
+                <p><strong>Ventanilla Única</strong></p>
+                <p>GAD-ORURO</p>
+            </div>
+            <div class="firma-block">
+                <div class="linea-firma"></div>
+                <p><strong>Secretaría General</strong></p>
+                <p>Gobierno Autónomo Departamental de Oruro</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="./src/main.js"></script>
+</body>
 </html>

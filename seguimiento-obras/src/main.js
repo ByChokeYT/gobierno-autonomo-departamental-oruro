@@ -1,47 +1,92 @@
-// Lógica de Negocio - Control de Inversión y Caminos EVM
-// Gobernación Autónoma Departamental de Oruro
+// ════════════════════════════════════════════════════════════════
+// CONTROL DE OBRAS VIALES (EVM) — GOBERNACIÓN DE ORURO
+// Valor Ganado (ANSI/EIA 748) · SEDECA & Obras Públicas
+// Senior Principal Software Architect Level
+// ════════════════════════════════════════════════════════════════
 
-let proyectos = [];
+'use strict';
+
+let obras = [];
+let obrasFiltradas = [];
 
 document.addEventListener("DOMContentLoaded", () => {
-    inicializarDatos();
-    renderTabla();
-    actualizarEstadisticas();
+    inicializarObras();
+    iniciarRelojVivo();
+    filtrarObras();
 });
 
-// Inicializar con datos semilla para demostrar desviaciones y cálculo EVM
-function inicializarDatos() {
-    const dataLocal = localStorage.getItem("oruro_proyectos_evm");
-    if (dataLocal) {
-        proyectos = JSON.parse(dataLocal);
+function iniciarRelojVivo() {
+    const DIAS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+    const MESES = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+
+    const tick = () => {
+        const ahora = new Date();
+        const h = String(ahora.getHours()).padStart(2, "0");
+        const m = String(ahora.getMinutes()).padStart(2, "0");
+        const s = String(ahora.getSeconds()).padStart(2, "0");
+
+        const clockTime = document.getElementById("clock-time");
+        const clockDate = document.getElementById("clock-date");
+
+        if (clockTime) clockTime.textContent = `${h}:${m}:${s}`;
+        if (clockDate) {
+            const dia = DIAS[ahora.getDay()];
+            clockDate.textContent = `${dia} ${ahora.getDate()} ${MESES[ahora.getMonth()]} ${ahora.getFullYear()}`;
+        }
+    };
+    tick();
+    setInterval(tick, 1000);
+}
+
+function inicializarObras() {
+    const local = localStorage.getItem("oruro_obras_evm_v2");
+    if (local) {
+        obras = JSON.parse(local);
     } else {
-        proyectos = [
+        obras = [
             {
-                id: "PROY-0001",
-                nombre: "Mejoramiento de Camino Vecinal Caracollo - La Joya",
-                provincia: "Cercado",
-                presupuesto: 8000000, // BAC
-                avancePlanificado: 50, // %
-                avanceReal: 52, // %
-                costoReal: 3900000 // AC
+                id: "SEDECA-2026-0001",
+                nombre: "Asfaltado Tramo Oruro - Huanuni (Fase II)",
+                provincia: "Pantaleón Dalence",
+                empresa: "Consorcio Altiplano / SEDECA",
+                bac: 18500000.00,
+                ac: 9200000.00,
+                planificadoPct: 50.0,
+                realPct: 52.5,
+                fecha: "10 Ene 2026"
             },
             {
-                id: "PROY-0002",
-                nombre: "Construcción Puente Vehicular Salinas de Garci Mendoza",
-                provincia: "Ladislao Cabrera",
-                presupuesto: 3500000, // BAC
-                avancePlanificado: 80, // %
-                avanceReal: 75, // %
-                costoReal: 2900000 // AC
+                id: "SEDECA-2026-0002",
+                nombre: "Construcción Puente Vehicular Challapata",
+                provincia: "Eduardo Abaroa",
+                empresa: "Constructora San Cristóbal",
+                bac: 7800000.00,
+                ac: 4100000.00,
+                planificadoPct: 55.0,
+                realPct: 51.0,
+                fecha: "18 Feb 2026"
             },
             {
-                id: "PROY-0003",
-                nombre: "Apertura Senda Vial e Integración Choquecota",
-                provincia: "Carangas",
-                presupuesto: 2000000, // BAC
-                avancePlanificado: 60, // %
-                avanceReal: 40, // %
-                costoReal: 1800000 // AC
+                id: "SEDECA-2026-0003",
+                nombre: "Mejoramiento Carretero Poopó - Antequera",
+                provincia: "Poopó",
+                empresa: "Asfaltos del Sur S.R.L.",
+                bac: 12400000.00,
+                ac: 6500000.00,
+                planificadoPct: 50.0,
+                realPct: 50.0,
+                fecha: "05 Mar 2026"
+            },
+            {
+                id: "SEDECA-2026-0004",
+                nombre: "Pavimentado Riego Accesos Parque Sajama",
+                provincia: "Sajama",
+                empresa: "SEDECA Oruro (Directa)",
+                bac: 9500000.00,
+                ac: 3800000.00,
+                planificadoPct: 40.0,
+                realPct: 44.0,
+                fecha: "12 May 2026"
             }
         ];
         guardarLocal();
@@ -49,217 +94,360 @@ function inicializarDatos() {
 }
 
 function guardarLocal() {
-    localStorage.setItem("oruro_proyectos_evm", JSON.stringify(proyectos));
+    localStorage.setItem("oruro_obras_evm_v2", JSON.stringify(obras));
 }
 
-// Cambiar de vista
+function calcularEVM(obra) {
+    const bac = Number(obra.bac || 0);
+    const ac = Number(obra.ac || 0);
+    const pv = bac * (Number(obra.planificadoPct || 0) / 100);
+    const ev = bac * (Number(obra.realPct || 0) / 100);
+
+    const spi = pv > 0 ? (ev / pv) : 1.0;
+    const cpi = ac > 0 ? (ev / ac) : 1.0;
+    const cv = ev - ac;
+    const sv = ev - pv;
+    const eac = cpi > 0 ? (bac / cpi) : bac;
+
+    let estadoKey = "optimo";
+    let estadoLabel = "Excelente (En Plazo & Costo)";
+
+    if (spi < 0.95 || cpi < 0.95) {
+        estadoKey = "critico";
+        estadoLabel = "Desviación Crítica";
+    } else if (spi < 1.0 || cpi < 1.0) {
+        estadoKey = "alerta";
+        estadoLabel = "Alerta Menor";
+    }
+
+    return { bac, ac, pv, ev, spi, cpi, cv, sv, eac, estadoKey, estadoLabel };
+}
+
 function switchTab(tabName) {
-    document.querySelectorAll(".nav-item").forEach(btn => btn.classList.remove("active"));
-    document.querySelectorAll(".tab-pane").forEach(pane => pane.classList.remove("active"));
-    
-    if (tabName === 'dashboard') {
-        document.querySelector("button[onclick=\"switchTab('dashboard')\"]").classList.add("active");
-        document.getElementById("tab-dashboard").classList.add("active");
-        document.getElementById("page-title").innerText = "Monitoreo Financiero de Proyectos Viales";
-    } else if (tabName === 'registro') {
-        document.querySelector("button[onclick=\"switchTab('registro')\"]").classList.add("active");
-        document.getElementById("tab-registro").classList.add("active");
-        document.getElementById("page-title").innerText = "Registrar Proyecto Vial";
-    }
-    
-    renderTabla();
-    actualizarEstadisticas();
+    document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
+    document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
+
+    const pane = document.getElementById(`tab-${tabName}`);
+    const navBtn = document.getElementById(`nav-${tabName}`);
+    if (pane) pane.classList.add("active");
+    if (navBtn) navBtn.classList.add("active");
+
+    const titles = {
+        dashboard: "Monitoreo Financiero y Físico de Proyectos Viales",
+        registro:  "Registrar Nuevo Proyecto Vial"
+    };
+
+    const pageTitle = document.getElementById("page-title");
+    if (pageTitle && titles[tabName]) pageTitle.textContent = titles[tabName];
+
+    filtrarObras();
 }
 
-// Actualizar contadores superiores
-function actualizarEstadisticas() {
-    if (proyectos.length === 0) {
-        document.getElementById("stat-presupuesto").innerText = "Bs 0.00";
-        document.getElementById("stat-spi-promedio").innerText = "0.00";
-        document.getElementById("stat-cpi-promedio").innerText = "0.00";
-        return;
-    }
+function filtrarObras() {
+    const query = (document.getElementById("input-buscar-obra")?.value ?? "").toLowerCase().trim();
+    const provincia = document.getElementById("filtro-provincia-obra")?.value ?? "";
+    const estadoEvm = document.getElementById("filtro-estado-evm")?.value ?? "";
 
-    let sumaPresupuestos = 0;
-    let sumaSpi = 0;
-    let sumaCpi = 0;
-
-    proyectos.forEach(p => {
-        sumaPresupuestos += parseFloat(p.presupuesto);
-        
-        // Calcular métricas individuales de EVM
-        const evm = calcularEVM(p);
-        sumaSpi += evm.spi;
-        sumaCpi += evm.cpi;
+    obrasFiltradas = obras.filter(o => {
+        const evm = calcularEVM(o);
+        const q = !query || o.nombre.toLowerCase().includes(query) || o.provincia.toLowerCase().includes(query) || o.empresa.toLowerCase().includes(query);
+        const p = !provincia || o.provincia === provincia;
+        const e = !estadoEvm || evm.estadoKey === estadoEvm;
+        return q && p && e;
     });
 
-    const spiPromedio = (sumaSpi / proyectos.length).toFixed(2);
-    const cpiPromedio = (sumaCpi / proyectos.length).toFixed(2);
+    renderTabla();
+    actualizarKPIs();
 
-    document.getElementById("stat-presupuesto").innerText = "Bs " + sumaPresupuestos.toLocaleString("es-BO");
-    
-    // Asignar colores a los promedios globales
-    const spiEl = document.getElementById("stat-spi-promedio");
-    spiEl.innerText = spiPromedio;
-    spiEl.className = "stat-num " + obtenerColorIndicador(spiPromedio);
-
-    const cpiEl = document.getElementById("stat-cpi-promedio");
-    cpiEl.innerText = cpiPromedio;
-    cpiEl.className = "stat-num " + obtenerColorIndicador(cpiPromedio);
+    const badge = document.getElementById("filter-result-badge-obras");
+    if (badge) badge.textContent = `${obrasFiltradas.length} obra${obrasFiltradas.length !== 1 ? 's' : ''}`;
 }
 
-// Renderizar la tabla con las barras de progreso dobles
+function actualizarKPIs() {
+    const bacTotal = obras.reduce((sum, o) => sum + Number(o.bac || 0), 0);
+    const evms = obras.map(calcularEVM);
+    const spiProm = evms.length > 0 ? (evms.reduce((s, e) => s + e.spi, 0) / evms.length) : 1.0;
+    const cpiProm = evms.length > 0 ? (evms.reduce((s, e) => s + e.cpi, 0) / evms.length) : 1.0;
+
+    const el = (id) => document.getElementById(id);
+    if (el("stat-presupuesto"))  el("stat-presupuesto").textContent  = `Bs ${bacTotal.toLocaleString('es-BO', {minimumFractionDigits: 2})}`;
+    if (el("stat-spi-promedio")) el("stat-spi-promedio").textContent = spiProm.toFixed(2);
+    if (el("stat-cpi-promedio")) el("stat-cpi-promedio").textContent = cpiProm.toFixed(2);
+    if (el("nav-count"))         el("nav-count").textContent         = obras.length;
+}
+
 function renderTabla() {
     const tbody = document.getElementById("tabla-proyectos");
     const emptyState = document.getElementById("estado-vacio");
     tbody.innerHTML = "";
 
-    if (proyectos.length === 0) {
-        emptyState.style.display = "flex";
+    if (obrasFiltradas.length === 0) {
+        if (emptyState) emptyState.style.display = "block";
         return;
-    } else {
-        emptyState.style.display = "none";
     }
+    if (emptyState) emptyState.style.display = "none";
 
-    proyectos.forEach(p => {
-        const evm = calcularEVM(p);
+    obrasFiltradas.forEach(o => {
+        const evm = calcularEVM(o);
         const tr = document.createElement("tr");
-
-        // Formato para mostrar desviaciones monetarias
-        let desviacionHTML = "";
-        if (evm.cv >= 0) {
-            desviacionHTML += `<span class="text-success" style="font-size: 0.8rem; font-weight: 600; display: block;">CV: +Bs ${evm.cv.toLocaleString("es-BO")}</span>`;
-        } else {
-            desviacionHTML += `<span class="text-danger" style="font-size: 0.8rem; font-weight: 600; display: block;">CV: -Bs ${Math.abs(evm.cv).toLocaleString("es-BO")}</span>`;
-        }
-
-        if (evm.sv >= 0) {
-            desviacionHTML += `<span class="text-success" style="font-size: 0.8rem; font-weight: 600; display: block;">SV: +Bs ${evm.sv.toLocaleString("es-BO")}</span>`;
-        } else {
-            desviacionHTML += `<span class="text-danger" style="font-size: 0.8rem; font-weight: 600; display: block;">SV: -Bs ${Math.abs(evm.sv).toLocaleString("es-BO")}</span>`;
-        }
-
-        // Obtener clases para insignias SPI y CPI
-        const classSpi = obtenerClaseEval(evm.spi);
-        const classCpi = obtenerClaseEval(evm.cpi);
-
-        // Clase de color de la barra real
-        const barClass = evm.spi >= 1.0 ? "bar-optimo" : (evm.spi >= 0.85 ? "bar-alerta" : "bar-critico");
 
         tr.innerHTML = `
             <td>
-                <strong>${p.nombre}</strong>
-                <span style="font-size: 0.75rem; color: var(--text-muted); display: block;">Provincia: ${p.provincia}</span>
+                <div style="font-weight:700;color:var(--text-main);">${o.nombre}</div>
+                <div style="font-size:0.68rem;color:var(--text-muted);margin-top:2px;">Provincia: ${o.provincia} | ${o.empresa}</div>
             </td>
-            <td>Bs ${parseFloat(p.presupuesto).toLocaleString("es-BO")}</td>
-            <td>Bs ${parseFloat(p.costoReal).toLocaleString("es-BO")}</td>
             <td>
-                <div class="progress-double-wrapper">
-                    <div class="progress-double">
-                        <!-- Capa Planificada -->
-                        <div class="progress-double-planned" style="width: ${p.avancePlanificado}%;"></div>
-                        <!-- Capa Real -->
-                        <div class="progress-double-real ${barClass}" style="width: ${p.avanceReal}%;"></div>
-                    </div>
-                    <div class="progress-double-labels">
-                        <span>Plan: ${p.avancePlanificado}%</span>
-                        <span>Real: ${p.avanceReal}%</span>
-                    </div>
+                <strong style="font-family:'JetBrains Mono',monospace;color:var(--primary-light);">Bs. ${evm.bac.toLocaleString('es-BO', {minimumFractionDigits:2})}</strong>
+            </td>
+            <td>
+                <span style="font-family:'JetBrains Mono',monospace;color:var(--text-secondary);">Bs. ${evm.ac.toLocaleString('es-BO', {minimumFractionDigits:2})}</span>
+            </td>
+            <td>
+                <div style="font-size:0.75rem;font-weight:700;color:var(--text-main);">Real: ${o.realPct}% (Plan: ${o.planificadoPct}%)</div>
+                <div class="progress-bar-wrap">
+                    <div class="progress-bar-fill" style="width:${Math.min(o.realPct, 100)}%;"></div>
                 </div>
             </td>
             <td>
-                <span class="badge-eval ${classSpi}">
-                    ${evm.spi.toFixed(2)}
-                </span>
+                <strong style="font-family:'JetBrains Mono',monospace;color:${evm.spi >= 1.0 ? 'var(--accent-cyan)' : 'var(--accent-rose)'};">${evm.spi.toFixed(2)}</strong>
             </td>
             <td>
-                <span class="badge-eval ${classCpi}">
-                    ${evm.cpi.toFixed(2)}
-                </span>
+                <strong style="font-family:'JetBrains Mono',monospace;color:${evm.cpi >= 1.0 ? 'var(--accent-emerald)' : 'var(--accent-rose)'};">${evm.cpi.toFixed(2)}</strong>
             </td>
             <td>
-                ${desviacionHTML}
+                <span class="badge-evm ${evm.estadoKey}">${evm.estadoLabel}</span>
             </td>
             <td>
-                <button class="btn-delete" onclick="eliminarProyecto('${p.id}')">🗑️ Dar de Baja</button>
+                <div style="display:flex;gap:6px;align-items:center;">
+                    <button class="btn-ficha" onclick="abrirFichaObra('${o.id}')" title="Ver Certificado A4">
+                        Ficha A4
+                    </button>
+                    <button class="btn-timeline" onclick="abrirTimelineObra('${o.id}')" title="Ver línea de tiempo">
+                        Hitos
+                    </button>
+                    <button class="btn-calc" onclick="abrirCalculadoraConDatos('${o.id}')" title="Simular EVM">
+                        Simular
+                    </button>
+                    <button class="btn-delete" onclick="eliminarObra('${o.id}')">
+                        ✕
+                    </button>
+                </div>
             </td>
         `;
         tbody.appendChild(tr);
     });
 }
 
-// Calcular valores EVM
-function calcularEVM(p) {
-    const bac = parseFloat(p.presupuesto);
-    const avPlan = parseFloat(p.avancePlanificado) / 100;
-    const avReal = parseFloat(p.avanceReal) / 100;
-    const ac = parseFloat(p.costoReal);
-
-    // Fórmulas
-    const pv = bac * avPlan;
-    const ev = bac * avReal;
-
-    const cv = ev - ac;
-    const sv = ev - pv;
-
-    // Control de divisiones por cero
-    const cpi = ac > 0 ? (ev / ac) : 1.0;
-    const spi = pv > 0 ? (ev / pv) : 1.0;
-
-    return { pv, ev, ac, cv, sv, cpi, spi };
-}
-
-// Obtener clase de semáforo para la UI
-function obtenerClaseEval(index) {
-    if (index >= 1.0) return "eval-optimo";
-    if (index >= 0.85) return "eval-alerta";
-    return "eval-critico";
-}
-
-// Obtener color de texto para cabecera
-function obtenerColorIndicador(index) {
-    if (index >= 1.0) return "text-success";
-    if (index >= 0.85) return "text-warning";
-    return "text-danger";
-}
-
-// Registrar nueva obra
-function registrarProyecto(e) {
+function registrarNuevaObra(e) {
     e.preventDefault();
+    const nombre = document.getElementById("obra-nombre").value.trim();
+    const provincia = document.getElementById("obra-provincia").value;
+    const empresa = document.getElementById("obra-empresa").value.trim();
+    const bac = parseFloat(document.getElementById("obra-bac").value) || 0;
+    const ac = parseFloat(document.getElementById("obra-ac").value) || 0;
+    const planificadoPct = parseFloat(document.getElementById("obra-planificado").value) || 0;
+    const realPct = parseFloat(document.getElementById("obra-real").value) || 0;
 
-    const nombre = document.getElementById("pro-nombre").value.trim();
-    const provincia = document.getElementById("pro-provincia").value;
-    const presupuesto = document.getElementById("pro-presupuesto").value;
-    const avancePlanificado = document.getElementById("pro-avance-plan").value;
-    const avanceReal = document.getElementById("pro-avance-real").value;
-    const costoReal = document.getElementById("pro-costo-real").value;
+    const num = String(obras.length + 1).padStart(4, "0");
+    const id = `SEDECA-2026-${num}`;
 
-    const id = `PROY-${String(proyectos.length + 1).padStart(4, "0")}`;
-
-    const nuevo = {
-        id,
-        nombre,
-        provincia,
-        presupuesto,
-        avancePlanificado,
-        avanceReal,
-        costoReal
+    const nueva = {
+        id, nombre, provincia, empresa, bac, ac, planificadoPct, realPct,
+        fecha: new Date().toLocaleDateString('es-BO', { day:'2-digit', month:'short', year:'numeric' })
     };
 
-    proyectos.push(nuevo);
+    obras.unshift(nueva);
     guardarLocal();
 
-    // Resetear formulario
-    document.getElementById("form-proyecto").reset();
+    document.getElementById("form-obra").reset();
+    mostrarToast(`Obra ${id} incorporada a fiscalización EVM.`, "success");
     switchTab('dashboard');
+    setTimeout(() => abrirFichaObra(id), 300);
 }
 
-// Eliminar obra
-function eliminarProyecto(id) {
-    if (confirm(`¿Dar de baja del sistema de monitoreo al proyecto vial ${id}?`)) {
-        proyectos = proyectos.filter(p => p.id !== id);
+function eliminarObra(id) {
+    const o = obras.find(item => item.id === id);
+    if (!o) return;
+    if (confirm(`¿Eliminar la obra ${id} ("${o.nombre}")?`)) {
+        obras = obras.filter(item => item.id !== id);
         guardarLocal();
-        renderTabla();
-        actualizarEstadisticas();
+        filtrarObras();
+        mostrarToast(`Obra ${id} eliminada.`, "warning");
     }
+}
+
+// ─── Modales A4 & Hitos ───────────────────────────────────────────
+function abrirFichaObra(id) {
+    const o = obras.find(item => item.id === id);
+    if (!o) return;
+    const evm = calcularEVM(o);
+
+    const el = (elementId) => document.getElementById(elementId);
+    if (el("ficha-obra-subtitle")) el("ficha-obra-subtitle").textContent = `${o.id} · ${o.nombre}`;
+    if (el("ficha-obra-codigo"))   el("ficha-obra-codigo").textContent   = `CERTIFICADO DE AVANCE VIAL EVM N° ${o.id}`;
+    if (el("ficha-obra-fecha"))    el("ficha-obra-fecha").textContent    = o.fecha;
+    if (el("ficha-obra-nombre"))   el("ficha-obra-nombre").textContent   = o.nombre;
+    if (el("ficha-obra-provincia"))el("ficha-obra-provincia").textContent= o.provincia;
+    if (el("ficha-obra-empresa"))  el("ficha-obra-empresa").textContent  = o.empresa;
+    if (el("ficha-obra-bac"))      el("ficha-obra-bac").textContent      = `Bs. ${evm.bac.toLocaleString('es-BO', {minimumFractionDigits: 2})}`;
+    if (el("ficha-obra-ac"))       el("ficha-obra-ac").textContent       = `Bs. ${evm.ac.toLocaleString('es-BO', {minimumFractionDigits: 2})}`;
+    if (el("ficha-obra-spi"))      el("ficha-obra-spi").textContent      = evm.spi.toFixed(2);
+    if (el("ficha-obra-cpi"))      el("ficha-obra-cpi").textContent      = evm.cpi.toFixed(2);
+    if (el("ficha-obra-eac"))      el("ficha-obra-eac").textContent      = `Bs. ${evm.eac.toLocaleString('es-BO', {minimumFractionDigits: 2})}`;
+    if (el("ficha-obra-dictamen")) el("ficha-obra-dictamen").textContent = evm.estadoLabel;
+
+    document.getElementById("modal-ficha-obra").classList.add("open");
+}
+
+function cerrarFichaObra() {
+    document.getElementById("modal-ficha-obra").classList.remove("open");
+}
+
+function imprimirFichaObra() {
+    window.print();
+}
+
+function abrirTimelineObra(id) {
+    const o = obras.find(item => item.id === id);
+    if (!o) return;
+    const evm = calcularEVM(o);
+
+    const el = (elementId) => document.getElementById(elementId);
+    if (el("timeline-obra-subtitle")) el("timeline-obra-subtitle").textContent = `${o.id} · ${o.nombre}`;
+
+    const content = `
+        <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border-subtle);padding:16px;border-radius:12px;margin-bottom:20px;">
+            <h4 style="font-size:0.95rem;color:var(--text-main);">${o.nombre}</h4>
+            <p style="font-size:0.78rem;color:var(--text-secondary);">Provincia: <strong>${o.provincia}</strong> | Empresa: <strong>${o.empresa}</strong></p>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:16px;">
+            <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);padding:14px;border-radius:10px;">
+                <h5 style="color:var(--primary-light);font-size:0.88rem;">1. Licitación y Orden de Proceder</h5>
+                <p style="font-size:0.76rem;color:var(--text-secondary);">Firma de contrato de ejecución con presupuesto asignado de <strong>Bs. ${evm.bac.toLocaleString('es-BO')}</strong>.</p>
+                <small style="font-size:0.65rem;color:var(--text-muted);">${o.fecha}</small>
+            </div>
+            <div style="background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.25);padding:14px;border-radius:10px;">
+                <h5 style="color:var(--accent-cyan);font-size:0.88rem;">2. Medición e Inspección Físico-Financiera (EVM)</h5>
+                <p style="font-size:0.76rem;color:var(--text-secondary);">Avance Planificado PV: <strong>${o.planificadoPct}%</strong> vs. Avance Real Ganado EV: <strong>${o.realPct}%</strong>.</p>
+            </div>
+            <div style="background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.25);padding:14px;border-radius:10px;">
+                <h5 style="color:var(--accent-emerald);font-size:0.88rem;">3. Emisión de Planilla de Avance N° 1</h5>
+                <p style="font-size:0.76rem;color:var(--text-secondary);">Certificación de costo real invertido (AC) de <strong>Bs. ${evm.ac.toLocaleString('es-BO')}</strong> con SPI=${evm.spi.toFixed(2)} y CPI=${evm.cpi.toFixed(2)}.</p>
+            </div>
+        </div>
+    `;
+
+    document.getElementById("timeline-obra-body").innerHTML = content;
+    document.getElementById("modal-timeline-obra").classList.add("open");
+}
+
+function cerrarTimelineObra() {
+    document.getElementById("modal-timeline-obra").classList.remove("open");
+}
+
+// ─── Calculadora EVM ──────────────────────────────────────────────
+function abrirCalculadoraEVMDirecta() {
+    document.getElementById("modal-calc-evm").classList.add("open");
+    simularEVM();
+}
+
+function abrirCalculadoraConDatos(id) {
+    const o = obras.find(item => item.id === id);
+    if (!o) return;
+
+    const el = (elementId) => document.getElementById(elementId);
+    if (el("calc-bac")) el("calc-bac").value = o.bac;
+    if (el("calc-ac"))  el("calc-ac").value  = o.ac;
+    if (el("calc-pv"))  el("calc-pv").value  = o.planificadoPct;
+    if (el("calc-ev"))  el("calc-ev").value  = o.realPct;
+
+    abrirCalculadoraEVMDirecta();
+}
+
+function cerrarCalculadoraEVMDirecta() {
+    document.getElementById("modal-calc-evm").classList.remove("open");
+}
+
+function simularEVM() {
+    const bac = parseFloat(document.getElementById("calc-bac")?.value || 0);
+    const ac  = parseFloat(document.getElementById("calc-ac")?.value || 0);
+    const pvPct = parseFloat(document.getElementById("calc-pv")?.value || 0);
+    const evPct = parseFloat(document.getElementById("calc-ev")?.value || 0);
+
+    const pv = bac * (pvPct / 100);
+    const ev = bac * (evPct / 100);
+
+    const spi = pv > 0 ? (ev / pv) : 1.0;
+    const cpi = ac > 0 ? (ev / ac) : 1.0;
+    const cv = ev - ac;
+    const sv = ev - pv;
+    const eac = cpi > 0 ? (bac / cpi) : bac;
+
+    const box = document.getElementById("calc-evm-results-box");
+    if (!box) return;
+
+    box.innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:center;">
+            <div style="background:rgba(56,189,248,0.1);padding:10px;border-radius:8px;">
+                <span style="font-size:0.7rem;color:var(--text-muted);">SPI (Cronograma)</span>
+                <h3 style="color:${spi>=1?'var(--accent-cyan)':'var(--accent-rose)'};font-size:1.4rem;">${spi.toFixed(2)}</h3>
+            </div>
+            <div style="background:rgba(52,211,153,0.1);padding:10px;border-radius:8px;">
+                <span style="font-size:0.7rem;color:var(--text-muted);">CPI (Costo)</span>
+                <h3 style="color:${cpi>=1?'var(--accent-emerald)':'var(--accent-rose)'};font-size:1.4rem;">${cpi.toFixed(2)}</h3>
+            </div>
+        </div>
+        <div style="margin-top:14px;font-size:0.8rem;color:var(--text-secondary);">
+            <p><strong>Variación de Costo (CV):</strong> Bs. ${cv.toLocaleString('es-BO', {minimumFractionDigits:2})}</p>
+            <p><strong>Variación de Cronograma (SV):</strong> Bs. ${sv.toLocaleString('es-BO', {minimumFractionDigits:2})}</p>
+            <p style="margin-top:6px;color:var(--primary-light);"><strong>Estimado al Finalizar (EAC):</strong> Bs. ${eac.toLocaleString('es-BO', {minimumFractionDigits:2})}</p>
+        </div>
+    `;
+}
+
+// ─── Reporte Ejecutivo A4 ─────────────────────────────────────────
+function generarReporteEjecutivoObras() {
+    const bacTotal = obras.reduce((sum, o) => sum + Number(o.bac || 0), 0);
+    const evms = obras.map(calcularEVM);
+    const spiProm = evms.length > 0 ? (evms.reduce((s, e) => s + e.spi, 0) / evms.length) : 1.0;
+    const cpiProm = evms.length > 0 ? (evms.reduce((s, e) => s + e.cpi, 0) / evms.length) : 1.0;
+
+    const el = (elementId) => document.getElementById(elementId);
+    if (el("rep-obra-bac")) el("rep-obra-bac").textContent = `Bs. ${bacTotal.toLocaleString('es-BO', {minimumFractionDigits: 2})}`;
+    if (el("rep-obra-spi")) el("rep-obra-spi").textContent = spiProm.toFixed(2);
+    if (el("rep-obra-cpi")) el("rep-obra-cpi").textContent = cpiProm.toFixed(2);
+
+    const tbody = el("reporte-obras-tabla-body");
+    if (tbody) {
+        tbody.innerHTML = obras.map(o => {
+            const e = calcularEVM(o);
+            return `
+                <tr>
+                    <td><strong>${o.nombre}</strong></td>
+                    <td>${o.provincia}</td>
+                    <td>Bs. ${e.bac.toLocaleString('es-BO', {minimumFractionDigits:2})}</td>
+                    <td>Bs. ${e.ac.toLocaleString('es-BO', {minimumFractionDigits:2})}</td>
+                    <td>${e.spi.toFixed(2)}</td>
+                    <td>${e.cpi.toFixed(2)}</td>
+                    <td><strong>${e.estadoLabel}</strong></td>
+                </tr>
+            `;
+        }).join("");
+    }
+
+    const area = el("area-impresion-reporte-obras");
+    if (area) area.style.display = "block";
+    window.print();
+    setTimeout(() => { if (area) area.style.display = "none"; }, 1000);
+}
+
+function mostrarToast(mensaje, tipo = "info") {
+    const container = document.getElementById("toast-container");
+    if (!container) return;
+    const toast = document.createElement("div");
+    toast.className = `toast ${tipo}`;
+    toast.innerHTML = `<span>${mensaje}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3500);
 }

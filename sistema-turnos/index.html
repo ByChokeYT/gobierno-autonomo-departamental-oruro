@@ -1,45 +1,234 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gobernación Oruro - Sistema de Turnos</title>
-    <!-- Vinculamos la hoja de estilos externa -->
-    <link rel="stylesheet" href="assets/css/styles.css">
+    <title>Gobernación de Oruro — Sistema de Turnos FIFO &amp; Ventanillas</title>
+    <meta name="description" content="Gestión de colas FIFO, emisor de tickets de atención y llamador de ventanillas — Gobernación Autónoma Departamental de Oruro.">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./assets/css/styles.css">
 </head>
-
 <body>
+    <div class="carbon-grid-overlay"></div>
+    <div class="glow-orb orb-gold"></div>
+    <div class="glow-orb orb-cyan"></div>
 
-    <div class="container">
-        <h1>Atención al Ciudadano</h1>
+    <div class="app-workspace">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-escudo-wrap">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo de Oruro" class="brand-escudo">
+                </div>
+                <div>
+                    <h2>TURNOS ORURO</h2>
+                    <p class="brand-sub">ATENCIÓN CIUDADANA FIFO</p>
+                </div>
+            </div>
 
-        <div class="panel">
-            <h2>Emitir Turno</h2>
-            <label for="nombre-ciudadano">Nombre del Ciudadano:</label>
-            <input type="text" id="nombre-ciudadano" placeholder="Ej. Juan Pérez">
-            <button id="btn-registrar">Registrar y Dar Turno</button>
-        </div>
+            <div class="live-clock-widget">
+                <div class="clock-time" id="turn-clock-time">00:00:00</div>
+                <div class="clock-badge">
+                    <span class="clock-badge-dot"></span>
+                    Salas de Atención Activas
+                </div>
+            </div>
 
-        <div class="panel">
-            <h2>Panel del Funcionario</h2>
-            <button id="btn-llamar" class="btn-llamar">Llamar Siguiente Turno</button>
+            <nav class="navigation-menu">
+                <div class="nav-section-label">ACCIONES DE SALA</div>
+                <button class="nav-item active" onclick="generarReporteEjecutivoTurnos()">
+                    <div class="nav-icon-box gold">📄</div>
+                    <span>Informe Ejecutivo A4</span>
+                </button>
+            </nav>
 
-            <p>Atendiendo ahora a:</p>
-            <div id="turno-actual">--</div>
-            <p id="nombre-actual" class="texto-secundario">Nadie en ventanilla</p>
-        </div>
+            <div class="sidebar-footer">
+                <div class="user-operator-pill">
+                    <div class="operator-avatar">V1</div>
+                    <div class="operator-info">
+                        <span class="operator-name">Ventanilla 1</span>
+                        <span class="operator-role">Atención al Público GAD-ORU</span>
+                    </div>
+                </div>
+                <div class="hash-integrity-badge">
+                    🔒 Cola FIFO Hash Verificada
+                </div>
+            </div>
+        </aside>
 
-        <div class="panel">
-            <h2>Fila de Espera (<span id="contador-fila">0</span>)</h2>
-            <ul id="lista-espera">
-                <!-- Los turnos aparecerán aquí -->
-            </ul>
+        <main class="main-content">
+            <header class="top-bar">
+                <div>
+                    <div class="badge-institutional">
+                        <span class="badge-dot"></span>
+                        DISTRIBUCIÓN DE TURNOS Y LLAMADOR DE VENTANILLAS
+                    </div>
+                    <h1>Atención al Ciudadano &amp; Fila Virtual</h1>
+                </div>
+            </header>
+
+            <div class="workspace-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;">
+                <!-- Card 1: Emisor de Turnos -->
+                <section class="card-focus">
+                    <div class="card-header">
+                        <h2>Emitir Nuevo Turno</h2>
+                        <p>Registre al ciudadano en la cola FIFO.</p>
+                    </div>
+
+                    <form id="form-emitir-turno" onsubmit="emitirTurno(event)" style="margin-top:16px;">
+                        <div class="form-group">
+                            <label for="nombre-ciudadano">Nombre del Ciudadano</label>
+                            <input type="text" id="nombre-ciudadano" placeholder="Ej. Juan Pérez Ramos" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="select-servicio">Área de Servicio</label>
+                            <select id="select-servicio">
+                                <option value="Ventanilla 1 - Trámites Generales">Ventanilla 1 - Trámites Generales</option>
+                                <option value="Ventanilla 2 - Personerías Jurídicas">Ventanilla 2 - Personerías Jurídicas</option>
+                                <option value="Ventanilla 3 - Regalías Mineras">Ventanilla 3 - Regalías Mineras</option>
+                            </select>
+                        </div>
+
+                        <div class="form-actions" style="margin-top:16px;">
+                            <button type="submit" class="btn-glow">Emitir Ticket &amp; Ticket A4</button>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- Card 2: Pantalla de Llamador de Ventanilla -->
+                <section class="card-focus" style="border-color:rgba(245,158,11,0.4);background:rgba(245,158,11,0.03);">
+                    <div class="card-header" style="text-align:center;">
+                        <h2>Llamador de Ventanilla</h2>
+                        <p>Panel de llamado para el funcionario público.</p>
+                    </div>
+
+                    <div style="text-align:center;margin:24px 0;">
+                        <span style="font-size:0.7rem;color:var(--text-muted);font-weight:700;letter-spacing:0.1em;">TURNO ATENDIENDO AHORA:</span>
+                        <div id="turno-actual" style="font-family:'JetBrains Mono',monospace;font-size:3.5rem;font-weight:900;color:var(--accent-gold);text-shadow:0 0 24px rgba(245,158,11,0.4);margin:8px 0;">--</div>
+                        <p id="nombre-actual" style="font-size:0.95rem;font-weight:700;color:var(--text-main);">Nadie en ventanilla</p>
+                    </div>
+
+                    <button class="btn-primary" onclick="llamarSiguienteTurno()" style="width:100%;padding:14px;font-size:0.95rem;justify-content:center;background:linear-gradient(135deg,var(--accent-gold),#f59e0b);color:#000;font-weight:900;font-family:var(--font-brand);">
+                        🔔 Llamar Siguiente Turno
+                    </button>
+                </section>
+
+                <!-- Card 3: Lista de Espera FIFO -->
+                <section class="card-focus">
+                    <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+                        <div>
+                            <h2>Cola de Espera (<span id="contador-fila">0</span>)</h2>
+                            <p>Turnos pendientes en orden FIFO.</p>
+                        </div>
+                    </div>
+
+                    <ul id="lista-espera" style="list-style:none;margin-top:16px;display:flex;flex-direction:column;gap:10px;max-height:280px;overflow-y:auto;">
+                        <!-- Dinámico -->
+                    </ul>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- ══════ MODAL: Ticket Térmico A4 SAFCO ══════ -->
+    <div id="modal-ficha-turno" class="modal-overlay">
+        <div class="modal-content" style="max-width:650px;">
+            <div class="modal-actions-bar">
+                <div class="modal-title-group">
+                    <div class="modal-title-icon">🎟️</div>
+                    <div>
+                        <h3>Ticket Oficial de Atención al Ciudadano</h3>
+                        <p class="modal-subtitle" id="ficha-turno-subtitle">Documento SAFCO · Ventanilla Única GAD-ORU</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-secondary" onclick="cerrarFichaTurno()">Cerrar</button>
+                    <button class="btn-primary" onclick="imprimirFichaTurno()">Imprimir Ticket A4</button>
+                </div>
+            </div>
+
+            <div class="documento-resolucion" id="area-impresion-turno">
+                <div class="escudo-agua"></div>
+
+                <div class="resolucion-header">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo" class="res-escudo">
+                    <div class="res-header-text">
+                        <h3>GOBIERNO AUTÓNOMO DEPARTAMENTAL DE ORURO</h3>
+                        <h5>SISTEMA DE TURNOS Y ATENCIÓN CIUDADANA</h5>
+                        <h4 id="ficha-turno-codigo">TICKET DE ATENCIÓN N° T-101</h4>
+                    </div>
+                    <div class="seal-top-right">
+                        <div class="gold-official-seal">
+                            <span>TURNOS<br>ORURO</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resolucion-body" style="text-align:center;">
+                    <p class="fecha-emision" style="text-align:center;">Oruro, <span id="ficha-turno-fecha">02 de Septiembre de 2026</span></p>
+
+                    <div style="border:2px dashed #b45309;padding:20px;border-radius:12px;margin:16px 0;background:#fef3c7;">
+                        <span style="font-size:0.75rem;color:#b45309;font-weight:800;letter-spacing:0.1em;">SU NÚMERO DE TURNO ES:</span>
+                        <h1 id="ficha-turno-numero" style="font-family:'JetBrains Mono',monospace;font-size:3.5rem;color:#b45309;font-weight:900;margin:6px 0;">T-101</h1>
+                        <p style="font-size:0.95rem;color:#000;font-weight:700;">Ciudadano: <span id="ficha-turno-nombre">Juan Pérez Ramos</span></p>
+                        <p style="font-size:0.82rem;color:#444;margin-top:4px;">Área: <strong id="ficha-turno-servicio">Ventanilla 1 - Trámites Generales</strong></p>
+                    </div>
+
+                    <p style="font-size:0.82rem;color:#64748b;">Por favor espere a ser llamado en la pantalla gigante de la sala de atención.</p>
+                </div>
+
+                <div class="resolucion-verification-row">
+                    <div class="qr-box-simulated">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M2 2h8v8H2V2zm2 2v4h4V4H4zm8-2h8v8h-8V2zm2 2v4h4V4h-4zM2 14h8v8H2v-8zm2 2v4h4v-4H4zm13-2h3v3h-3v-3zm0 5h3v3h-3v-3zm-5-5h3v3h-3v-3zm0 5h3v3h-3v-3z"/>
+                        </svg>
+                        <span>Atención al Público GAD-ORU</span>
+                    </div>
+
+                    <div class="security-hash-block">
+                        <small>HASH COLA FIFO SHA-256:</small>
+                        <code id="ficha-turno-hash">SHA256: 10109876543210123456789abcdef0123456789abcdef0123456789abcdef</code>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Vinculamos la lógica externa -->
-    <script src="src/main.js"></script>
-</body>
+    <!-- ══════ IMPRESIÓN REPORTE EJECUTIVO A4 ══════ -->
+    <div id="area-impresion-reporte-turnos" class="documento-resolucion" style="display:none;">
+        <div class="resolucion-header">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo" class="res-escudo">
+            <div class="res-header-text">
+                <h3>GOBIERNO AUTÓNOMO DEPARTAMENTAL DE ORURO</h3>
+                <h5>SECRETARÍA GENERAL · ATENCIÓN CIUDADANA</h5>
+                <h4>INFORME EJECUTIVO DE ATENCIÓN Y TURNOS FIFO</h4>
+            </div>
+            <div class="gold-official-seal">
+                <span>TURNOS<br>AUDITORÍA</span>
+            </div>
+        </div>
 
+        <div class="resolucion-body">
+            <p class="fecha-emision">Oruro, <span id="reporte-turn-fecha">02 de Septiembre de 2026</span></p>
+
+            <table style="width:100%;border-collapse:collapse;margin-top:20px;font-size:0.8rem;color:#000;" border="1" cellpadding="6">
+                <thead>
+                    <tr style="background:#e2e8f0;">
+                        <th>Turno</th>
+                        <th>Ciudadano</th>
+                        <th>Ventanilla / Área</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="reporte-turn-tabla-body">
+                    <!-- Dinámico -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="./src/main.js"></script>
+</body>
 </html>

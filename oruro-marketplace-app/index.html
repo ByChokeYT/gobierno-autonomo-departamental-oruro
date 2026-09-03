@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gobernación de Oruro — Oruro Produce Marketplace (16 Provincias)</title>
+    <meta name="description" content="Catálogo de productores agropecuarios, artesanales y mineros de las 16 provincias de Oruro — Gobierno Autónomo Departamental de Oruro.">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./assets/css/styles.css">
+</head>
+<body>
+    <div class="carbon-grid-overlay"></div>
+    <div class="glow-orb orb-gold"></div>
+    <div class="glow-orb orb-rust"></div>
+
+    <div class="app-workspace">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-escudo-wrap">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo de Oruro" class="brand-escudo">
+                </div>
+                <div>
+                    <h2>ORURO PRODUCE</h2>
+                    <p class="brand-sub">FERIA DE LAS 16 PROVINCIAS</p>
+                </div>
+            </div>
+
+            <div class="live-clock-widget">
+                <div class="clock-time" id="mkt-clock-time">00:00:00</div>
+                <div class="clock-badge">
+                    <span class="clock-badge-dot"></span>
+                    Feria Departamental en Vivo
+                </div>
+            </div>
+
+            <nav class="navigation-menu">
+                <div class="nav-section-label">CATEGORÍAS DE ORIGEN</div>
+                <button class="nav-item active" onclick="filtrarCategoria('TODOS')">
+                    <div class="nav-icon-box">🌾</div>
+                    <span>Todos los Productos</span>
+                </button>
+                <button class="nav-item" onclick="filtrarCategoria('Quinua')">
+                    <div class="nav-icon-box gold">🥣</div>
+                    <span>Quinua Real Orgánica</span>
+                </button>
+                <button class="nav-item" onclick="filtrarCategoria('Camélidos')">
+                    <div class="nav-icon-box rust">🦙</div>
+                    <span>Camélidos &amp; Charque</span>
+                </button>
+                <button class="nav-item" onclick="filtrarCategoria('Textiles')">
+                    <div class="nav-icon-box">🧶</div>
+                    <span>Textiles &amp; Artesanías</span>
+                </button>
+                <button class="nav-item" onclick="generarReporteEjecutivoMarketplace()" style="margin-top:14px;">
+                    <div class="nav-icon-box gold">📄</div>
+                    <span>Informe Ejecutivo A4</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-operator-pill">
+                    <div class="operator-avatar">MP</div>
+                    <div class="operator-info">
+                        <span class="operator-name">Mercado Departamental</span>
+                        <span class="operator-role">Desarrollo Productivo GAD-ORU</span>
+                    </div>
+                </div>
+                <div class="hash-integrity-badge">
+                    🔒 Origen Certificado SHA-256
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <div>
+                    <div class="badge-institutional">
+                        <span class="badge-dot"></span>
+                        OFERTA DE LAS 16 PROVINCIAS DEL DEPARTAMENTO DE ORURO
+                    </div>
+                    <h1>Oruro Produce — Feria Virtual Departamental</h1>
+                </div>
+                <div class="top-bar-stats">
+                    <div class="quick-stat">
+                        <span class="stat-num" id="stat-productores-count">16</span>
+                        <span class="stat-lbl">Provincias Productoras</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="workspace-grid" style="display:grid;grid-template-columns:1fr;gap:24px;">
+                <section class="card-focus">
+                    <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
+                        <div>
+                            <h2>Catálogo Oficial de Productores Departamentales</h2>
+                            <p>Productos con Sello de Origen Oruro y Acreditación Gubernamental.</p>
+                        </div>
+                        <div style="display:flex;gap:12px;align-items:center;">
+                            <select id="select-provincia-filtro" onchange="filtrarPorProvincia()" style="background:var(--bg-input);border:1px solid var(--border-main);border-radius:var(--radius-md);color:#fff;padding:8px 12px;font-size:0.85rem;">
+                                <option value="TODOS">Todas las 16 Provincias</option>
+                                <option value="Ladislao Cabrera">Ladislao Cabrera (Salinas)</option>
+                                <option value="Eduardo Abaroa">Eduardo Abaroa (Challapata)</option>
+                                <option value="Pantaleón Dalence">Pantaleón Dalence (Huanuni)</option>
+                                <option value="Sajama">Sajama (Curahuara de Carangas)</option>
+                                <option value="Cercado">Cercado (Oruro)</option>
+                            </select>
+                            <input type="text" id="input-buscar-producto" placeholder="Buscar producto o productor..." style="background:var(--bg-input);border:1px solid var(--border-main);border-radius:var(--radius-md);color:#fff;padding:8px 14px;font-size:0.85rem;width:240px;" oninput="filtrarPorTexto()">
+                        </div>
+                    </div>
+
+                    <div class="products-grid" id="contenedor-productos" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:20px;margin-top:22px;">
+                        <!-- Dinámico -->
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- ══════ MODAL: Ficha A4 de Productor SAFCO ══════ -->
+    <div id="modal-ficha-producto" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-actions-bar">
+                <div class="modal-title-group">
+                    <div class="modal-title-icon">🌾</div>
+                    <div>
+                        <h3>Certificado Oficial de Productor Departamental</h3>
+                        <p class="modal-subtitle" id="ficha-mkt-subtitle">Acreditación GAD-ORU · Ley N° 031</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-secondary" onclick="cerrarFichaProducto()">Cerrar</button>
+                    <button class="btn-primary" onclick="imprimirFichaProducto()">Imprimir Ficha A4</button>
+                </div>
+            </div>
+
+            <div class="documento-resolucion" id="area-impresion-producto">
+                <div class="escudo-agua"></div>
+
+                <div class="resolucion-header">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo" class="res-escudo">
+                    <div class="res-header-text">
+                        <h3>GOBIERNO AUTÓNOMO DEPARTAMENTAL DE ORURO</h3>
+                        <h5>SECRETARÍA DE DESARROLLO PRODUCTIVO Y ECONOMÍA PLURAL</h5>
+                        <h4 id="ficha-mkt-codigo">ACREDITACIÓN DE ORIGEN N° MKT-ORU-2026-01</h4>
+                    </div>
+                    <div class="seal-top-right">
+                        <div class="gold-official-seal">
+                            <span>ORURO<br>PRODUCE</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resolucion-body">
+                    <p class="fecha-emision">Oruro, <span id="ficha-mkt-fecha">02 de Septiembre de 2026</span></p>
+
+                    <p><strong>CERTIFICACIÓN DE ORIGEN PROVINCIAL:</strong> La Secretaría Departamental de Desarrollo Productivo del Gobierno Autónomo Departamental de Oruro certifica el registro y acreditación del productor en la plataforma oficial.</p>
+
+                    <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.86rem;color:#000;" border="1" cellpadding="8">
+                        <tr>
+                            <td style="background:#f8fafc;font-weight:700;width:32%;">PRODUCTOR / ASOCIACIÓN:</td>
+                            <td><strong id="ficha-mkt-productor" style="color:#b45309;font-size:1.05rem;">Asociación de Productores de Quinua Real (APROQUIRI)</strong></td>
+                        </tr>
+                        <tr>
+                            <td style="background:#f8fafc;font-weight:700;">PROVINCIA DE ORIGEN:</td>
+                            <td><strong id="ficha-mkt-provincia" style="color:#0284c7;">Ladislao Cabrera (Salinas de Garci Mendoza)</strong></td>
+                        </tr>
+                        <tr>
+                            <td style="background:#f8fafc;font-weight:700;">PRODUCTO REGISTRADO:</td>
+                            <td><span id="ficha-mkt-producto">Quinua Real Blanca Orgánica (Saco 50 Kg)</span></td>
+                        </tr>
+                        <tr>
+                            <td style="background:#f8fafc;font-weight:700;">PRECIO OFICIAL DE VENTA:</td>
+                            <td><strong id="ficha-mkt-precio" style="color:#059669;font-size:1.1rem;">Bs. 850 / Saco</strong></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="resolucion-verification-row">
+                    <div class="qr-box-simulated">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M2 2h8v8H2V2zm2 2v4h4V4H4zm8-2h8v8h-8V2zm2 2v4h4V4h-4zM2 14h8v8H2v-8zm2 2v4h4v-4H4zm13-2h3v3h-3v-3zm0 5h3v3h-3v-3zm-5-5h3v3h-3v-3zm0 5h3v3h-3v-3z"/>
+                        </svg>
+                        <span>Sello Oruro Produce GAD-ORU</span>
+                    </div>
+
+                    <div class="security-hash-block">
+                        <small>HASH ORIGEN PRODUCTIVO SHA-256:</small>
+                        <code id="ficha-mkt-hash">SHA256: 99909876543210123456789abcdef0123456789abcdef0123456789abcdef</code>
+                    </div>
+                </div>
+
+                <div class="resolucion-firmas">
+                    <div class="firma-block">
+                        <div class="linea-firma"></div>
+                        <p><strong>Firma del Productor</strong></p>
+                        <p>Representante Legal</p>
+                    </div>
+                    <div class="firma-block">
+                        <div class="linea-firma"></div>
+                        <p><strong>Desarrollo Productivo</strong></p>
+                        <p>Gobierno Autónomo Departamental de Oruro</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════ IMPRESIÓN REPORTE EJECUTIVO A4 ══════ -->
+    <div id="area-impresion-reporte-mkt" class="documento-resolucion" style="display:none;">
+        <div class="resolucion-header">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo" class="res-escudo">
+            <div class="res-header-text">
+                <h3>GOBIERNO AUTÓNOMO DEPARTAMENTAL DE ORURO</h3>
+                <h5>SECRETARÍA DE DESARROLLO PRODUCTIVO</h5>
+                <h4>INFORME EJECUTIVO DEL MERCADO DEPARTAMENTAL DE LAS 16 PROVINCIAS</h4>
+            </div>
+            <div class="gold-official-seal">
+                <span>ORURO<br>MERCADO</span>
+            </div>
+        </div>
+
+        <div class="resolucion-body">
+            <p class="fecha-emision">Oruro, <span id="reporte-mkt-fecha">02 de Septiembre de 2026</span></p>
+
+            <table style="width:100%;border-collapse:collapse;margin-top:20px;font-size:0.8rem;color:#000;" border="1" cellpadding="6">
+                <thead>
+                    <tr style="background:#e2e8f0;">
+                        <th>Cod</th>
+                        <th>Producto</th>
+                        <th>Productor</th>
+                        <th>Provincia</th>
+                        <th>Precio</th>
+                    </tr>
+                </thead>
+                <tbody id="reporte-mkt-tabla-body">
+                    <!-- Dinámico -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="./assets/js/main.js"></script>
+</body>
+</html>

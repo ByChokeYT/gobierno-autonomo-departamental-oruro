@@ -1,107 +1,158 @@
-// ------------------------------------------------------------------
-// MISIÓN PARA EL ALUMNO:
-// Debes hacer que los botones funcionen modificando ÚNICAMENTE este archivo.
-// NO puedes usar bases de datos ni LocalStorage todavía.
-// Toda la información debe vivir en estas dos variables globales:
-// ------------------------------------------------------------------
+// ════════════════════════════════════════════════════════════════
+// SISTEMA DE TURNOS FIFO Y LLAMADOR DE VENTANILLAS — SAFCO
+// Atención al Ciudadano · Gobernación Autónoma Departamental de Oruro
+// Senior Principal Software Architect Level
+// ════════════════════════════════════════════════════════════════
 
-// Arreglo para guardar a las personas que están esperando
-let filaDeEspera = [];
+'use strict';
 
-// Número correlativo para asignar el turno (ej. 1, 2, 3...)
-let numeroTurnoGlobal = 1;
+let colaTurnos = [];
+let historialAtendidos = [];
+let contadorTurno = 100;
+let turnoActual = null;
 
-// ------------------------------------------------------------------
-// REFERENCIAS AL DOM (Las conexiones entre JS y el HTML)
-// ------------------------------------------------------------------
-const inputNombre = document.getElementById('nombre-ciudadano');
-const btnRegistrar = document.getElementById('btn-registrar');
-const btnLlamar = document.getElementById('btn-llamar');
-const displayTurnoActual = document.getElementById('turno-actual');
-const displayNombreActual = document.getElementById('nombre-actual');
-const listaEsperaUl = document.getElementById('lista-espera');
-const contadorFila = document.getElementById('contador-fila');
+document.addEventListener("DOMContentLoaded", () => {
+    inicializarTurnos();
+    iniciarRelojVivo();
+    renderCola();
+});
 
-// ------------------------------------------------------------------
-// FUNCIONES CORE (Tu trabajo empieza aquí)
-// ------------------------------------------------------------------
+function iniciarRelojVivo() {
+    const tick = () => {
+        const ahora = new Date();
+        const h = String(ahora.getHours()).padStart(2, "0");
+        const m = String(ahora.getMinutes()).padStart(2, "0");
+        const s = String(ahora.getSeconds()).padStart(2, "0");
 
-function registrarCiudadano() {
-    // RETO 1:
-    // 1. Obtener el valor de 'inputNombre'
-    const nombre = inputNombre.value.trim();
-
-    // 2. Validar que no esté vacío (TIP: ten cuidado con los espacios en blanco)
-    if (nombre === "") {
-        alert("Por favor, ingrese el nombre del ciudadano.");
-        return;
-    }
-
-    // 3. Crear un objeto literal que represente a la persona. Ejemplo:
-    //    { turno: "A-1", nombre: "Juan Pérez" }
-    const nuevoCiudadano = {
-        turno: `A-${numeroTurnoGlobal}`,
-        nombre: nombre
+        const el = document.getElementById("turn-clock-time");
+        if (el) el.textContent = `${h}:${m}:${s}`;
     };
-
-    // 4. Agregar ese objeto a 'filaDeEspera'
-    filaDeEspera.push(nuevoCiudadano);
-
-    // 5. Incrementar 'numeroTurnoGlobal' para el siguiente
-    numeroTurnoGlobal++;
-
-    // 6. Limpiar el input para que quede listo para otra persona
-    inputNombre.value = "";
-
-    // 7. Llamar a la función 'actualizarInterfazFila()'
-    actualizarInterfazFila();
+    tick();
+    setInterval(tick, 1000);
 }
 
-function llamarSiguiente() {
-    // RETO 2:
-    // 1. Validar si 'filaDeEspera' está vacía. Si es así, avisar y salir.
-    if (filaDeEspera.length === 0) {
-        alert("No hay ciudadanos en la fila de espera.");
+function inicializarTurnos() {
+    colaTurnos = [
+        { id: "T-101", nombre: "Juan Pérez Ramos", servicio: "Ventanilla 1 - Trámites Generales", hora: "09:00" },
+        { id: "T-102", nombre: "María Elena Quispe", servicio: "Ventanilla 2 - Personerías Jurídicas", hora: "09:10" },
+        { id: "T-103", nombre: "Roberto Mamani", servicio: "Ventanilla 3 - Regalías Mineras", hora: "09:15" }
+    ];
+    contadorTurno = 103;
+}
+
+function emitirTurno(e) {
+    e.preventDefault();
+
+    const nombre   = document.getElementById("nombre-ciudadano").value.trim();
+    const servicio = document.getElementById("select-servicio").value;
+
+    contadorTurno++;
+    const id = `T-${contadorTurno}`;
+    const hora = new Date().toLocaleTimeString('es-BO', {hour:'2-digit', minute:'2-digit'});
+
+    const nuevo = { id, nombre, servicio, hora };
+    colaTurnos.push(nuevo);
+
+    document.getElementById("form-emitir-turno").reset();
+    renderCola();
+    mostrarToast(`Ticket ${id} emitido para ${nombre}.`, "success");
+    setTimeout(() => abrirFichaTurno(nuevo), 300);
+}
+
+function llamarSiguienteTurno() {
+    if (colaTurnos.length === 0) {
+        mostrarToast("No hay ciudadanos esperando en la cola FIFO.", "warning");
         return;
     }
 
-    // 2. Extraer a la PRIMERA persona de la 'filaDeEspera' (piensa en FIFO)
-    const siguientePersona = filaDeEspera.shift();
+    turnoActual = colaTurnos.shift(); // Algoritmo FIFO (First-In, First-Out)
+    historialAtendidos.push(turnoActual);
 
-    // 3. Mostrar el turno de esa persona en 'displayTurnoActual'
-    displayTurnoActual.innerText = siguientePersona.turno;
+    const el = (id) => document.getElementById(id);
+    if (el("turno-actual"))  el("turno-actual").textContent  = turnoActual.id;
+    if (el("nombre-actual")) el("nombre-actual").textContent = `${turnoActual.nombre} · ${turnoActual.servicio}`;
 
-    // 4. Mostrar el nombre de esa persona en 'displayNombreActual'
-    displayNombreActual.innerText = siguientePersona.nombre;
-
-    // 5. Llamar a la función 'actualizarInterfazFila()'
-    actualizarInterfazFila();
+    renderCola();
+    mostrarToast(`🔔 ¡Llamando al Turno ${turnoActual.id} en ${turnoActual.servicio}!`, "info");
 }
 
-function actualizarInterfazFila() {
-    // RETO 3:
-    // 1. Limpiar el contenido actual de 'listaEsperaUl' para evitar duplicados
-    listaEsperaUl.innerHTML = "";
+function renderCola() {
+    const lista = document.getElementById("lista-espera");
+    const contador = document.getElementById("contador-fila");
+    if (contador) contador.textContent = colaTurnos.length;
+    if (!lista) return;
 
-    // 2. Recorrer el arreglo 'filaDeEspera'
-    filaDeEspera.forEach(persona => {
-        // 3. Por cada persona, crear un elemento <li> (ej. "Turno: A-X - Nombre")
-        const li = document.createElement('li');
-        
-        // Usamos estructura interna para que el CSS (flexbox justify-content: space-between)
-        // separe adecuadamente el turno del nombre
-        li.innerHTML = `<span>Turno: ${persona.turno}</span> <span>${persona.nombre}</span>`;
+    lista.innerHTML = "";
 
-        // 4. Agregar ese <li> al 'listaEsperaUl'
-        listaEsperaUl.appendChild(li);
+    if (colaTurnos.length === 0) {
+        lista.innerHTML = `<li style="font-size:0.8rem;color:var(--text-muted);text-align:center;padding:12px;">Sin turnos en fila</li>`;
+        return;
+    }
+
+    colaTurnos.forEach((t, idx) => {
+        const li = document.createElement("li");
+        li.style.cssText = "background:rgba(255,255,255,0.03);border:1px solid var(--border-subtle);padding:10px 14px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;";
+        li.innerHTML = `
+            <div>
+                <strong style="font-family:'JetBrains Mono',monospace;color:var(--primary-light);">${t.id}</strong>
+                <span style="font-size:0.82rem;color:var(--text-main);margin-left:8px;">${t.nombre}</span>
+            </div>
+            <span style="font-size:0.68rem;color:var(--text-muted);font-weight:700;">#${idx + 1} en fila</span>
+        `;
+        lista.appendChild(li);
     });
-
-    // 5. Actualizar el texto de 'contadorFila' con la cantidad de gente esperando.
-    contadorFila.innerText = filaDeEspera.length;
 }
 
-// ------------------------------------------------------------------
-// EVENT LISTENER (Conectando clics a las funciones)
-// ------------------------------------------------------------------
-btnRegistrar.addEventListener('click', registrarCiudadano);
-btnLlamar.addEventListener('click', llamarSiguiente);
+// ─── Modal A4 & Reporte ───────────────────────────────────────────
+function abrirFichaTurno(t) {
+    if (!t) return;
+
+    const el = (elementId) => document.getElementById(elementId);
+    if (el("ficha-turno-subtitle")) el("ficha-turno-subtitle").textContent = `${t.id} · Ciudadano: ${t.nombre}`;
+    if (el("ficha-turno-codigo"))   el("ficha-turno-codigo").textContent   = `TICKET DE ATENCIÓN N° ${t.id}`;
+    if (el("ficha-turno-fecha"))    el("ficha-turno-fecha").textContent    = new Date().toLocaleDateString('es-BO', {day:'2-digit', month:'short', year:'numeric'}) + " - " + t.hora;
+    if (el("ficha-turno-numero"))   el("ficha-turno-numero").textContent   = t.id;
+    if (el("ficha-turno-nombre"))   el("ficha-turno-nombre").textContent   = t.nombre;
+    if (el("ficha-turno-servicio")) el("ficha-turno-servicio").textContent = t.servicio;
+
+    document.getElementById("modal-ficha-turno").classList.add("open");
+}
+
+function cerrarFichaTurno() {
+    document.getElementById("modal-ficha-turno").classList.remove("open");
+}
+
+function imprimirFichaTurno() {
+    window.print();
+}
+
+function generarReporteEjecutivoTurnos() {
+    const el = (elementId) => document.getElementById(elementId);
+    const tbody = el("reporte-turn-tabla-body");
+    if (tbody) {
+        const todos = [...historialAtendidos, ...colaTurnos];
+        tbody.innerHTML = todos.map(t => `
+            <tr>
+                <td><strong>${t.id}</strong></td>
+                <td>${t.nombre}</td>
+                <td>${t.servicio}</td>
+                <td>${historialAtendidos.includes(t) ? 'Atendido' : 'En Espera'}</td>
+            </tr>
+        `).join("");
+    }
+
+    const area = el("area-impresion-reporte-turnos");
+    if (area) area.style.display = "block";
+    window.print();
+    setTimeout(() => { if (area) area.style.display = "none"; }, 1000);
+}
+
+function mostrarToast(mensaje, tipo = "info") {
+    const container = document.getElementById("toast-container");
+    if (!container) return;
+    const toast = document.createElement("div");
+    toast.className = `toast ${tipo}`;
+    toast.innerHTML = `<span>${mensaje}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3500);
+}

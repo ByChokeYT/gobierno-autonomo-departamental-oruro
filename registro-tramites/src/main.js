@@ -1,152 +1,218 @@
-// ------------------------------------------------------------------
-// GOBERNACIÓN AUTÓNOMA DEPARTAMENTAL DE ORURO
-// FASE 2: La Memoria (Persistencia de Datos con LocalStorage)
-// ------------------------------------------------------------------
+// ════════════════════════════════════════════════════════════════
+// REGISTRO DE TRÁMITES CIUDADANOS (CRUD) — SAFCO
+// Secretaría General · Gobernación Autónoma Departamental de Oruro
+// Senior Principal Software Architect Level
+// ════════════════════════════════════════════════════════════════
 
-// ------------------------------------------------------------------
-// 1. ESTADO DE LA APLICACIÓN (Variables Globales)
-// ------------------------------------------------------------------
-// Intentamos cargar la lista desde LocalStorage al iniciar. Si no hay nada, inicializamos vacío.
-let listaTramites = [];
+'use strict';
 
-// ------------------------------------------------------------------
-// 2. REFERENCIAS AL DOM
-// ------------------------------------------------------------------
-const formulario = document.getElementById('formulario-tramite');
-const inputNombre = document.getElementById('nombre');
-const inputCedula = document.getElementById('cedula');
-const selectTramite = document.getElementById('tipo-tramite');
-const tbodyTramites = document.getElementById('tbody-tramites');
-const contadorTramites = document.getElementById('contador-tramites');
-const estadoVacio = document.getElementById('estado-vacio');
+let tramites = [];
+let tramitesFiltrados = [];
 
-// ------------------------------------------------------------------
-// 3. FUNCIONES DE PERSISTENCIA (LocalStorage)
-// ------------------------------------------------------------------
+document.addEventListener("DOMContentLoaded", () => {
+    inicializarTramites();
+    iniciarRelojVivo();
+    filtrarTramites();
+    actualizarContador();
+});
 
-// RETO 1: Guardar información en LocalStorage
-function guardarEnLocalStorage() {
-    // 1. Convertir el arreglo 'listaTramites' a un String usando JSON.stringify
-    // 2. Guardar en localStorage bajo la clave 'tramites_gobernacion'
-    localStorage.setItem('tramites_gobernacion', JSON.stringify(listaTramites));
+function iniciarRelojVivo() {
+    const tick = () => {
+        const ahora = new Date();
+        const h = String(ahora.getHours()).padStart(2, "0");
+        const m = String(ahora.getMinutes()).padStart(2, "0");
+        const s = String(ahora.getSeconds()).padStart(2, "0");
+
+        const el = document.getElementById("tram-clock-time");
+        if (el) el.textContent = `${h}:${m}:${s}`;
+    };
+    tick();
+    setInterval(tick, 1000);
 }
 
-// RETO 2: Cargar información desde LocalStorage
-function cargarDesdeLocalStorage() {
-    // 1. Obtener el string guardado en localStorage bajo la clave 'tramites_gobernacion'
-    const datosRaw = localStorage.getItem('tramites_gobernacion');
-    
-    // 2. Si existen datos, convertirlos de vuelta a un arreglo usando JSON.parse y asignarlos a 'listaTramites'
-    if (datosRaw) {
-        listaTramites = JSON.parse(datosRaw);
-    }
-}
-
-// ------------------------------------------------------------------
-// 4. FUNCIONES DE RENDERIZADO (Actualizar la Interfaz)
-// ------------------------------------------------------------------
-
-// RETO 3: Dibujar la tabla dinámicamente
-function renderizarTabla() {
-    // 1. Limpiar el contenido actual del cuerpo de la tabla para evitar duplicidad
-    tbodyTramites.innerHTML = '';
-
-    // 2. Controlar la visibilidad de la sección de "Sin Registros / Estado Vacío"
-    if (listaTramites.length === 0) {
-        estadoVacio.classList.remove('hidden');
+function inicializarTramites() {
+    const local = localStorage.getItem("oruro_registro_tramites_v2");
+    if (local) {
+        tramites = JSON.parse(local);
     } else {
-        estadoVacio.classList.add('hidden');
+        tramites = [
+            {
+                id: "TR-2026-0001",
+                nombre: "Juan Carlos Flores Pérez",
+                cedula: "1234567 OR",
+                tipo: "Licencia de Funcionamiento",
+                estado: "En Proceso",
+                fecha: "02 Sep 2026 - 08:45"
+            },
+            {
+                id: "TR-2026-0002",
+                nombre: "María Elena Quispe Colque",
+                cedula: "4589120 OR",
+                tipo: "Certificación Técnica Ambiental",
+                estado: "Aprobado",
+                fecha: "02 Sep 2026 - 09:30"
+            },
+            {
+                id: "TR-2026-0003",
+                nombre: "Roberto Mamani Choque",
+                cedula: "7891234 OR",
+                tipo: "Pago de Impuestos Departamentales",
+                estado: "Pendiente",
+                fecha: "02 Sep 2026 - 10:15"
+            }
+        ];
+        guardarLocal();
     }
+}
 
-    // 3. Recorrer el arreglo y crear las filas HTML dinámicamente
-    listaTramites.forEach((tramite, index) => {
-        // Crear elemento de fila tr
-        const fila = document.createElement('tr');
+function guardarLocal() {
+    localStorage.setItem("oruro_registro_tramites_v2", JSON.stringify(tramites));
+}
 
-        // Llenar contenido de celdas
-        fila.innerHTML = `
-            <td><strong>${index + 1}</strong></td>
-            <td>${tramite.nombre}</td>
-            <td>${tramite.cedula}</td>
-            <td><span class="cell-badge">${tramite.tipo}</span></td>
-            <td>
-                <button class="btn-completar" onclick="completarTramite(${tramite.id})">
-                    <span>✔️</span> Completar
-                </button>
-            </td>
-        `;
+function actualizarContador() {
+    const el = document.getElementById("contador-tramites");
+    if (el) el.textContent = tramites.length;
+}
 
-        // Añadir la fila al tbody
-        tbodyTramites.appendChild(fila);
+function registrarTramite(e) {
+    e.preventDefault();
+
+    const nombre = document.getElementById("nombre").value.trim();
+    const cedula = document.getElementById("cedula").value.trim();
+    const tipo   = document.getElementById("tipo-tramite").value;
+
+    const num = String(tramites.length + 1).padStart(4, "0");
+    const id = `TR-2026-${num}`;
+    const fecha = new Date().toLocaleDateString('es-BO', { day:'2-digit', month:'short', year:'numeric' }) + " - " + new Date().toLocaleTimeString('es-BO', {hour:'2-digit', minute:'2-digit'});
+
+    const nuevo = { id, nombre, cedula, tipo, estado: "En Proceso", fecha };
+    tramites.unshift(nuevo);
+    guardarLocal();
+
+    document.getElementById("formulario-tramite").reset();
+    actualizarContador();
+    filtrarTramites();
+    mostrarToast(`Trámite ${id} registrado exitosamente.`, "success");
+    setTimeout(() => abrirFichaTramite(id), 300);
+}
+
+function eliminarTramite(id) {
+    if (confirm(`¿Eliminar el trámite ${id}?`)) {
+        tramites = tramites.filter(t => t.id !== id);
+        guardarLocal();
+        actualizarContador();
+        filtrarTramites();
+        mostrarToast(`Trámite ${id} eliminado.`, "warning");
+    }
+}
+
+function filtrarTramiteTexto() {
+    filtrarTramites();
+}
+
+function filtrarEstado(estado) {
+    filtrarTramites();
+}
+
+function filtrarTramites() {
+    const query = (document.getElementById("input-buscar-tramite")?.value || "").toLowerCase().trim();
+
+    tramitesFiltrados = tramites.filter(t => {
+        return !query || t.id.toLowerCase().includes(query) || t.nombre.toLowerCase().includes(query) || t.cedula.toLowerCase().includes(query);
     });
 
-    // 4. Actualizar el contador numérico en el encabezado
-    contadorTramites.innerText = listaTramites.length;
+    renderTabla();
 }
 
-// ------------------------------------------------------------------
-// 5. ACCIONES DEL CRUD (Registrar y Completar/Eliminar)
-// ------------------------------------------------------------------
+function renderTabla() {
+    const tbody = document.getElementById("tbody-tramites");
+    if (!tbody) return;
+    tbody.innerHTML = "";
 
-// RETO 4: Registrar un nuevo trámite
-function registrarTramite(event) {
-    // 1. Prevenir el comportamiento por defecto del formulario (evitar recarga de página)
-    event.preventDefault();
+    tramitesFiltrados.forEach(t => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>
+                <strong style="font-family:'JetBrains Mono',monospace;color:var(--primary-light);">${t.id}</strong>
+            </td>
+            <td>
+                <div style="font-weight:700;color:var(--text-main);">${t.nombre}</div>
+                <div style="font-size:0.68rem;color:var(--text-muted);">C.I.: ${t.cedula}</div>
+            </td>
+            <td>
+                <span style="font-size:0.8rem;color:var(--text-secondary);">${t.tipo}</span>
+            </td>
+            <td>
+                <span style="font-size:0.72rem;font-weight:800;padding:3px 8px;border-radius:999px;background:${t.estado === 'Aprobado' ? 'rgba(52,211,153,0.15)' : 'rgba(245,158,11,0.15)'};color:${t.estado === 'Aprobado' ? 'var(--primary-light)' : 'var(--accent-gold)'};">${t.estado}</span>
+            </td>
+            <td>
+                <div style="display:flex;gap:6px;">
+                    <button class="btn-ficha" onclick="abrirFichaTramite('${t.id}')" title="Ver Ticket A4">
+                        Ticket A4
+                    </button>
+                    <button class="btn-delete" onclick="eliminarTramite('${t.id}')">
+                        ✕
+                    </button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
 
-    // 2. Capturar valores y limpiar espacios innecesarios
-    const nombre = inputNombre.value.trim();
-    const cedula = inputCedula.value.trim();
-    const tipo = selectTramite.value;
+// ─── Modal A4 & Reporte ───────────────────────────────────────────
+function abrirFichaTramite(id) {
+    const t = tramites.find(item => item.id === id);
+    if (!t) return;
 
-    // 3. Validaciones básicas de seguridad
-    if (nombre === "" || cedula === "" || tipo === "") {
-        alert("Todos los campos son obligatorios.");
-        return;
+    const el = (elementId) => document.getElementById(elementId);
+    if (el("ficha-tramite-subtitle")) el("ficha-tramite-subtitle").textContent = `${t.id} · Ciudadano: ${t.nombre}`;
+    if (el("ficha-tramite-codigo"))   el("ficha-tramite-codigo").textContent   = `TICKET DE RECEPCIÓN N° ${t.id}`;
+    if (el("ficha-tramite-fecha"))    el("ficha-tramite-fecha").textContent    = t.fecha;
+    if (el("ficha-tramite-num"))      el("ficha-tramite-num").textContent      = t.id;
+    if (el("ficha-tramite-nombre"))   el("ficha-tramite-nombre").textContent   = t.nombre;
+    if (el("ficha-tramite-ci"))       el("ficha-tramite-ci").textContent       = t.cedula;
+    if (el("ficha-tramite-tipo"))     el("ficha-tramite-tipo").textContent     = t.tipo;
+    if (el("ficha-tramite-estado"))   el("ficha-tramite-estado").textContent   = t.estado;
+
+    document.getElementById("modal-ficha-tramite").classList.add("open");
+}
+
+function cerrarFichaTramite() {
+    document.getElementById("modal-ficha-tramite").classList.remove("open");
+}
+
+function imprimirFichaTramite() {
+    window.print();
+}
+
+function generarReporteEjecutivoTramites() {
+    const el = (elementId) => document.getElementById(elementId);
+    const tbody = el("reporte-tram-tabla-body");
+    if (tbody) {
+        tbody.innerHTML = tramites.map(t => `
+            <tr>
+                <td><strong>${t.id}</strong></td>
+                <td>${t.nombre}</td>
+                <td>${t.cedula}</td>
+                <td>${t.tipo}</td>
+                <td>${t.estado}</td>
+            </tr>
+        `).join("");
     }
 
-    // 4. Crear un objeto literal para el trámite con un ID único (timestamp)
-    const nuevoTramite = {
-        id: Date.now(), // ID único basado en milisegundos
-        nombre: nombre,
-        cedula: cedula,
-        tipo: tipo
-    };
-
-    // 5. Agregar el objeto al arreglo 'listaTramites'
-    listaTramites.push(nuevoTramite);
-
-    // 6. Guardar en LocalStorage y Renderizar
-    guardarEnLocalStorage();
-    renderizarTabla();
-
-    // 7. Resetear el formulario para un nuevo ingreso
-    formulario.reset();
+    const area = el("area-impresion-reporte-tramites");
+    if (area) area.style.display = "block";
+    window.print();
+    setTimeout(() => { if (area) area.style.display = "none"; }, 1000);
 }
 
-// RETO 5: Eliminar/Completar un trámite
-function completarTramite(id) {
-    // 1. Filtrar el arreglo 'listaTramites' para remover el trámite con el id seleccionado
-    listaTramites = listaTramites.filter(tramite => tramite.id !== id);
-
-    // 2. Guardar el arreglo actualizado en LocalStorage
-    guardarEnLocalStorage();
-
-    // 3. Renderizar la tabla de nuevo
-    renderizarTabla();
+function mostrarToast(mensaje, tipo = "info") {
+    const container = document.getElementById("toast-container");
+    if (!container) return;
+    const toast = document.createElement("div");
+    toast.className = `toast ${tipo}`;
+    toast.innerHTML = `<span>${mensaje}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3500);
 }
-
-// ------------------------------------------------------------------
-// 6. INICIALIZACIÓN Y EVENTOS
-// ------------------------------------------------------------------
-
-// Escuchar el submit del formulario para registrar
-formulario.addEventListener('submit', registrarTramite);
-
-// Función de arranque de la aplicación
-function inicializar() {
-    cargarDesdeLocalStorage();
-    renderizarTabla();
-}
-
-// Arrancar al cargar el documento
-document.addEventListener('DOMContentLoaded', inicializar);

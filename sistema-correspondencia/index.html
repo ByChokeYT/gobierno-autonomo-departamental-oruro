@@ -1,279 +1,393 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gobernación Oruro - Hojas de Ruta y Correspondencia</title>
-    <!-- Fuentes de Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/styles.css">
+    <title>Gobernación de Oruro — SISCO · Hojas de Ruta & Correspondencia Oficial</title>
+    <meta name="description" content="Sistema de gestión, radicación, derivación y seguimiento de Hojas de Ruta institucionales — Gobernación Autónoma Departamental de Oruro.">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./assets/css/styles.css">
 </head>
-
 <body>
+    <div class="carbon-grid-overlay"></div>
+    <div class="glow-orb orb-blue"></div>
+    <div class="glow-orb orb-gold"></div>
 
     <div class="app-workspace">
-        
-        <!-- Panel de Control Lateral (Sidebar) -->
+        <!-- ══════════════ SIDEBAR ══════════════ -->
         <aside class="sidebar">
             <div class="sidebar-brand">
-                <span class="brand-icon">🏛️</span>
+                <div class="brand-escudo-wrap">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo de Oruro" class="brand-escudo">
+                </div>
                 <div>
-                    <h2>Gobernación</h2>
-                    <p>Oruro - Bolivia</p>
+                    <h2>SISCO ORURO</h2>
+                    <p class="brand-sub">HOJAS DE RUTA · GAD-ORU</p>
                 </div>
             </div>
 
-            <!-- Botones de Navegación del Workspace (Pestañas) -->
+            <!-- Live Clock Widget -->
+            <div class="live-clock-widget">
+                <div class="clock-time" id="sisco-clock-time">00:00:00</div>
+                <div class="clock-badge">
+                    <span class="clock-badge-dot"></span>
+                    Ventanilla Única en Vivo
+                </div>
+            </div>
+
+            <!-- Navigation Tabs -->
             <nav class="navigation-menu">
-                <button class="nav-item active" data-tab="tab-registro">
-                    <span class="nav-icon">📥</span>
-                    <span class="nav-label">Ventanilla Única</span>
+                <div class="nav-section-label">PANEL PRINCIPAL</div>
+                <button class="nav-item active" onclick="cambiarPestana('registro')">
+                    <div class="nav-icon-box">📥</div>
+                    <span>Ventanilla Única</span>
                 </button>
-                <button class="nav-item" data-tab="tab-bandeja">
-                    <span class="nav-icon">💼</span>
-                    <span class="nav-label">Bandeja Interna</span>
+                <button class="nav-item" onclick="cambiarPestana('bandeja')">
+                    <div class="nav-icon-box">💼</div>
+                    <span>Bandeja Institucional</span>
                 </button>
-                <button class="nav-item" data-tab="tab-consulta">
-                    <span class="nav-icon">🔍</span>
-                    <span class="nav-label">Rastreo Ciudadano</span>
+                <button class="nav-item" onclick="cambiarPestana('rastreo')">
+                    <div class="nav-icon-box">🔍</div>
+                    <span>Rastreo de Hoja de Ruta</span>
+                </button>
+                <button class="nav-item" onclick="generarReporteEjecutivoCorrespondencia()" style="margin-top:10px;">
+                    <div class="nav-icon-box gold">📄</div>
+                    <span>Informe Ejecutivo A4</span>
                 </button>
             </nav>
 
             <div class="sidebar-footer">
-                <div class="server-status">
-                    <span class="status-indicator online"></span>
-                    <span>Servidor centralizado online</span>
+                <div class="user-operator-pill">
+                    <div class="operator-avatar">VU</div>
+                    <div class="operator-info">
+                        <span class="operator-name">Ventanilla Única</span>
+                        <span class="operator-role">Secretaría General GAD-ORU</span>
+                    </div>
+                </div>
+                <div class="hash-integrity-badge">
+                    🔒 Hash SHA-256 Verificado
                 </div>
             </div>
         </aside>
 
-        <!-- Contenedor Principal (Main Area) -->
+        <!-- ══════════════ MAIN CONTENT ══════════════ -->
         <main class="main-content">
-            
-            <!-- Cabecera Superior -->
             <header class="top-bar">
-                <div class="page-title-area">
-                    <span class="section-indicator">SISCO v2.5</span>
-                    <h1 id="page-current-title">Ventanilla Única de Registro</h1>
+                <div>
+                    <div class="badge-institutional">
+                        <span class="badge-dot"></span>
+                        SISTEMA DE GESTIÓN DOCUMENTAL · HOJAS DE RUTA SAFCO
+                    </div>
+                    <h1 id="page-title">Ventanilla Única de Correspondencia</h1>
                 </div>
-                
                 <div class="top-bar-stats">
                     <div class="quick-stat">
-                        <span class="stat-num" id="contador-tramites">0</span>
-                        <span class="stat-lbl">Trámites Activos</span>
+                        <span class="stat-num" id="stat-total-tramites">0</span>
+                        <span class="stat-lbl">Hojas de Ruta</span>
                     </div>
                 </div>
             </header>
 
-            <!-- Sección de Contenido Dinámico (Pestañas) -->
-            <div class="workspace-body">
-                
-                <!-- PESTAÑA 1: Ventanilla Única (Registro) -->
-                <div id="tab-registro" class="tab-pane active">
-                    <div class="card-focus centered-card">
-                        <div class="card-header">
-                            <h2>Nueva Correspondencia Externa</h2>
-                            <p>Registre solicitudes externas para iniciar la Hoja de Ruta institucional.</p>
+            <!-- ══════ PESTAÑA 1: REGISTRO ══════ -->
+            <div id="pane-registro" class="tab-pane active">
+                <div class="card-focus">
+                    <div class="card-header">
+                        <h2>Nueva Hoja de Ruta / Correspondencia Externa</h2>
+                        <p>Registre solicitudes ciudadanas e institucionales para radicar la Hoja de Ruta oficial.</p>
+                    </div>
+
+                    <form id="form-correspondencia" autocomplete="off" onsubmit="registrarCorrespondencia(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="input-remitente">Nombre Completo del Remitente</label>
+                                <input type="text" id="input-remitente" placeholder="Ej. Juan Pérez Ramos" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="input-ci">Cédula de Identidad (C.I.) / Institución</label>
+                                <input type="text" id="input-ci" placeholder="Ej. 4581298 OR" required>
+                            </div>
                         </div>
-                        
-                        <form id="form-correspondencia" autocomplete="off">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="input-remitente">Nombre del Remitente</label>
-                                    <input type="text" id="input-remitente" placeholder="Ej. Juan Pérez Ramos" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="input-ci">Cédula de Identidad (CI)</label>
-                                    <input type="text" id="input-ci" placeholder="Ej. 1234567 OR" required>
-                                </div>
-                            </div>
 
-                            <div class="form-group">
-                                <label for="input-asunto">Asunto / Descripción de la Solicitud</label>
-                                <textarea id="input-asunto" placeholder="Detalle brevemente el trámite o los documentos adjuntos..." rows="4" required></textarea>
-                            </div>
+                        <div class="form-group">
+                            <label for="input-asunto">Asunto / Resumen de la Solicitud</label>
+                            <textarea id="input-asunto" placeholder="Describa el objetivo del trámite, montos solicitados o documentos adjuntos..." rows="3" required></textarea>
+                        </div>
 
+                        <div class="form-row">
                             <div class="form-group">
-                                <label for="select-destino-inicial">Oficina de Destino Inicial</label>
-                                <select id="select-destino-inicial" required>
-                                    <option value="">Seleccione dependencia...</option>
+                                <label for="select-destino">Secretaría / Unidad de Destino Inicial</label>
+                                <select id="select-destino">
                                     <option value="Secretaría General">Secretaría General</option>
-                                    <option value="Dirección de Obras Públicas">Dirección de Obras Públicas</option>
-                                    <option value="Asesoría Jurídica">Asesoría Jurídica</option>
-                                    <option value="Unidad de Planificación">Unidad de Planificación</option>
-                                    <option value="Dirección Financiera">Dirección Financiera</option>
+                                    <option value="Obras Públicas (SEDECA)">Secretaría de Obras Públicas (SEDECA)</option>
+                                    <option value="Medio Ambiente y Agua">Secretaría de Medio Ambiente y Agua</option>
+                                    <option value="Asuntos Jurídicos">Dirección General de Asuntos Jurídicos</option>
+                                    <option value="Economía y Finanzas">Secretaría de Economía y Finanzas</option>
+                                    <option value="Minería y Metalurgia">Dirección de Minería y Metalurgia</option>
                                 </select>
                             </div>
+                            <div class="form-group">
+                                <label for="select-prioridad">Prioridad Operativa</label>
+                                <select id="select-prioridad">
+                                    <option value="Normal">Normal (Atención Regular 72 hrs)</option>
+                                    <option value="Urgente">Urgente (Atención Prioritaria 24 hrs)</option>
+                                    <option value="Muy Urgente">Muy Urgente / Despacho Inmediato</option>
+                                </select>
+                            </div>
+                        </div>
 
-                            <button type="submit" id="btn-registrar" class="btn-glow">Iniciar Flujo Documental</button>
-                        </form>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-glow">Radicar Hoja de Ruta &amp; Generar Ticket A4</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ══════ PESTAÑA 2: BANDEJA ══════ -->
+            <div id="pane-bandeja" class="tab-pane">
+                <div class="card-focus">
+                    <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+                        <div>
+                            <h2>Bandeja Institucional de Hojas de Ruta</h2>
+                            <p>Hojas de ruta en tránsito entre Secretarías con timeline de derivación en vivo.</p>
+                        </div>
+                        <input type="text" id="input-buscar-hr" placeholder="Buscar por N° HR, remitente o asunto..." style="background:var(--bg-input);border:1px solid var(--border-main);border-radius:var(--radius-md);color:#fff;padding:8px 14px;font-size:0.85rem;width:260px;" oninput="filtrarHojasRuta()">
+                    </div>
+
+                    <div class="table-responsive" style="margin-top:18px;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Hoja de Ruta</th>
+                                    <th>Remitente</th>
+                                    <th>Asunto</th>
+                                    <th>Ubicación Actual</th>
+                                    <th>Prioridad</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-hojas-body">
+                                <!-- Dinámico -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
+            </div>
 
-                <!-- PESTAÑA 2: Bandeja Interna (Tabla de Derivaciones) -->
-                <div id="tab-bandeja" class="tab-pane">
-                    <div class="card-focus table-card">
-                        <div class="card-header flex-header">
-                            <div>
-                                <h2>Correspondencia Registrada</h2>
-                                <p>Seleccione un trámite para ver detalles y derivarlo a otra oficina.</p>
-                            </div>
-                        </div>
+            <!-- ══════ PESTAÑA 3: RASTREO ══════ -->
+            <div id="pane-rastreo" class="tab-pane">
+                <div class="card-focus">
+                    <div class="card-header">
+                        <h2>Rastreo Ciudadano de Hoja de Ruta</h2>
+                        <p>Ingrese el código de Hoja de Ruta para auditar su estado y línea de tiempo.</p>
+                    </div>
 
-                        <div class="table-responsive">
-                            <table id="tabla-hojas-ruta">
-                                <thead>
-                                    <tr>
-                                        <th>Código</th>
-                                        <th>Remitente</th>
-                                        <th>Asunto / Solicitud</th>
-                                        <th>Ubicación Actual</th>
-                                        <th>Estado</th>
-                                        <th>Acción</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tbody-hojas-ruta">
-                                    <!-- Dinámico -->
-                                </tbody>
-                            </table>
+                    <div style="display:flex;gap:12px;margin:20px 0;max-width:550px;">
+                        <input type="text" id="input-rastreo-codigo" placeholder="Ej. HR-2026-0001" style="flex:1;background:var(--bg-input);border:1px solid var(--border-main);border-radius:var(--radius-md);color:#fff;padding:12px 16px;font-family:var(--font-mono);font-size:0.95rem;">
+                        <button class="btn-primary" onclick="buscarRastreoCiudadano()">Buscar Hoja de Ruta</button>
+                    </div>
 
-                            <div id="tabla-vacía" class="empty-state">
-                                <div class="empty-animation">📁</div>
-                                <h3>Bandeja sin registros</h3>
-                                <p>No existen Hojas de Ruta activas en este momento.</p>
-                            </div>
-                        </div>
+                    <div id="contenedor-resultado-rastreo" style="display:none;background:rgba(255,255,255,0.03);border:1px solid var(--border-main);border-radius:var(--radius-lg);padding:24px;margin-top:20px;">
+                        <!-- Dinámico -->
                     </div>
                 </div>
-
-                <!-- PESTAÑA 3: Consulta y Rastreo Ciudadano -->
-                <div id="tab-consulta" class="tab-pane">
-                    <div class="consulta-layout">
-                        
-                        <div class="card-focus search-box-card">
-                            <h2>Rastreador de Hojas de Ruta</h2>
-                            <p>Escriba el código correlativo para consultar el historial de oficinas por las que pasó el documento.</p>
-                            
-                            <div class="search-field">
-                                <input type="text" id="input-buscar-codigo" placeholder="Ej. HR-OR-2026-0001">
-                                <button type="button" id="btn-buscar">Rastrear</button>
-                            </div>
-                        </div>
-
-                        <!-- Panel de Resultados del Rastreo -->
-                        <div id="resultado-seguimiento" class="resultado-seguimiento-area">
-                            
-                            <!-- Estado inicial sin búsquedas -->
-                            <div id="seguimiento-vacio" class="tracking-empty">
-                                <div class="empty-glow-icon">🔍</div>
-                                <h3>Esperando Código</h3>
-                                <p>Ingrese un código de Hoja de Ruta para mostrar la línea de tiempo.</p>
-                            </div>
-
-                            <!-- Información General del Documento Encontrado -->
-                            <div id="info-tramite-buscado" class="tracking-info-card hidden">
-                                <div class="info-card-header">
-                                    <div>
-                                        <span class="tracking-label">Código Único</span>
-                                        <h3 id="info-codigo">HR-OR-2026-0001</h3>
-                                    </div>
-                                    <div style="display: flex; gap: 10px; align-items: center;">
-                                        <button type="button" id="btn-imprimir-ficha" class="btn-print">🖨️ Imprimir Ficha</button>
-                                        <span id="info-estado" class="badge">Pendiente</span>
-                                    </div>
-                                </div>
-                                <div class="info-card-body">
-                                    <p><strong>Remitente:</strong> <span id="info-remitente">-</span></p>
-                                    <p><strong>Asunto:</strong> <span id="info-asunto">-</span></p>
-                                </div>
-                            </div>
-
-                            <!-- Línea de Tiempo del Historial de Derivaciones -->
-                            <div id="timeline-derivaciones" class="tracking-timeline hidden">
-                                <!-- Elementos dinámicos -->
-                            </div>
-
-                        </div>
-
-                    </div>
-                </div>
-
             </div>
         </main>
     </div>
 
-    <!-- Panel Lateral Deslizable (Sliding Drawer) para Derivaciones -->
-    <div id="drawer-derivacion" class="drawer-overlay hidden">
-        <div class="drawer-content">
-            <div class="drawer-header">
-                <div>
-                    <h2>Derivación de Documento</h2>
-                    <p>Mueva el expediente a la oficina correspondiente añadiendo un proveído.</p>
+    <!-- ══════ MODAL: Hoja de Ruta A4 SAFCO ══════ -->
+    <div id="modal-ficha-hr" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-actions-bar">
+                <div class="modal-title-group">
+                    <div class="modal-title-icon">🏛️</div>
+                    <div>
+                        <h3>Hoja de Ruta Departamental SAFCO</h3>
+                        <p class="modal-subtitle" id="ficha-hr-subtitle">Documento Oficial de Derivación · Ventanilla Única</p>
+                    </div>
                 </div>
-                <button type="button" id="btn-cerrar-drawer" class="btn-close-drawer">&times;</button>
+                <div class="header-actions">
+                    <button class="btn-secondary" onclick="cerrarFichaHR()">Cerrar</button>
+                    <button class="btn-primary" onclick="imprimirFichaHR()">Imprimir Hoja de Ruta A4</button>
+                </div>
             </div>
 
-            <form id="form-derivar" autocomplete="off">
-                <input type="hidden" id="modal-tramite-id">
-                
-                <div class="drawer-meta-box">
-                    <div>
-                        <span class="meta-label">Trámite</span>
-                        <span class="meta-val" id="modal-codigo-tramite">-</span>
+            <div class="documento-resolucion" id="area-impresion-hr">
+                <div class="escudo-agua"></div>
+
+                <div class="resolucion-header">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo" class="res-escudo">
+                    <div class="res-header-text">
+                        <h3>GOBIERNO AUTÓNOMO DEPARTAMENTAL DE ORURO</h3>
+                        <h5>SECRETARÍA GENERAL · VENTANILLA ÚNICA DE CORRESPONDENCIA</h5>
+                        <h4 id="ficha-hr-codigo">HOJA DE RUTA DEPARTAMENTAL N° HR-2026-0001</h4>
                     </div>
-                    <div>
-                        <span class="meta-label">Ubicación Actual</span>
-                        <span class="meta-val" id="modal-ubicacion-tramite">-</span>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="select-oficina-destino">Oficina Destinataria (Derivar a):</label>
-                    <select id="select-oficina-destino" required>
-                        <option value="">Seleccione oficina destino...</option>
-                        <option value="Secretaría General">Secretaría General</option>
-                        <option value="Dirección de Obras Públicas">Dirección de Obras Públicas</option>
-                        <option value="Asesoría Jurídica">Asesoría Jurídica</option>
-                        <option value="Unidad de Planificación">Unidad de Planificación</option>
-                        <option value="Dirección Financiera">Dirección Financiera</option>
-                        <option value="Archivo Central (Completado)">Archivo Central (Completado)</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="select-nuevo-estado">Nuevo Estado del Trámite:</label>
-                    <select id="select-nuevo-estado" required>
-                        <option value="En Revisión">En Revisión</option>
-                        <option value="Aprobado">Aprobado</option>
-                        <option value="Observado / Pendiente">Observado / Pendiente</option>
-                        <option value="Archivado / Completado">Archivado / Completado</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="textarea-proveido">Proveído / Instrucción Oficial:</label>
-                    <textarea id="textarea-proveido" placeholder="Ej: Remito para su respectiva consideración técnica..." rows="5" required></textarea>
-                </div>
-
-                <div class="form-group checkbox-group">
-                    <div class="checkbox-wrapper">
-                        <input type="checkbox" id="checkbox-firma-digital">
-                        <label for="checkbox-firma-digital" class="label-checkbox">🔒 Firmar digitalmente con ADSIB (Bolivia)</label>
+                    <div class="seal-top-right">
+                        <div class="gold-official-seal">
+                            <span>SISCO<br>ORURO</span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="drawer-footer">
-                    <button type="button" id="btn-cancelar-drawer" class="btn-secondary">Cancelar</button>
-                    <button type="submit" id="btn-guardar-derivacion" class="btn-primary">Guardar Derivación</button>
+                <div class="resolucion-body">
+                    <p class="fecha-emision">Oruro, <span id="ficha-hr-fecha">02 de Septiembre de 2026</span></p>
+
+                    <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.86rem;color:#000;" border="1" cellpadding="8">
+                        <tr>
+                            <td style="background:#f8fafc;font-weight:700;width:30%;">N° HOJA DE RUTA:</td>
+                            <td><strong id="ficha-hr-num" style="color:#0284c7;font-size:1.05rem;">HR-2026-0001</strong></td>
+                        </tr>
+                        <tr>
+                            <td style="background:#f8fafc;font-weight:700;">REMITENTE / C.I.:</td>
+                            <td><span id="ficha-hr-remitente">Juan Pérez Ramos</span> | C.I.: <strong id="ficha-hr-ci">4581298 OR</strong></td>
+                        </tr>
+                        <tr>
+                            <td style="background:#f8fafc;font-weight:700;">ASUNTO:</td>
+                            <td><span id="ficha-hr-asunto">Solicitud de asfaltado tramo Caracollo - La Joya</span></td>
+                        </tr>
+                        <tr>
+                            <td style="background:#f8fafc;font-weight:700;">DESTINO INICIAL / PRIORIDAD:</td>
+                            <td><strong id="ficha-hr-destino">Secretaría de Obras Públicas</strong> | Prioridad: <span id="ficha-hr-prioridad">Normal</span></td>
+                        </tr>
+                    </table>
+
+                    <h4 style="font-family:var(--font-brand);font-size:0.95rem;margin-top:24px;color:#000;border-bottom:1px solid #000;padding-bottom:4px;">MATRIZ DE PROVEÍDOS Y DERIVACIONES OFICIALES:</h4>
+
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;">
+                        <div style="border:1px solid #000;padding:12px;min-height:100px;font-size:0.75rem;">
+                            <strong>PROVEÍDO 1 (DESPACHO):</strong>
+                            <p style="margin-top:6px;color:#444;">Para su conocimiento, informe técnico y tratamiento legal correspondiente.</p>
+                            <div style="margin-top:25px;border-top:1px stroke #000;text-align:center;">Firma y Sello Recibido</div>
+                        </div>
+                        <div style="border:1px solid #000;padding:12px;min-height:100px;font-size:0.75rem;">
+                            <strong>PROVEÍDO 2 (SECRETARÍA DE DESTINO):</strong>
+                            <p style="margin-top:6px;color:#444;">Proceder con la inspección en campo y remisión de informe en 48 hrs.</p>
+                            <div style="margin-top:25px;border-top:1px stroke #000;text-align:center;">Firma y Sello Recibido</div>
+                        </div>
+                    </div>
                 </div>
-            </form>
+
+                <div class="resolucion-verification-row">
+                    <div class="qr-box-simulated">
+                        <svg width="56" height="56" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M2 2h8v8H2V2zm2 2v4h4V4H4zm8-2h8v8h-8V2zm2 2v4h4V4h-4zM2 14h8v8H2v-8zm2 2v4h4v-4H4zm13-2h3v3h-3v-3zm0 5h3v3h-3v-3zm-5-5h3v3h-3v-3zm0 5h3v3h-3v-3z"/>
+                        </svg>
+                        <span>Registro de Ventanilla Única GAD-ORU</span>
+                    </div>
+
+                    <div class="security-hash-block">
+                        <small>HASH DE INTEGRIDAD CRIPTOGRÁFICA SHA-256:</small>
+                        <code id="ficha-hr-hash">SHA256: 202609876543210123456789abcdef0123456789abcdef0123456789abcdef</code>
+                    </div>
+                </div>
+
+                <div class="resolucion-firmas">
+                    <div class="firma-block">
+                        <div class="linea-firma"></div>
+                        <p><strong>Encargado Ventanilla Única</strong></p>
+                        <p>Gobierno Autónomo Departamental de Oruro</p>
+                    </div>
+                    <div class="firma-block">
+                        <div class="linea-firma"></div>
+                        <p><strong>Recepción Secretaría de Destino</strong></p>
+                        <p>Cargo y Firma del Funcionario</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <script src="src/main.js"></script>
-</body>
+    <!-- ══════ MODAL: Timeline Derivación ══════ -->
+    <div id="modal-derivacion-hr" class="modal-overlay">
+        <div class="modal-content" style="max-width:650px;">
+            <div class="modal-actions-bar">
+                <div class="modal-title-group">
+                    <div class="modal-title-icon">🔄</div>
+                    <div>
+                        <h3>Derivar Hoja de Ruta a Nueva Secretaría</h3>
+                        <p class="modal-subtitle" id="deriv-modal-subtitle">Asignación de Proveído e Historial de Radicación</p>
+                    </div>
+                </div>
+                <button class="btn-secondary" onclick="cerrarDerivacionModal()">✕</button>
+            </div>
 
+            <div style="padding:24px;">
+                <form id="form-derivar-hr" onsubmit="guardarDerivacion(event)">
+                    <div class="form-group">
+                        <label for="select-nueva-oficina">Derivar a Nueva Secretaría / Unidad</label>
+                        <select id="select-nueva-oficina" required>
+                            <option value="Secretaría General">Secretaría General</option>
+                            <option value="Obras Públicas (SEDECA)">Secretaría de Obras Públicas (SEDECA)</option>
+                            <option value="Medio Ambiente y Agua">Secretaría de Medio Ambiente y Agua</option>
+                            <option value="Asuntos Jurídicos">Dirección General de Asuntos Jurídicos</option>
+                            <option value="Economía y Finanzas">Secretaría de Economía y Finanzas</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-instruccion">Instrucción / Proveído Oficial</label>
+                        <textarea id="input-instruccion" placeholder="Escriba la instrucción u observación formal..." rows="3" required></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="cerrarDerivacionModal()">Cancelar</button>
+                        <button type="submit" class="btn-primary">Registrar Derivación Oficial</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════ IMPRESIÓN REPORTE EJECUTIVO A4 ══════ -->
+    <div id="area-impresion-reporte-correspondencia" class="documento-resolucion" style="display:none;">
+        <div class="resolucion-header">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_departamental_de_Oruro.jpg" alt="Escudo" class="res-escudo">
+            <div class="res-header-text">
+                <h3>GOBIERNO AUTÓNOMO DEPARTAMENTAL DE ORURO</h3>
+                <h5>SECRETARÍA GENERAL · SISTEMA DE GESTIÓN DOCUMENTAL</h5>
+                <h4>INFORME EJECUTIVO CONSOLIDADO DE HOJAS DE RUTA</h4>
+            </div>
+            <div class="gold-official-seal">
+                <span>AUDITORÍA<br>SISCO</span>
+            </div>
+        </div>
+
+        <div class="resolucion-body">
+            <p class="fecha-emision">Oruro, <span id="reporte-hr-fecha">02 de Septiembre de 2026</span></p>
+            <p><strong>CONSOLIDADO DE HOJAS DE RUTA REGISTRADAS:</strong> Resumen de la correspondencia oficial tramitada en la Ventanilla Única.</p>
+
+            <table style="width:100%;border-collapse:collapse;margin-top:20px;font-size:0.8rem;color:#000;" border="1" cellpadding="6">
+                <thead>
+                    <tr style="background:#e2e8f0;">
+                        <th>N° HR</th>
+                        <th>Remitente</th>
+                        <th>Asunto</th>
+                        <th>Ubicación Actual</th>
+                        <th>Prioridad</th>
+                    </tr>
+                </thead>
+                <tbody id="reporte-hr-tabla-body">
+                    <!-- Dinámico -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="resolucion-firmas">
+            <div class="firma-block">
+                <div class="linea-firma"></div>
+                <p><strong>Ventanilla Única de Correspondencia</strong></p>
+                <p>GAD-ORURO</p>
+            </div>
+            <div class="firma-block">
+                <div class="linea-firma"></div>
+                <p><strong>Secretaría General</strong></p>
+                <p>Gobierno Autónomo Departamental de Oruro</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="./src/main.js"></script>
+</body>
 </html>
